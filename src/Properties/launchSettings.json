@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "RainBOT": {
+      "commandName": "Project",
+      "commandLineArgs": "--debug"
+    }
+  }
+}

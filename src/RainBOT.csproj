@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <RootNamespace>Milimoe.RainBOT</RootNamespace>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <BaseOutputPath>..\bin</BaseOutputPath>
+    <Authors>Milimoe</Authors>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DebugType>embedded</DebugType>
+    <NoWarn>1701;1702;SYSLIB1045</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DebugType>embedded</DebugType>
+    <NoWarn>1701;1702;SYSLIB1045</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="OneBot-HTTPClient">
+      <HintPath>..\..\OneBot-HTTPClient\bin\Debug\net8.0\OneBot-HTTPClient.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>
