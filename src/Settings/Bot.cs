@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Reflection;
+using System.Text.Json;
 using Milimoe.OneBot.Framework;
 using Milimoe.OneBot.Framework.Utility;
 using Milimoe.OneBot.Model.Content;
@@ -54,6 +55,31 @@ namespace Milimoe.RainBOT.Settings
                     GroupMembers.Add(g.group_id, data.Deserialize<List<Member>>(JsonTools.options) ?? []);
                 }
             }
+        }
+
+        public static Member GetMember(long group_id, long user_id)
+        {
+            if (GroupMembers.TryGetValue(group_id, out List<Member>? members) && members != null)
+            {
+                Member? member = members.Where(m => m.user_id == user_id).FirstOrDefault();
+                if (member != null)
+                {
+                    return member;
+                }
+            }
+            return new();
+        }
+
+        public static string GetMemberNickName(long group_id, long user_id)
+        {
+            Member member = GetMember(group_id, user_id);
+            if (member.user_id != 0) return member.card != "" ? member.card : member.nickname;
+            return "";
+        }
+
+        public static string GetMemberNickName(Member member)
+        {
+            return member.card != "" ? member.card : member.nickname;
         }
     }
 }

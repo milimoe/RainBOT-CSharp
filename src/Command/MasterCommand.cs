@@ -275,6 +275,20 @@ namespace Milimoe.RainBOT.Command
                                 }
                             }
                             break;
+                        case "osmcoregroup":
+                            if (args.Length > 1 && long.TryParse(args[1].Trim(), out long osmcoregroup_id))
+                            {
+                                string args0 = args[0].ToString().Trim();
+                                if (args0 == "add" || args0 == "remove" || args0 == "+" || args0 == "-")
+                                {
+                                    isadd = args0 == "add" || args0 == "+";
+                                    if (isadd) GeneralSettings.OSMCoreGroup.Add(osmcoregroup_id);
+                                    else GeneralSettings.OSMCoreGroup.Remove(osmcoregroup_id);
+                                    msg = AddRemoveAccessGroupMember("OSM核心启用群聊", isadd, osmcoregroup_id);
+                                    return msg;
+                                }
+                            }
+                            break;
                     }
                     return "OSM Core：指令格式不正确或传入的参数不支持。\r\n格式：.osm <command> [part] [args...]";
             }

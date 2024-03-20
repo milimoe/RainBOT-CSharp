@@ -36,40 +36,49 @@ namespace Milimoe.RainBOT.ListeningTask
                     Console.ForegroundColor = ConsoleColor.Gray;
                 }
 
-                MuteRecall.Muted[e.group_id].Remove(e.user_id);
+                if (MuteRecall.Muted.TryGetValue(e.group_id, out Dictionary<long, long>? mute_group) && mute_group != null) mute_group.Remove(e.user_id);
 
+                bool onOSMCore = GeneralSettings.OSMCoreGroup.Contains(e.group_id);
                 // OSM指令
                 if (e.detail.Length >= 4 && e.detail[..4] == ".osm")
                 {
                     if (GeneralSettings.IsRun && e.detail.Contains(".osm info"))
                     {
                         // OSM核心状态
-                        string msg = "OSM插件运行状态：" + "\r\n本群已启用OSM核心";
-                        if (GeneralSettings.IsRepeat)
+                        string msg = "OSM插件运行状态：";
+                        if (onOSMCore)
                         {
-                            msg += "\r\n随机复读：开启";
-                            msg += $"\r\n随机复读概率：{GeneralSettings.PRepeat}%" +
-                                $"\r\n随机复读延迟区间：{GeneralSettings.RepeatDelay[0]}至{GeneralSettings.RepeatDelay[1]}秒";
+                            msg += "\r\n本群已启用OSM核心";
+                            if (GeneralSettings.IsRepeat)
+                            {
+                                msg += "\r\n随机复读：开启";
+                                msg += $"\r\n随机复读概率：{GeneralSettings.PRepeat}%" +
+                                    $"\r\n随机复读延迟区间：{GeneralSettings.RepeatDelay[0]}至{GeneralSettings.RepeatDelay[1]}秒";
+                            }
+                            else msg += "\r\n随机复读：关闭";
+                            if (GeneralSettings.IsOSM)
+                            {
+                                msg += "\r\n随机OSM：开启";
+                                msg += $"\r\n随机OSM概率：{GeneralSettings.POSM}%";
+                            }
+                            else msg += "\r\n随机OSM：关闭";
+                            if (GeneralSettings.IsSayNo)
+                            {
+                                msg += "\r\n随机反驳不：开启";
+                                msg += $"\r\n随机反驳不概率：{GeneralSettings.PSayNo}%";
+                            }
+                            else msg += "\r\n随机反驳不：关闭";
+                            if (GeneralSettings.IsMute)
+                            {
+                                msg += "\r\n禁言抽奖：开启";
+                                msg += $"\r\n禁言抽奖时长区间：{GeneralSettings.MuteTime[0]}至{GeneralSettings.MuteTime[1]}秒";
+                            }
+                            else msg += "\r\n禁言抽奖：关闭";
                         }
-                        else msg += "\r\n随机复读：关闭";
-                        if (GeneralSettings.IsOSM)
+                        else
                         {
-                            msg += "\r\n随机OSM：开启";
-                            msg += $"\r\n随机OSM概率：{GeneralSettings.POSM}%";
+                            msg += "\r\n本群未启用OSM核心";
                         }
-                        else msg += "\r\n随机OSM：关闭";
-                        if (GeneralSettings.IsSayNo)
-                        {
-                            msg += "\r\n随机反驳不：开启";
-                            msg += $"\r\n随机反驳不概率：{GeneralSettings.PSayNo}%";
-                        }
-                        else msg += "\r\n随机反驳不：关闭";
-                        if (GeneralSettings.IsMute)
-                        {
-                            msg += "\r\n禁言抽奖：开启";
-                            msg += $"\r\n禁言抽奖时长区间：{GeneralSettings.MuteTime[0]}至{GeneralSettings.MuteTime[1]}秒";
-                        }
-                        else msg += "\r\n禁言抽奖：关闭";
                         _ = Post(e, "OSM状态", msg);
                     }
                     else if (GeneralSettings.IsRun && e.detail.Contains(".osm stop"))
@@ -226,6 +235,7 @@ namespace Milimoe.RainBOT.ListeningTask
                     if (int.TryParse(reply.data.id, out int id))
                     {
                         TaskUtility.NewTask(async () => await Post(SupportedAPI.delete_msg, e.group_id, "撤回", new DeleteMsgContent(id)));
+                        TaskUtility.NewTask(async () => await Post(SupportedAPI.delete_msg, e.group_id, "撤回", new DeleteMsgContent(e.real_id)));
                         return;
                     }
                 }
@@ -366,6 +376,61 @@ namespace Milimoe.RainBOT.ListeningTask
                     });
                     return;
                 }
+                if (e.detail.Contains("马云", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    TaskUtility.NewTask(async () =>
+                    {
+                        if (!await CheckBlackList(e)) return;
+                        GroupMessageContent content = new(e.group_id);
+                        content.message.Add(new RecordMessage(Music.MusicList["马云"]));
+                        await Post(e, "Record", content);
+                    });
+                    return;
+                }
+                if (e.detail.Contains("电锯", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    TaskUtility.NewTask(async () =>
+                    {
+                        if (!await CheckBlackList(e)) return;
+                        GroupMessageContent content = new(e.group_id);
+                        content.message.Add(new RecordMessage(Music.MusicList["电锯"]));
+                        await Post(e, "Record", content);
+                    });
+                    return;
+                }
+                if (e.detail.Contains("疤王", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    TaskUtility.NewTask(async () =>
+                    {
+                        if (!await CheckBlackList(e)) return;
+                        GroupMessageContent content = new(e.group_id);
+                        content.message.Add(new RecordMessage(Music.MusicList["疤王"]));
+                        await Post(e, "Record", content);
+                    });
+                    return;
+                }
+                if (e.detail.Contains("终极", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    TaskUtility.NewTask(async () =>
+                    {
+                        if (!await CheckBlackList(e)) return;
+                        GroupMessageContent content = new(e.group_id);
+                        content.message.Add(new RecordMessage(Music.MusicList["终极"]));
+                        await Post(e, "Record", content);
+                    });
+                    return;
+                }
+                if (e.detail.Contains("音乐", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    TaskUtility.NewTask(async () =>
+                    {
+                        if (!await CheckBlackList(e)) return;
+                        GroupMessageContent content = new(e.group_id);
+                        content.message.Add(new RecordMessage(Music.MusicList[Music.MusicList.Keys.ToArray()[new Random().Next(Music.MusicList.Count)]]));
+                        await Post(e, "Record", content);
+                    });
+                    return;
+                }
 
                 // 我的运势
                 if (e.detail == "我的运势")
@@ -452,7 +517,7 @@ namespace Milimoe.RainBOT.ListeningTask
                                 if (Daily.UserDailys.TryGetValue(qq, out string? daily) && daily != null)
                                 {
                                     GroupMessageContent content = new(e.group_id);
-                                    content.message.Add(new TextMessage(qq + "的今日运势是：\r\n" + daily));
+                                    content.message.Add(new TextMessage(qq + "（" + Bot.GetMemberNickName(e.group_id, e.user_id) + "）的今日运势是：\r\n" + daily));
                                     await Post(e, "查看运势", content);
                                 }
                                 else
@@ -464,6 +529,9 @@ namespace Milimoe.RainBOT.ListeningTask
                     });
                     return;
                 }
+
+                // 下面是开启了OSM Core的群组才能使用的功能
+                if (!onOSMCore) return;
 
                 // 禁言抽奖
                 if (GeneralSettings.IsMute && e.detail == "禁言抽奖" && !MuteRecall.WillMute.ContainsKey(e.user_id))
@@ -636,7 +704,7 @@ namespace Milimoe.RainBOT.ListeningTask
                 else if (e.detail.Contains("可以") && !e.detail.Contains('不') && e.CheckThrow(GeneralSettings.PSayNo, out dice))
                 {
                     ColorfulCheckPass(sender, "随机反驳不", dice, GeneralSettings.PSayNo);
-                    if (dice < 20)
+                    if (dice < (GeneralSettings.PSayNo / 2))
                     {
                         _ = Post(e, "随机反驳不", "可以");
                     }
@@ -645,10 +713,10 @@ namespace Milimoe.RainBOT.ListeningTask
                         _ = Post(e, "随机反驳不", "不可以");
                     }
                 }
-                else if (e.detail.Contains('能') && !e.detail.Contains('不') && !e.detail.Contains('可') && e.CheckThrow(GeneralSettings.PSayNo, out dice))
+                else if (e.detail.Contains('能') && !e.detail.Contains('不') && !e.detail.Contains('技') && !e.detail.Contains('可') && e.CheckThrow(GeneralSettings.PSayNo, out dice))
                 {
                     ColorfulCheckPass(sender, "随机反驳不", dice, GeneralSettings.PSayNo);
-                    if (dice < 20)
+                    if (dice < (GeneralSettings.PSayNo / 2))
                     {
                         _ = Post(e, "随机反驳不", "能");
                     }
@@ -660,7 +728,7 @@ namespace Milimoe.RainBOT.ListeningTask
                 else if (e.detail.Contains("可能") && !e.detail.Contains('不') && e.CheckThrow(GeneralSettings.PSayNo, out dice))
                 {
                     ColorfulCheckPass(sender, "随机反驳不", dice, GeneralSettings.PSayNo);
-                    if (dice < 20)
+                    if (dice < (GeneralSettings.PSayNo / 2))
                     {
                         _ = Post(e, "随机反驳不", "可能");
                     }

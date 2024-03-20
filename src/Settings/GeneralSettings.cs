@@ -48,6 +48,8 @@ namespace Milimoe.RainBOT.Settings
 
         public static List<long> RecallAccessGroup { get; set; } = [];
 
+        public static List<long> OSMCoreGroup { get; set; } = [];
+
         public static PluginConfig Configs { get; set; } = new("rainbot", "config");
 
         public static void LoadSetting()
@@ -138,6 +140,10 @@ namespace Milimoe.RainBOT.Settings
             {
                 RecallAccessGroup = (List<long>)value;
             }
+            if (configs.TryGetValue("OSMCoreGroup", out value) && value != null)
+            {
+                OSMCoreGroup = (List<long>)value;
+            }
         }
 
         public static void SaveConfig()
@@ -162,6 +168,7 @@ namespace Milimoe.RainBOT.Settings
             Configs.Add("MuteAccessGroup", MuteAccessGroup);
             Configs.Add("UnMuteAccessGroup", UnMuteAccessGroup);
             Configs.Add("RecallAccessGroup", RecallAccessGroup);
+            Configs.Add("OSMCoreGroup", OSMCoreGroup);
             Configs.Save();
         }
     }
