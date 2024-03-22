@@ -151,7 +151,7 @@ try
             }
         }
     });
-    
+
     _ = Task.Factory.StartNew(async () =>
     {
         while (true)
@@ -172,19 +172,42 @@ try
             }
         }
     });
-    
-    // 循环接收消息，此线程会在没有请求时阻塞
+
+    bool isListening = true;
+    CancellationTokenSource cts = new();
+    CancellationToken ct = cts.Token;
+
+    Task t = Task.Factory.StartNew(() =>
+    {
+        // 循环接收消息，此线程会在没有请求时阻塞
+        while (isListening)
+        {
+            try
+            {
+                listener.GetContext();
+            }
+            catch (Exception e)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(e);
+                Console.ForegroundColor = ConsoleColor.Gray;
+            }
+        }
+    }, ct);
+
     while (true)
     {
-        try
+        string order = Console.ReadLine()?.ToLower().Trim() ?? "";
+        switch (order)
         {
-            listener.GetContext();
-        }
-        catch (Exception e)
-        {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine(e);
-            Console.ForegroundColor = ConsoleColor.Gray;
+            case "debug on":
+                GeneralSettings.IsDebug = true;
+                Console.WriteLine("开启Debug模式");
+                break;
+            case "debug off":
+                GeneralSettings.IsDebug = false;
+                Console.WriteLine("关闭Debug模式");
+                break;
         }
     }
 }

@@ -10,8 +10,9 @@
         /// man<para/>
         /// 马云<para/>
         /// 疤王<para/>
-        /// 电锯/追命<para/>
+        /// 电锯<para/>
         /// 终极<para/>
+        /// 高考<para/>
         /// </summary>
         public static Dictionary<string, string> MusicList { get; set; } = [];
 
@@ -25,6 +26,7 @@
             MusicList.Add("疤王", "file:///" + AppDomain.CurrentDomain.BaseDirectory.ToString() + @"music\疤王.mp3");
             MusicList.Add("电锯", "file:///" + AppDomain.CurrentDomain.BaseDirectory.ToString() + @"music\电锯.mp3");
             MusicList.Add("终极", "file:///" + AppDomain.CurrentDomain.BaseDirectory.ToString() + @"music\终极.mp3");
+            MusicList.Add("高考", "file:///" + AppDomain.CurrentDomain.BaseDirectory.ToString() + @"music\高考.mp3");
         }
     }
 }

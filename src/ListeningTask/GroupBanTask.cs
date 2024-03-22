@@ -1,5 +1,4 @@
-﻿using System.Reflection;
-using Milimoe.OneBot.Framework;
+﻿using Milimoe.OneBot.Framework;
 using Milimoe.OneBot.Model.Content;
 using Milimoe.OneBot.Model.Event;
 using Milimoe.OneBot.Model.Other;
@@ -27,7 +26,7 @@ namespace Milimoe.RainBOT.ListeningTask
                     MuteRecall.Muted[e.group_id].Add(e.user_id, GeneralSettings.Master);
                     SetGroupBanContent content_unmute_master = new(e.group_id, GeneralSettings.Master, 0);
                     SetGroupBanContent content_mute_operator = new(e.group_id, e.operator_id, 60);
-                    await GroupMessageTask.Post(SupportedAPI.set_group_ban, e.group_id, "反制禁言", [content_unmute_master, content_mute_operator]);
+                    await Bot.SendMessage(SupportedAPI.set_group_ban, e.group_id, "反制禁言", [content_unmute_master, content_mute_operator], true);
                     Member sender = Bot.GetMember(e.group_id, e.operator_id);
                     await e.SendMessage($"检测到主人被{sender.user_id}（{(sender.card != "" ? sender.card : sender.nickname)}）禁言！");
                 }
