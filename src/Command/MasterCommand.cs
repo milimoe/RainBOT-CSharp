@@ -52,14 +52,14 @@ namespace Milimoe.RainBOT.Command
                 {
                     msg += "\r\n本群未启用OSM核心";
                 }
-                _ = send_group ? Bot.SendGroupMessage(target_id, "OSM状态", msg) : Bot.SendFriendMessage(target_id, "OSM状态", msg);
+                SendMessage(send_group, target_id, msg);
             }
             else if (GeneralSettings.IsRun && command.Contains(".osm stop"))
             {
                 if (user_id == GeneralSettings.Master)
                 {
                     string result = Execute_Worker(".osm stop", "");
-                    _ = send_group ? Bot.SendGroupMessage(target_id, "OSM指令", result) : Bot.SendFriendMessage(target_id, "OSM指令", result);
+                    SendMessage(send_group, target_id, result);
                 }
                 else Access_Denied(send_group, target_id);
             }
@@ -68,7 +68,7 @@ namespace Milimoe.RainBOT.Command
                 if (user_id == GeneralSettings.Master)
                 {
                     string result = Execute_Worker(".osm start", "");
-                    _ = send_group ? Bot.SendGroupMessage(target_id, "OSM指令", result) : Bot.SendFriendMessage(target_id, "OSM指令", result);
+                    SendMessage(send_group, target_id, result);
                 }
                 else Access_Denied(send_group, target_id);
             }
@@ -109,8 +109,7 @@ namespace Milimoe.RainBOT.Command
                     {
                         await Bot.GetGroups();
                         await Bot.GetGroupMembers();
-                        string text = "刷新缓存完成。请注意，刷新缓存会导致正在禁言中的成员无法通过私聊忏悔命令解禁。";
-                        _ = send_group ? Bot.SendGroupMessage(target_id, "OSM指令", text) : Bot.SendFriendMessage(target_id, "OSM指令", text);
+                        SendMessage(send_group, target_id, "刷新缓存完成。请注意，刷新缓存会导致正在禁言中的成员无法通过私聊忏悔命令解禁。");
                     });
                 }
                 else Access_Denied(send_group, target_id);
@@ -120,8 +119,7 @@ namespace Milimoe.RainBOT.Command
                 if (user_id == GeneralSettings.Master)
                 {
                     GeneralSettings.LoadSetting();
-                    string text = "参数设定以及权限组重新加载完成。";
-                    _ = send_group ? Bot.SendGroupMessage(target_id, "OSM指令", text) : Bot.SendFriendMessage(target_id, "OSM指令", text);
+                    SendMessage(send_group, target_id, "参数设定以及权限组重新加载完成。");
                 }
                 else Access_Denied(send_group, target_id);
             }
@@ -132,7 +130,7 @@ namespace Milimoe.RainBOT.Command
                     string str = command.Replace(".osm set", "").Trim();
                     string[] strs = Regex.Split(str, @"\s+");
                     string result = Execute_Worker(".osm set", strs[0], strs.Length > 1 ? strs[1..] : []);
-                    _ = send_group ? Bot.SendGroupMessage(target_id, "OSM指令", result) : Bot.SendFriendMessage(target_id, "OSM指令", result);
+                    SendMessage(send_group, target_id, result);
                 }
                 else Access_Denied(send_group, target_id);
             }
@@ -167,7 +165,7 @@ namespace Milimoe.RainBOT.Command
                     else Access_Denied(send_group, target_id);
                 });
             }
-            else
+            else if (command.Contains(".osm core") || command == ".osm")
             {
                 // OSM核心信息
                 if (send_group)
@@ -185,6 +183,10 @@ namespace Milimoe.RainBOT.Command
                     _ = Bot.SendFriendMessage(target_id, "OSM核心", content);
                 }
                 return;
+            }
+            else
+            {
+                SendMessage(send_group, target_id, Execute_Worker(".osm missingcommand", ""));
             }
             return;
         }
@@ -472,10 +474,11 @@ namespace Milimoe.RainBOT.Command
             return "OSM Core：指令格式不正确或传入的参数不支持。\r\n格式：.osm <command> [part] [args...]";
         }
 
-        public static void Access_Denied(bool send_group, long target_id)
+        public static void Access_Denied(bool send_group, long target_id) => SendMessage(send_group, target_id, "你没有权限使用此指令。");
+        
+        public static void SendMessage(bool send_group, long target_id, string msg)
         {
-            string access_denied = "你没有权限使用此指令。";
-            _ = send_group ? Bot.SendGroupMessage(target_id, "OSM指令", access_denied) : Bot.SendFriendMessage(target_id, "OSM指令", access_denied);
+            _ = send_group ? Bot.SendGroupMessage(target_id, "OSM指令", msg) : Bot.SendFriendMessage(target_id, "OSM指令", msg);
         }
 
         public static string UpdateValue(string part, string old_value, string new_value, ConsoleColor color = ConsoleColor.Cyan)

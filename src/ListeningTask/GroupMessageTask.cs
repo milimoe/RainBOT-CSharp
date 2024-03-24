@@ -360,7 +360,7 @@ namespace Milimoe.RainBOT.ListeningTask
                                 if (Daily.UserDailys.TryGetValue(qq, out string? daily) && daily != null)
                                 {
                                     GroupMessageContent content = new(e.group_id);
-                                    content.message.Add(new TextMessage(qq + "（" + Bot.GetMemberNickName(e.group_id, e.user_id) + "）的今日运势是：\r\n" + daily));
+                                    content.message.Add(new TextMessage(Bot.GetMemberNickName(e.group_id, qq) + "（" + qq + "）的今日运势是：\r\n" + daily));
                                     await Bot.SendGroupMessage(e.group_id, "查看运势", content);
                                 }
                                 else
