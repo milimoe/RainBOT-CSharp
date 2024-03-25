@@ -165,111 +165,14 @@ namespace Milimoe.RainBOT.ListeningTask
                 }
 
                 // 发音频API
-                if (e.detail.Contains("kun", StringComparison.CurrentCultureIgnoreCase))
+                var match_music = Music.MusicList.Keys.Where(s => e.detail.Contains(s, StringComparison.CurrentCultureIgnoreCase));
+                if (match_music.Any())
                 {
                     TaskUtility.NewTask(async () =>
                     {
                         if (!await Bot.CheckBlackList(true, e.user_id, e.group_id)) return;
                         GroupMessageContent content = new(e.group_id);
-                        content.message.Add(new RecordMessage(Music.MusicList["ikun"]));
-                        await Bot.SendGroupMessage(e.group_id, "Record", content);
-                    });
-                    return;
-                }
-                if (e.detail.Contains("csgo", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    TaskUtility.NewTask(async () =>
-                    {
-                        if (!await Bot.CheckBlackList(true, e.user_id, e.group_id)) return;
-                        GroupMessageContent content = new(e.group_id);
-                        content.message.Add(new RecordMessage(Music.MusicList["懂CSGO"]));
-                        await Bot.SendGroupMessage(e.group_id, "Record", content);
-                    });
-                    return;
-                }
-                if (e.detail.Contains("架不住") || e.detail.Contains("打不死") || e.detail.Contains("不玩了"))
-                {
-                    TaskUtility.NewTask(async () =>
-                    {
-                        if (!await Bot.CheckBlackList(true, e.user_id, e.group_id)) return;
-                        GroupMessageContent content = new(e.group_id);
-                        content.message.Add(new RecordMessage(Music.MusicList["令人沮丧的游戏"]));
-                        await Bot.SendGroupMessage(e.group_id, "Record", content);
-                    });
-                }
-                if (e.detail.Contains("man", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    TaskUtility.NewTask(async () =>
-                    {
-                        if (!await Bot.CheckBlackList(true, e.user_id, e.group_id)) return;
-                        GroupMessageContent content = new(e.group_id);
-                        content.message.Add(new RecordMessage(Music.MusicList["man"]));
-                        await Bot.SendGroupMessage(e.group_id, "Record", content);
-                    });
-                    return;
-                }
-                if (e.detail.Contains("马云", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    TaskUtility.NewTask(async () =>
-                    {
-                        if (!await Bot.CheckBlackList(true, e.user_id, e.group_id)) return;
-                        GroupMessageContent content = new(e.group_id);
-                        content.message.Add(new RecordMessage(Music.MusicList["马云"]));
-                        await Bot.SendGroupMessage(e.group_id, "Record", content);
-                    });
-                    return;
-                }
-                if (e.detail.Contains("电锯", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    TaskUtility.NewTask(async () =>
-                    {
-                        if (!await Bot.CheckBlackList(true, e.user_id, e.group_id)) return;
-                        GroupMessageContent content = new(e.group_id);
-                        content.message.Add(new RecordMessage(Music.MusicList["电锯"]));
-                        await Bot.SendGroupMessage(e.group_id, "Record", content);
-                    });
-                    return;
-                }
-                if (e.detail.Contains("疤王", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    TaskUtility.NewTask(async () =>
-                    {
-                        if (!await Bot.CheckBlackList(true, e.user_id, e.group_id)) return;
-                        GroupMessageContent content = new(e.group_id);
-                        content.message.Add(new RecordMessage(Music.MusicList["疤王"]));
-                        await Bot.SendGroupMessage(e.group_id, "Record", content);
-                    });
-                    return;
-                }
-                if (e.detail.Contains("终极", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    TaskUtility.NewTask(async () =>
-                    {
-                        if (!await Bot.CheckBlackList(true, e.user_id, e.group_id)) return;
-                        GroupMessageContent content = new(e.group_id);
-                        content.message.Add(new RecordMessage(Music.MusicList["终极"]));
-                        await Bot.SendGroupMessage(e.group_id, "Record", content);
-                    });
-                    return;
-                }
-                if (e.detail.Contains("高考", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    TaskUtility.NewTask(async () =>
-                    {
-                        if (!await Bot.CheckBlackList(true, e.user_id, e.group_id)) return;
-                        GroupMessageContent content = new(e.group_id);
-                        content.message.Add(new RecordMessage(Music.MusicList["高考"]));
-                        await Bot.SendGroupMessage(e.group_id, "Record", content);
-                    });
-                    return;
-                }
-                if (e.detail.Contains("音乐", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    TaskUtility.NewTask(async () =>
-                    {
-                        if (!await Bot.CheckBlackList(true, e.user_id, e.group_id)) return;
-                        GroupMessageContent content = new(e.group_id);
-                        content.message.Add(new RecordMessage(Music.MusicList[Music.MusicList.Keys.ToArray()[new Random().Next(Music.MusicList.Count)]]));
+                        content.message.Add(new RecordMessage(Music.MusicList[match_music.First()]));
                         await Bot.SendGroupMessage(e.group_id, "Record", content);
                     });
                     return;
