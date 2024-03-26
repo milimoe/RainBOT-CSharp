@@ -51,6 +51,8 @@
             MusicList.Add("追溯起源", "file:///" + AppDomain.CurrentDomain.BaseDirectory.ToString() + @"music\追溯起源.mp3");
             MusicList.Add("zood", "file:///" + AppDomain.CurrentDomain.BaseDirectory.ToString() + @"music\zood.mp3");
             MusicList.Add("igs", "file:///" + AppDomain.CurrentDomain.BaseDirectory.ToString() + @"music\igotsmoke.mp3");
+            MusicList.Add("劝导", "file:///" + AppDomain.CurrentDomain.BaseDirectory.ToString() + @"music\丁真劝导.mp3");
+            MusicList.Add("丁真", "file:///" + AppDomain.CurrentDomain.BaseDirectory.ToString() + @"music\丁真劝导.mp3");
         }
     }
 }
