@@ -53,6 +53,7 @@
             MusicList.Add("igs", "file:///" + AppDomain.CurrentDomain.BaseDirectory.ToString() + @"music\igotsmoke.mp3");
             MusicList.Add("劝导", "file:///" + AppDomain.CurrentDomain.BaseDirectory.ToString() + @"music\丁真劝导.mp3");
             MusicList.Add("丁真", "file:///" + AppDomain.CurrentDomain.BaseDirectory.ToString() + @"music\丁真劝导.mp3");
+            MusicList.Add("change", "file:///" + AppDomain.CurrentDomain.BaseDirectory.ToString() + @"music\change.mp3");
         }
     }
 }

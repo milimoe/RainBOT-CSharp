@@ -536,11 +536,14 @@ namespace Milimoe.RainBOT.ListeningTask
                     Bot.ColorfulCheckPass(sender, "随机叫哥", dice, GeneralSettings.PCallBrother, delay);
                     string name = (sender.card != "" ? sender.card : sender.nickname).Trim();
                     int pos = new Random().Next(name.Length - 1);
-                    GroupMessageContent content = new(e.group_id);
-                    content.message.Add(new AtMessage(e.user_id));
-                    content.message.Add(new TextMessage(string.Concat(name.AsSpan(pos, 2), "哥")));
-                    _ = Bot.SendGroupMessage(e.group_id, "随机叫哥", content, delay * 1000);
-                    return;
+                    if (pos != -1)
+                    {
+                        GroupMessageContent content = new(e.group_id);
+                        content.message.Add(new AtMessage(e.user_id));
+                        content.message.Add(new TextMessage(string.Concat(name.AsSpan(pos, name.Length > 1 ? 2 : name.Length), "哥")));
+                        _ = Bot.SendGroupMessage(e.group_id, "随机叫哥", content, delay * 1000);
+                        return;
+                    }
                 }
             }
             catch (Exception ex)
