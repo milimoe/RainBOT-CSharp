@@ -111,7 +111,7 @@ namespace Milimoe.RainBOT.Settings
                     await Task.Delay(1000 * GeneralSettings.BlackFrozenTime);
                     BlackList.Times.Remove(user_id);
                 });
-                await (send_group ? SendFriendMessage(target_id, "黑名单", content) : SendFriendMessage(target_id, "黑名单", content));
+                await (send_group ? SendGroupMessage(target_id, "黑名单", content) : SendFriendMessage(target_id, "黑名单", content));
                 return false;
             }
             else

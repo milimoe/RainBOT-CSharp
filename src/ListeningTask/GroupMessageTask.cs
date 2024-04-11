@@ -144,7 +144,7 @@ namespace Milimoe.RainBOT.ListeningTask
                         return;
                     });
                 }
-                if (e.detail.Contains("丁真") || e.detail == "一眼丁真" || e.detail == "一眼顶针")
+                if (e.detail == "一眼丁真" || e.detail == "一眼顶针")
                 {
                     TaskUtility.NewTask(async () =>
                     {
@@ -155,9 +155,8 @@ namespace Milimoe.RainBOT.ListeningTask
                         return;
                     });
                 }
-                if (EEWords.Any(e.detail.Contains))
+                if (EEWords.Any(e.detail.Contains) && e.CheckThrow(20, out _))
                 {
-                    if (BlackList.Times.TryGetValue(e.user_id, out long bltimes) && bltimes > 5) return;
                     GroupMessageContent content = new(e.group_id);
                     content.message.Add(new ImageMessage("file:///" + AppDomain.CurrentDomain.BaseDirectory.ToString() + @"img\ee.png"));
                     _ = Bot.SendGroupMessage(e.group_id, "Image", content);
@@ -269,6 +268,26 @@ namespace Milimoe.RainBOT.ListeningTask
                                 else
                                 {
                                     await Bot.SendGroupMessage(e.group_id, "查看运势", "TA今天还没有抽取运势哦，快去提醒TA！");
+                                }
+                            }
+                        }
+                    });
+                    return;
+                }
+                if (e.user_id == GeneralSettings.Master && e.detail.Length > 4 && e.detail[..2] == "重置" && (e.detail[^2..] == "运势"))
+                {
+                    TaskUtility.NewTask(async () =>
+                    {
+                        if (!await Bot.CheckBlackList(true, e.user_id, e.group_id)) return;
+                        string[] strs = e.detail.Replace("重置", "").Replace("运势", "").Trim().Split(' ');
+                        foreach (string str_qq in strs)
+                        {
+                            if (long.TryParse(str_qq.Trim().Replace("@", ""), out long qq))
+                            {
+                                if (qq == GeneralSettings.BotQQ && !Daily.UserDailys.ContainsKey(qq))
+                                {
+                                    Daily.UserDailys.Remove(GeneralSettings.BotQQ);
+                                    await Bot.SendGroupMessage(e.group_id, "重置运势", "已重置" + Bot.GetMemberNickName(e.group_id, qq) + "（" + qq + "）的今日运势。");
                                 }
                             }
                         }
