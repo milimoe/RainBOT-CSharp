@@ -103,16 +103,32 @@ namespace Milimoe.RainBOT.Settings
             else if (++bltimes == 5)
             {
                 BlackList.Times[user_id] = 6;
-                FriendMessageContent content = new(user_id);
-                content.message.Add(new AtMessage(user_id));
-                content.message.Add(new TextMessage("警告：你已因短时间内频繁操作被禁止使用BOT指令" + (GeneralSettings.BlackFrozenTime / 60) + "分钟" + (GeneralSettings.BlackFrozenTime % 60) + "秒。"));
-                _ = Task.Run(async () =>
+                if (send_group)
                 {
-                    await Task.Delay(1000 * GeneralSettings.BlackFrozenTime);
-                    BlackList.Times.Remove(user_id);
-                });
-                await (send_group ? SendGroupMessage(target_id, "黑名单", content) : SendFriendMessage(target_id, "黑名单", content));
-                return false;
+                    GroupMessageContent content = new(user_id);
+                    content.message.Add(new AtMessage(user_id));
+                    content.message.Add(new TextMessage("警告：你已因短时间内频繁操作被禁止使用BOT指令" + (GeneralSettings.BlackFrozenTime / 60) + "分钟" + (GeneralSettings.BlackFrozenTime % 60) + "秒。"));
+                    _ = Task.Run(async () =>
+                    {
+                        await Task.Delay(1000 * GeneralSettings.BlackFrozenTime);
+                        BlackList.Times.Remove(user_id);
+                    });
+                    await SendGroupMessage(target_id, "黑名单", content);
+                    return false;
+                }
+                else
+                {
+                    FriendMessageContent content = new(user_id);
+                    content.message.Add(new AtMessage(user_id));
+                    content.message.Add(new TextMessage("警告：你已因短时间内频繁操作被禁止使用BOT指令" + (GeneralSettings.BlackFrozenTime / 60) + "分钟" + (GeneralSettings.BlackFrozenTime % 60) + "秒。"));
+                    _ = Task.Run(async () =>
+                    {
+                        await Task.Delay(1000 * GeneralSettings.BlackFrozenTime);
+                        BlackList.Times.Remove(user_id);
+                    });
+                    await SendFriendMessage(target_id, "黑名单", content);
+                    return false;
+                }
             }
             else
             {

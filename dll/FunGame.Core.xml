@@ -1,0 +1,2846 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>FunGame.Core</name>
+    </assembly>
+    <members>
+        <member name="T:Milimoe.FunGame.Core.Api.Transmittal.DataRequest">
+            <summary>
+            需要配合Milimoe.FunGame.Core.Library.Constant.DataRequestType使用
+            确保已添加对应的枚举
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Api.Transmittal.DataRequest.Result">
+            <summary>
+            数据请求结果
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Api.Transmittal.DataRequest.Error">
+            <summary>
+            详细错误信息
+            </summary>
+        </member>
+        <member name="F:Milimoe.FunGame.Core.Api.Transmittal.DataRequest.Worker">
+            <summary>
+            私有的实现类
+            </summary>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Transmittal.DataRequest.#ctor(Milimoe.FunGame.Core.Library.Common.Network.Socket,Milimoe.FunGame.Core.Library.Constant.DataRequestType,System.Boolean)">
+            <summary>
+            基于本地已连接的Socket创建新的数据请求
+            使用RunTimeModel中的NewDataRequest创建一个新的请求
+            </summary>
+            <param name="Socket"></param>
+            <param name="RequestType"></param>
+            <param name="IsLongRunning"></param>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Transmittal.DataRequest.AddRequestData(System.String,System.Object)">
+            <summary>
+            添加数据
+            </summary>
+            <param name="key"></param>
+            <param name="value"></param>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Transmittal.DataRequest.Dispose">
+            <summary>
+            长时间运行的数据请求需要在使用完毕后自行关闭
+            </summary>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Transmittal.DataRequest.SendRequest">
+            <summary>
+            向服务器发送数据请求
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Transmittal.DataRequest.SendRequestAsync">
+            <summary>
+            异步向服务器发送数据请求
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Transmittal.DataRequest.GetResult``1(System.String)">
+            <summary>
+            获取指定key对应的反序列化对象
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="key"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Transmittal.DataRequest.GetHashtableJsonObject``1(System.Collections.Hashtable,System.String)">
+            <summary>
+            反序列化Hashtable中的Json对象
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="hashtable"></param>
+            <param name="key"></param>
+            <returns></returns>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Api.Transmittal.MailSender.MailSenderID">
+            <summary>
+            邮件服务内部ID
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Api.Transmittal.MailSender.SmtpClientInfo">
+            <summary>
+            Smtp客户端信息
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Api.Transmittal.MailSender.LastestResult">
+            <summary>
+            上一个邮件发送的结果
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Api.Transmittal.MailSender.ErrorMsg">
+            <summary>
+            上一个邮件的发送错误信息（如果发送失败）
+            </summary>
+        </member>
+        <member name="F:Milimoe.FunGame.Core.Api.Transmittal.MailSender._SmtpClientInfo">
+            内部变量
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Transmittal.MailSender.#ctor(System.String,System.String,System.String,System.String,System.Int32,System.Boolean)">
+            <summary>
+            创建邮件服务
+            </summary>
+            <param name="SenderMailAddress"></param>
+            <param name="SenderName"></param>
+            <param name="SenderPassword"></param>
+            <param name="Host"></param>
+            <param name="Port"></param>
+            <param name="OpenSSL"></param>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Transmittal.MailSender.CreateMail(System.String,System.String,System.Net.Mail.MailPriority,System.Boolean,System.String[],System.String[],System.String[])">
+            <summary>
+            创建完整邮件对象
+            </summary>
+            <param name="Subject"></param>
+            <param name="Body"></param>
+            <param name="Priority"></param>
+            <param name="HTML"></param>
+            <param name="ToList"></param>
+            <param name="CCList"></param>
+            <param name="BCCList"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Transmittal.MailSender.Send(Milimoe.FunGame.Core.Library.Common.Network.MailObject)">
+            <summary>
+            发送邮件
+            </summary>
+            <param name="Mail"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Transmittal.MailSender.Dispose">
+            <summary>
+            关闭邮件服务
+            </summary>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Transmittal.MailSender.Dispose(System.Boolean)">
+            <summary>
+            关闭邮件服务
+            </summary>
+            <param name="Disposing"></param>
+        </member>
+        <member name="T:Milimoe.FunGame.Core.Api.Transmittal.SQLHelper">
+            <summary>
+            需要在Server中继承此类实现
+            </summary>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Transmittal.SQLHelper.Execute">
+            <summary>
+            执行一个命令
+            </summary>
+            <returns>影响的行数</returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Transmittal.SQLHelper.Execute(System.String)">
+            <summary>
+            执行一个指定的命令
+            </summary>
+            <param name="Script">命令</param>
+            <returns>影响的行数</returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Transmittal.SQLHelper.ExecuteDataSet">
+            <summary>
+            查询DataSet
+            </summary>
+            <returns>结果集</returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Transmittal.SQLHelper.ExecuteDataSet(System.String)">
+            <summary>
+            执行指定的命令查询DataSet
+            </summary>
+            <param name="Script">命令</param>
+            <returns>结果集</returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Transmittal.SQLHelper.ExecuteDataRow">
+            <summary>
+            执行指定的命令查询DataRow（可选实现）
+            </summary>
+            <returns>结果行</returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Transmittal.SQLHelper.ExecuteDataRow(System.String)">
+            <summary>
+            执行指定的命令查询DataRow（可选实现）
+            </summary>
+            <param name="Script">命令</param>
+            <returns>结果行</returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Transmittal.SQLHelper.Close">
+            <summary>
+            关闭连接
+            </summary>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Transmittal.SQLHelper.NewTransaction">
+            <summary>
+            创建一个SQL事务
+            </summary>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Transmittal.SQLHelper.Commit">
+            <summary>
+            提交事务
+            </summary>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Transmittal.SQLHelper.Rollback">
+            <summary>
+            回滚事务
+            </summary>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.Factory.GetCharacter">
+            <summary>
+            获取角色实例
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.Factory.GetInventory">
+            <summary>
+            获取库存实例
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.Factory.GetItem(Milimoe.FunGame.Core.Library.Constant.ItemType)">
+            <summary>
+            获取物品实例，默认返回Passiveitem 被动物品 需要强制转换
+            </summary>
+            <param name="type">Item类型 主动 或 被动</param>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.Factory.GetActiveItem">
+            <summary>
+            获取主动物品实例
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.Factory.GetPassiveItem">
+            <summary>
+            获取被动物品实例
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.Factory.GetRoom(System.Int64,System.String,System.Nullable{System.DateTime},Milimoe.FunGame.Core.Entity.User,Milimoe.FunGame.Core.Library.Constant.RoomType,System.String,System.String,Milimoe.FunGame.Core.Library.Constant.RoomState,System.Boolean,System.String)">
+            <summary>
+            获取房间实例
+            </summary>
+            <param name="Id">房间内部序列号</param>
+            <param name="Roomid">房间号</param>
+            <param name="CreateTime">创建时间</param>
+            <param name="RoomMaster">房主</param>
+            <param name="RoomType">房间类型</param>
+            <param name="GameMode">游戏模组</param>
+            <param name="GameMap"></param>
+            <param name="RoomState">房间状态</param>
+            <param name="IsRank"></param>
+            <param name="Password">房间密码</param>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.Factory.GetRoom(System.Data.DataRow,Milimoe.FunGame.Core.Entity.User)">
+            <summary>
+            通过DataSet获取房间实例
+            </summary>
+            <param name="DrRoom"></param>
+            <param name="User"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.Factory.GetRooms(System.Data.DataSet,System.Data.DataSet)">
+            <summary>
+            通过DataSet获取房间列表
+            </summary>
+            <param name="DsRoom"></param>
+            <param name="DsUser"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.Factory.GetHall">
+            <summary>
+            获取大厅（-1号房）
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.Factory.GetSkill(Milimoe.FunGame.Core.Library.Constant.SkillType)">
+            <summary>
+            获取技能实例，默认返回PassiveSkill 被动技能 需要强制转换
+            </summary>
+            <param name="type">Skill类型 主动 或 被动</param>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.Factory.GetActiveSkill">
+            <summary>
+            获取主动技能实例
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.Factory.GetPassiveSkill">
+            <summary>
+            获取被动技能实例
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.Factory.GetUser">
+            <summary>
+            获取用户实例
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.Factory.GetUser(System.Int64,System.String,System.Nullable{System.DateTime},System.Nullable{System.DateTime},System.String,System.String,System.Boolean,System.Boolean,System.Boolean,System.Decimal,System.Decimal,System.Decimal,System.String)">
+            <summary>
+            获取用户实例
+            </summary>
+            <param name="Id"></param>
+            <param name="Username"></param>
+            <param name="RegTime"></param>
+            <param name="LastTime"></param>
+            <param name="Email"></param>
+            <param name="NickName"></param>
+            <param name="IsAdmin"></param>
+            <param name="IsOperator"></param>
+            <param name="IsEnable"></param>
+            <param name="Credits"></param>
+            <param name="Materials"></param>
+            <param name="GameTime"></param>
+            <param name="AutoKey"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.Factory.GetUser(System.Data.DataSet)">
+            <summary>
+            获取用户实例
+            </summary>
+            <param name="ds"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.Factory.GetUser(System.Data.DataRow)">
+            <summary>
+            获取用户实例
+            </summary>
+            <param name="dr"></param>
+            <returns></returns>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Api.Utility.GameModeLoader.Modes">
+            <summary>
+            适用于客户端的模组集
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Api.Utility.GameModeLoader.ServerModes">
+            <summary>
+            适用于服务器的模组集
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Api.Utility.GameModeLoader.Maps">
+            <summary>
+            游戏地图集
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Api.Utility.GameModeLoader.Characters">
+            <summary>
+            角色表
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Api.Utility.GameModeLoader.Skills">
+            <summary>
+            技能表
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Api.Utility.GameModeLoader.Items">
+            <summary>
+            物品表
+            </summary>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.GameModeLoader.LoadGameModes(Milimoe.FunGame.Core.Library.Constant.FunGameInfo.FunGame,System.Collections.Hashtable,System.Object[])">
+            <summary>
+            传入 <see cref="T:Milimoe.FunGame.Core.Library.Constant.FunGameInfo.FunGame"/> 类型来创建指定端的模组读取器
+            <para>runtime = <see cref="F:Milimoe.FunGame.Core.Library.Constant.FunGameInfo.FunGame.FunGame_Desktop"/> 时，仅读取 <seealso cref="P:Milimoe.FunGame.Core.Api.Utility.GameModeLoader.Modes"/></para>
+            <para>runtime = <see cref="F:Milimoe.FunGame.Core.Library.Constant.FunGameInfo.FunGame.FunGame_Server"/> 时，仅读取 <seealso cref="P:Milimoe.FunGame.Core.Api.Utility.GameModeLoader.ServerModes"/></para>
+            <seealso cref="P:Milimoe.FunGame.Core.Api.Utility.GameModeLoader.Maps"/> 都会读取
+            </summary>
+            <param name="runtime">传入 <see cref="T:Milimoe.FunGame.Core.Library.Constant.FunGameInfo.FunGame"/> 类型来创建指定端的模组读取器</param>
+            <param name="delegates">用于构建 <see cref="T:Milimoe.FunGame.Core.Controller.AddonController"/></param>
+            <param name="otherobjs">其他需要传入给插件初始化的对象</param>
+            <returns></returns>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Api.Utility.GameModeLoader.Item(System.String)">
+            <summary>
+            获取对应名称的模组实例
+            <para>如果需要取得服务器模组的实例，请调用 <see cref="M:Milimoe.FunGame.Core.Api.Utility.GameModeLoader.GetServerMode(System.String)"/></para>
+            </summary>
+            <param name="name"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.GameModeLoader.GetServerMode(System.String)">
+            <summary>
+            获取对应名称的服务器模组实例
+            </summary>
+            <param name="name"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.GameModeLoader.GetGameMap(System.String)">
+            <summary>
+            获取对应名称的游戏地图
+            </summary>
+            <param name="name"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Milimoe.FunGame.Core.Api.Utility.NetworkUtility">
+            <summary>
+            网络服务工具箱
+            </summary>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.NetworkUtility.IsIP(System.String)">
+            <summary>
+            判断字符串是否是IP地址
+            </summary>
+            <param name="str"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.NetworkUtility.IsEmail(System.String)">
+            <summary>
+            判断字符串是否为邮箱地址
+            </summary>
+            <param name="str"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.NetworkUtility.IsUserName(System.String)">
+            <summary>
+            判断字符串是否是正常的用户名（只有中英文和数字）
+            </summary>
+            <param name="str"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.NetworkUtility.GetUserNameLength(System.String)">
+            <summary>
+            获取用户名长度
+            </summary>
+            <param name="str"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.NetworkUtility.IsServerAddress(System.String,System.String@,System.Int32@)">
+            <summary>
+            判断字符串是否是一个FunGame可接受的服务器地址<para/>
+            此方法可以解析域名
+            </summary>
+            <param name="str"></param>
+            <param name="addr"></param>
+            <param name="port"></param>
+            <returns>返回地址验证结果，同时输出服务器地址和端口号</returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.NetworkUtility.IsServerAddress(System.String,System.Int32)">
+            <summary>
+            判断参数是否是一个FunGame可接受的服务器地址
+            </summary>
+            <param name="ip"></param>
+            <param name="port"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.NetworkUtility.GetServerPing(System.String)">
+            <summary>
+            获取服务器的延迟
+            </summary>
+            <param name="addr">服务器IP地址</param>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.NetworkUtility.GetIPAddress(System.String,System.Net.Sockets.AddressFamily)">
+            <summary>
+            解析域名为IP地址
+            </summary>
+            <param name="domain"></param>
+            <param name="family"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.NetworkUtility.JsonSerialize``1(``0)">
+            <summary>
+            返回目标对象的Json字符串
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="obj"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.NetworkUtility.JsonSerialize``1(``0,System.Text.Json.JsonSerializerOptions)">
+            <summary>
+            返回目标对象的Json字符串 可指定反序列化选项
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="obj"></param>
+            <param name="options"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.NetworkUtility.JsonDeserialize``1(System.String)">
+            <summary>
+            反序列化Json对象
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="json"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.NetworkUtility.JsonDeserialize``1(System.String,System.Text.Json.JsonSerializerOptions)">
+            <summary>
+            反序列化Json对象 可指定反序列化选项
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="json"></param>
+            <param name="options"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.NetworkUtility.JsonDeserializeFromHashtable``1(System.Collections.Hashtable,System.String)">
+            <summary>
+            反序列化Hashtable中的Json对象
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="hashtable"></param>
+            <param name="key"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.NetworkUtility.JsonDeserializeFromIEnumerable``1(System.Collections.Generic.IEnumerable{System.Object},System.Int32)">
+            <summary>
+            反序列化IEnumerable中的Json对象
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="e"></param>
+            <param name="index"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.NetworkUtility.JsonDeserializeFromIEnumerable``1(System.Collections.Generic.IEnumerable{System.Object},System.Int32,System.Text.Json.JsonSerializerOptions)">
+            <summary>
+            反序列化IEnumerable中的Json对象 可指定反序列化选项
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="e"></param>
+            <param name="index"></param>
+            <param name="options"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.NetworkUtility.JsonDeserializeFromHashtable``1(System.Collections.Hashtable,System.String,System.Text.Json.JsonSerializerOptions)">
+            <summary>
+            反序列化Hashtable中的Json对象 可指定反序列化选项
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="hashtable"></param>
+            <param name="key"></param>
+            <param name="options"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Milimoe.FunGame.Core.Api.Utility.DateTimeUtility">
+            <summary>
+            时间服务工具箱
+            </summary>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.DateTimeUtility.GetDateTime(Milimoe.FunGame.Core.Library.Constant.TimeType)">
+            <summary>
+            获取系统时间
+            </summary>
+            <param name="type">格式化类型</param>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.DateTimeUtility.GetDateTime(System.String)">
+            <summary>
+            通过字符串转换为DateTime对象
+            </summary>
+            <param name="format">时间字符串</param>
+            <returns>转换失败返回当前时间</returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.DateTimeUtility.GetDateTimeToString(Milimoe.FunGame.Core.Library.Constant.TimeType)">
+            <summary>
+            获取系统时间并转为字符串
+            </summary>
+            <param name="type">格式化类型</param>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.DateTimeUtility.GetDateTimeToString(System.String)">
+            <summary>
+            获取系统时间并转为字符串
+            </summary>
+            <param name="format">格式化字符串</param>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.DateTimeUtility.GetNowShortTime">
+            <summary>
+            获取系统短时间
+            </summary>
+            <returns>时:分:秒</returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.DateTimeUtility.GetNowTime">
+            <summary>
+            获取系统日期
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:Milimoe.FunGame.Core.Api.Utility.Encryption">
+            <summary>
+            使用HMACSHA512算法加密
+            </summary>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.Encryption.HmacSha512(System.String,System.String)">
+            <summary>
+            使用HMACSHA512算法加密
+            </summary>
+            <param name="Message">需要加密的值</param>
+            <param name="Key">秘钥</param>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.Encryption.RSAEncrypt(System.String,System.String)">
+            <summary>
+            使用RSA算法加密
+            </summary>
+            <param name="PlainText">明文</param>
+            <param name="PublicKey">公钥</param>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.Encryption.RSADecrypt(System.String,System.String)">
+            <summary>
+            使用RSA算法解密
+            </summary>
+            <param name="SecretText">密文</param>
+            <param name="PrivateKey">私钥</param>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.StringExtension.Encrypt(System.String,System.String)">
+            <summary>
+            使用HMACSHA512算法加密
+            </summary>
+            <param name="msg">需要加密的值</param>
+            <param name="key">秘钥</param>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.Verification.CreateVerifyCode(Milimoe.FunGame.Core.Library.Constant.VerifyCodeType,System.Int32)">
+            <summary>
+            生成验证码
+            </summary>
+            <param name="type">类型</param>
+            <param name="length">长度</param>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.Verification.NumberVerifyCode(System.Int32)">
+            <summary>
+            数字验证码
+            </summary>
+            <param name="length"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.Verification.LetterVerifyCode(System.Int32)">
+            <summary>
+            字母验证码
+            </summary>
+            <param name="length"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.Verification.MixVerifyCode(System.Int32)">
+            <summary>
+            混合验证码
+            </summary>
+            <param name="length"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.TaskUtility.NewTask(System.Action)">
+            <summary>
+            开启一个任务：调用返回对象的OnCompleted()方法可以执行后续操作，支持异步
+            </summary>
+            <param name="action"></param>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.TaskUtility.NewTask(System.Func{System.Threading.Tasks.Task})">
+            <summary>
+            开启一个任务：调用返回对象的OnCompleted()方法可以执行后续操作，支持异步
+            </summary>
+            <param name="task"></param>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.TaskUtility.RunTimer(System.Action,System.Int32)">
+            <summary>
+            开启一个计时器任务
+            </summary>
+            <param name="action"></param>
+            <param name="milliseconds"></param>
+        </member>
+        <member name="T:Milimoe.FunGame.Core.Api.Utility.Implement">
+            <summary>
+            See: <see cref="T:Milimoe.FunGame.Core.Library.Constant.InterfaceMethod"/>, <see cref="T:Milimoe.FunGame.Core.Library.Constant.InterfaceType"/>, <see cref="T:Milimoe.FunGame.Core.Library.Constant.InterfaceSet"/>
+            </summary>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.Implement.GetFunGameImplementType(System.Reflection.Assembly,Milimoe.FunGame.Core.Library.Constant.InterfaceType)">
+            <summary>
+            获取FunGame.Implement.dll中接口的实现方法
+            </summary>
+            <param name="Assembly">程序集</param>
+            <param name="Interface">接口代号</param>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.Implement.GetImplementClassName(Milimoe.FunGame.Core.Library.Constant.InterfaceType)">
+            <summary>
+            获取接口实现类类名
+            </summary>
+            <param name="Interface">接口类型</param>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.Implement.GetImplementMethodName(Milimoe.FunGame.Core.Library.Constant.InterfaceMethod)">
+            <summary>
+            获取接口方法名（支持属性）
+            </summary>
+            <param name="Method">方法</param>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.Implement.GetFunGameImplValue(Milimoe.FunGame.Core.Library.Constant.InterfaceType,Milimoe.FunGame.Core.Library.Constant.InterfaceMethod,System.Boolean)">
+            <summary>
+            公开方法：获取FunGame.Implement.DLL中指定方法（属性）的返回值
+            </summary>
+            <param name="Interface">接口代号</param>
+            <param name="Method">方法代号（支持属性）</param>
+            <param name="IsMethod">是否是方法（如是属性请传入false）</param>
+            <returns></returns>
+        </member>
+        <member name="T:Milimoe.FunGame.Core.Api.Utility.JsonTool">
+            <summary>
+            创建一个Json工具类<para/>
+            此工具类拥有单独的序列化选项，支持添加自定义转换器 <see cref="T:Milimoe.FunGame.Core.Library.Common.Architecture.BaseEntityConverter`1"/><para/>
+            <see cref="T:Milimoe.FunGame.Core.Library.Common.Architecture.BaseEntityConverter`1"/> 继承自 <see cref="T:System.Text.Json.Serialization.JsonConverter"/>
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Api.Utility.JsonTool.JsonSerializerOptions">
+            <summary>
+            序列化选项<para/>
+            已经默认添加了下列转换器：<para/>
+            <see cref="T:Milimoe.FunGame.Core.Library.Common.JsonConverter.DateTimeConverter"/>, <see cref="T:Milimoe.FunGame.Core.Library.Common.JsonConverter.DataTableConverter"/>, <see cref="T:Milimoe.FunGame.Core.Library.Common.JsonConverter.DataSetConverter"/>
+            </summary>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.JsonTool.AddConverter(System.Text.Json.Serialization.JsonConverter)">
+            <summary>
+            注册一个自定义转换器，支持 <see cref="T:Milimoe.FunGame.Core.Library.Common.Architecture.BaseEntityConverter`1"/>
+            </summary>
+            <param name="converter"></param>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.JsonTool.AddConverters(System.Collections.Generic.IEnumerable{System.Text.Json.Serialization.JsonConverter})">
+            <summary>
+            注册多个自定义转换器，支持 <see cref="T:Milimoe.FunGame.Core.Library.Common.Architecture.BaseEntityConverter`1"/>
+            </summary>
+            <param name="converters"></param>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.JsonTool.GetString``1(``0)">
+            <summary>
+            获取Json字符串
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="obj"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.JsonTool.GetObject``1(System.String)">
+            <summary>
+            反序列化Json对象
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="json"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.JsonTool.GetObject(System.String)">
+            <summary>
+            反序列化Json对象，此方法可能无法返回正确的类型，请注意辨别
+            </summary>
+            <param name="json"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.JsonTool.GetObject``1(System.Collections.Hashtable,System.String)">
+            <summary>
+            反序列化Hashtable中Key对应的Json对象
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="table"></param>
+            <param name="key"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.JsonTool.JsonDeserializeFromIEnumerable``1(System.Collections.Generic.IEnumerable{System.Object},System.Int32)">
+            <summary>
+            反序列化IEnumerable中的Json对象 可指定反序列化选项
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="e"></param>
+            <param name="index"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.JsonTool.GetObjects``1(System.String)">
+            <summary>
+            反序列化多个Json对象
+            注意必须是相同的Json对象才可以使用此方法解析
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="json"></param>
+            <returns></returns>
+        </member>
+        <member name="F:Milimoe.FunGame.Core.Api.Utility.JsonTool.options">
+            <summary>
+            Private JsonSerializerOptions
+            </summary>
+        </member>
+        <member name="T:Milimoe.FunGame.Core.Api.Utility.PluginConfig">
+            <summary>
+            简易的插件配置文件生成器<para/>
+            仅支持部分基本类型（<see cref="T:System.Int64"/>, <see cref="T:System.Decimal"/>, <see cref="T:System.String"/>, <see cref="T:System.Boolean"/>）及其数组（<see cref="T:System.Collections.Generic.List`1">List&lt;long&gt;, List&lt;decimal&gt;, List&lt;string&gt;, List&lt;bool&gt;</see>和<see cref="T:System.Array">long[], decimal[], string[], bool[]</see>）
+            <para/>文件会保存为：程序目录/configs/<see cref="P:Milimoe.FunGame.Core.Api.Utility.PluginConfig.PluginName"/>/<see cref="P:Milimoe.FunGame.Core.Api.Utility.PluginConfig.FileName"/>.json
+            </summary>
+            <remarks>
+            新建一个配置文件，文件会保存为：程序目录/configs/<see cref="P:Milimoe.FunGame.Core.Api.Utility.PluginConfig.PluginName"/>/<see cref="P:Milimoe.FunGame.Core.Api.Utility.PluginConfig.FileName"/>.json
+            </remarks>
+            <param name="plugin_name"></param>
+            <param name="file_name"></param>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.PluginConfig.#ctor(System.String,System.String)">
+            <summary>
+            简易的插件配置文件生成器<para/>
+            仅支持部分基本类型（<see cref="T:System.Int64"/>, <see cref="T:System.Decimal"/>, <see cref="T:System.String"/>, <see cref="T:System.Boolean"/>）及其数组（<see cref="T:System.Collections.Generic.List`1">List&lt;long&gt;, List&lt;decimal&gt;, List&lt;string&gt;, List&lt;bool&gt;</see>和<see cref="T:System.Array">long[], decimal[], string[], bool[]</see>）
+            <para/>文件会保存为：程序目录/configs/<see cref="P:Milimoe.FunGame.Core.Api.Utility.PluginConfig.PluginName"/>/<see cref="P:Milimoe.FunGame.Core.Api.Utility.PluginConfig.FileName"/>.json
+            </summary>
+            <remarks>
+            新建一个配置文件，文件会保存为：程序目录/configs/<see cref="P:Milimoe.FunGame.Core.Api.Utility.PluginConfig.PluginName"/>/<see cref="P:Milimoe.FunGame.Core.Api.Utility.PluginConfig.FileName"/>.json
+            </remarks>
+            <param name="plugin_name"></param>
+            <param name="file_name"></param>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Api.Utility.PluginConfig.PluginName">
+            <summary>
+            插件的名称
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Api.Utility.PluginConfig.FileName">
+            <summary>
+            配置文件的名称（后缀将是.json）
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Api.Utility.PluginConfig.Item(System.String)">
+            <summary>
+            使用索引器给指定key赋值，不存在key会新增
+            </summary>
+            <param name="key"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.PluginConfig.Parse``1(System.String)">
+            <summary>
+            如果保存了对象，请使用此方法转换
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="key"></param>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.PluginConfig.GetValue(System.String)">
+            <summary>
+            获取指定key的value
+            </summary>
+            <param name="key"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.PluginConfig.Get``1(System.String)">
+            <summary>
+            使用泛型获取指定key的value
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="key"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.PluginConfig.Add(System.String,System.Object)">
+            <summary>
+            添加一个配置，如果已存在key会覆盖
+            </summary>
+            <param name="key"></param>
+            <param name="value"></param>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.PluginConfig.LoadConfig">
+            <summary>
+            从配置文件中读取配置。
+            注意：所有保存时为数组的对象都会变成<see cref="T:System.Collections.Generic.List`1"/>对象，并且不支持<see cref="T:System.Object"/>类型
+            </summary>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.PluginConfig.SaveConfig">
+            <summary>
+            将配置保存到配置文件。调用此方法会覆盖原有的.json，请注意备份
+            </summary>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.PluginConfig.AddValue(System.String,System.Text.Json.JsonElement)">
+            <summary>
+            Json反序列化的方法
+            </summary>
+            <param name="key"></param>
+            <param name="obj"></param>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.PluginConfig.AddValues(System.String,System.Text.Json.JsonElement.ArrayEnumerator)">
+            <summary>
+            Json数组反序列化的方法。不支持<see cref="T:System.Object"/>数组。
+            </summary>
+            <param name="key"></param>
+            <param name="obj"></param>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Api.Utility.PluginLoader.Plugins">
+            <summary>
+            已读取的插件列表
+            <para>key 是 <see cref="P:Milimoe.FunGame.Core.Library.Common.Addon.Plugin.Name"/></para>
+            </summary>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.PluginLoader.LoadPlugins(System.Collections.Hashtable,System.Object[])">
+            <summary>
+            构建一个插件读取器并读取插件
+            </summary>
+            <param name="delegates">用于构建 <see cref="T:Milimoe.FunGame.Core.Controller.AddonController"/></param>
+            <param name="otherobjs">其他需要传入给插件初始化的对象</param>
+            <returns></returns>
+        </member>
+        <member name="T:Milimoe.FunGame.Core.Api.Utility.Singleton">
+            <summary>
+            单例表：表中的对象以类名作为Key保存，并以Key获取该对象，Key具有唯一约束
+            用于储存单例对象使用
+            </summary>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.Singleton.IsExist(System.Object)">
+            <summary>
+            查询目标的类是否已经有实例
+            </summary>
+            <param name="single">单例对象</param>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.Singleton.Add(System.Object)">
+            <summary>
+            将目标和目标的类添加至单例表
+            </summary>
+            <param name="single">单例对象</param>
+            <returns></returns>
+            <exception cref="T:Milimoe.FunGame.SingletonAddException">添加单例到单例表时遇到错误</exception>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.Singleton.Remove(System.Object)">
+            <summary>
+            将目标和目标的类从单例表中移除
+            </summary>
+            <param name="single">单例对象</param>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.Singleton.Get``1">
+            <summary>
+            获取单例对象
+            </summary>
+            <typeparam name="T">目标类</typeparam>
+            <returns></returns>
+            <exception cref="T:Milimoe.FunGame.SingletonGetException">不能从单例表中获取到指定的单例</exception>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.Singleton.Get(System.Type)">
+            <summary>
+            获取单例对象
+            </summary>
+            <param name="type">目标类</param>
+            <returns></returns>
+            <exception cref="T:Milimoe.FunGame.SingletonGetException">不能从单例表中获取到指定的单例</exception>
+        </member>
+        <member name="F:Milimoe.FunGame.Core.Api.Utility.INIHelper.DefaultFileName">
+            <summary>
+            默认的配置文件名称
+            </summary>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.INIHelper.WriteINI(System.String,System.String,System.String,System.String)">
+            <summary>
+            写入ini文件
+            </summary>
+            <param name="Section">Section</param>
+            <param name="Key">键</param>
+            <param name="Value">值</param>
+            <param name="FileName">文件名，缺省为FunGame.ini</param>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.INIHelper.ReadINI(System.String,System.String,System.String)">
+            <summary>
+            读取ini文件
+            </summary>
+            <param name="Section">Section</param>
+            <param name="Key">键</param>
+            <param name="FileName">文件名，缺省为FunGame.ini</param>
+            <returns>读取到的值</returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.INIHelper.ExistINIFile(System.String)">
+            <summary>
+            查询ini文件是否存在
+            </summary>
+            <param name="FileName">文件名，缺省为FunGame.ini</param>
+            <returns>是否存在</returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.INIHelper.Init(Milimoe.FunGame.Core.Library.Constant.FunGameInfo.FunGame)">
+            <summary>
+            初始化ini模板文件
+            </summary>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.TXTHelper.ReadTXT(System.String,System.String)">
+            <summary>
+            读取TXT文件内容
+            </summary>
+            <param name="filename">文件名</param>
+            <param name="path">相对路径</param>
+            <returns>内容</returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.TXTHelper.WriteTXT(System.String,System.String,System.String)">
+            <summary>
+            写入TXT文件内容（如不存在文件会创建，反之新起一行追加）
+            </summary>
+            <param name="message"></param>
+            <param name="filename">文件名</param>
+            <param name="path">相对路径</param>
+            <returns>内容</returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.TXTHelper.AppendErrorLog(System.String)">
+            <summary>
+            追加错误日志 默认写入logs文件夹下的当日日期.log文件
+            </summary>
+            <param name="msg"></param>
+        </member>
+        <member name="T:Milimoe.FunGame.Core.Api.Utility.TwoFactorAuthenticator">
+            <summary>
+            Aka. 2FA 双重认证 双因素身份验证
+            </summary>
+        </member>
+        <member name="F:Milimoe.FunGame.Core.Api.Utility.TwoFactorAuthenticator.SQLHelper">
+            <summary>
+            SQLHelper 允许为空
+            </summary>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.TwoFactorAuthenticator.#ctor">
+            <summary>
+            不使用SQL模式
+            </summary>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.TwoFactorAuthenticator.#ctor(Milimoe.FunGame.Core.Api.Transmittal.SQLHelper)">
+            <summary>
+            使用SQL模式 记录对应账号的密文到数据库中
+            </summary>
+            <param name="SQLHelper"></param>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.TwoFactorAuthenticator.IsAvailable(System.String)">
+            <summary>
+            检查账号是否需要2FA
+            </summary>
+            <param name="username"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.TwoFactorAuthenticator.Authenticate(System.String,System.String)">
+            <summary>
+            2FA验证
+            </summary>
+            <param name="username"></param>
+            <param name="code"></param>
+            <returns></returns>
+        </member>
+        <member name="F:Milimoe.FunGame.Core.Api.Utility.TwoFactorAuthenticator.INTERVAL_SECONDS">
+            <summary>
+            每30秒刷新
+            </summary>
+        </member>
+        <member name="F:Milimoe.FunGame.Core.Api.Utility.TwoFactorAuthenticator.DIGITS">
+            <summary>
+            6位数字2FA验证码
+            </summary>
+        </member>
+        <member name="F:Milimoe.FunGame.Core.Api.Utility.TwoFactorAuthenticator.PUBLICKEY">
+            <summary>
+            ----- PUBLIC KEY -----
+            </summary>
+        </member>
+        <member name="F:Milimoe.FunGame.Core.Api.Utility.TwoFactorAuthenticator.SECRETSIGN">
+            <summary>
+            ----- SECRET SIGN -----
+            </summary>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.TwoFactorAuthenticator.CreateSecretKey(System.String)">
+            <summary>
+            创键私钥，用于绑定账号，并生成两个文件，需要用户保存
+            </summary>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.TwoFactorAuthenticator.Base32Encode(System.Byte[])">
+            <summary>
+            生成随机秘钥字符串
+            </summary>
+            <param name="data"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.TwoFactorAuthenticator.GenerateCode(System.String)">
+            <summary>
+            生成基于当前时间戳的6位数字2FA验证码
+            </summary>
+            <param name="secretKey"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.TwoFactorAuthenticator.GetCurrentCounter">
+            <summary>
+            获取当前时间节点
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.TwoFactorAuthenticator.Base32Decode(System.String)">
+            <summary>
+            生成验证码
+            </summary>
+            <param name="input"></param>
+            <returns></returns>
+            <exception cref="T:System.ArgumentException"></exception>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.TwoFactorAuthenticator.SplitKeyFile(System.String,System.String[]@)">
+            <summary>
+            拆分字符串中的密文和私钥
+            </summary>
+            <param name="content"></param>
+            <param name="strs"></param>
+            <returns></returns>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Controller.AddonController.MaskMethod_WriteLine">
+            <summary>
+            输出系统消息
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Controller.AddonController.MaskMethod_Error">
+            <summary>
+            输出错误消息
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Controller.AddonController.MaskMethod_NewDataRequest">
+            <summary>
+            基于本地已连接的Socket创建新的数据请求
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Controller.AddonController.MaskMethod_NewLongRunningDataRequest">
+            <summary>
+            基于本地已连接的Socket创建长时间运行的数据请求
+            </summary>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Controller.AddonController.WriteLine(System.String)">
+            <summary>
+            输出系统消息
+            </summary>
+            <param name="msg"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Controller.AddonController.Error(System.Exception)">
+            <summary>
+            输出错误消息
+            </summary>
+            <param name="e"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Controller.AddonController.NewDataRequest(Milimoe.FunGame.Core.Library.Constant.DataRequestType)">
+            <summary>
+            基于本地已连接的Socket创建新的数据请求
+            <para>请勿在 <see cref="T:Milimoe.FunGame.Core.Library.Common.Addon.GameModeServer"/> 中调用此方法</para>
+            </summary>
+            <param name="type"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Controller.AddonController.NewLongRunningDataRequest(Milimoe.FunGame.Core.Library.Constant.DataRequestType)">
+            <summary>
+            基于本地已连接的Socket创建长时间运行的数据请求
+            <para>请勿在 <see cref="T:Milimoe.FunGame.Core.Library.Common.Addon.GameModeServer"/> 中调用此方法</para>
+            </summary>
+            <param name="type"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Controller.AddonController.#ctor(Milimoe.FunGame.Core.Interface.IAddon,System.Collections.Hashtable)">
+            <summary>
+            新建一个AddonController
+            </summary>
+            <param name="Addon"></param>
+            <param name="delegates"></param>
+        </member>
+        <member name="T:Milimoe.FunGame.Core.Controller.RunTimeController">
+            <summary>
+            此类实现服务器连接、断开连接、心跳检测、创建数据请求等功能
+            -- 需要继承并实现部分方法 --
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Controller.RunTimeController.Socket">
+            <summary>
+            与服务器的连接套接字实例
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Controller.RunTimeController.Connected">
+            <summary>
+            套接字是否已经连接
+            </summary>
+        </member>
+        <member name="F:Milimoe.FunGame.Core.Controller.RunTimeController._ReceivingTask">
+            <summary>
+            接收服务器信息的线程
+            </summary>
+        </member>
+        <member name="F:Milimoe.FunGame.Core.Controller.RunTimeController._Socket">
+            <summary>
+            用于类内赋值
+            </summary>
+        </member>
+        <member name="F:Milimoe.FunGame.Core.Controller.RunTimeController._IsReceiving">
+            <summary>
+            是否正在接收服务器信息
+            </summary>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Controller.RunTimeController.Disconnect">
+            <summary>
+            断开服务器连接
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Controller.RunTimeController.EndGame">
+            <summary>
+            发送结束游戏反馈
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Controller.RunTimeController.Connect(System.String,System.Int32)">
+            <summary>
+            连接服务器
+            </summary>
+            <param name="addr"></param>
+            <param name="port"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Controller.RunTimeController.GetServerAddress">
+            <summary>
+            获取服务器地址
+            </summary>
+            <returns>string：IP地址；int：端口号</returns>
+            <exception cref="T:Milimoe.FunGame.FindServerFailedException"></exception>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Controller.RunTimeController.BeforeConnect(System.String@,System.Int32@,System.Collections.ArrayList)">
+            <summary>
+            此方法将在连接服务器前触发<para/>
+            客户端可以重写此方法
+            </summary>
+            <param name="ip">服务器IP</param>
+            <param name="port">服务器端口</param>
+            <param name="args">重写时可以提供额外的连接参数</param>
+            <returns>false：中止连接</returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Controller.RunTimeController.AfterConnect(System.Collections.ArrayList)">
+            <summary>
+            此方法将在连接服务器后触发（Connect结果返回前）<para/>
+            客户端可以重写此方法
+            </summary>
+            <param name="ConnectArgs">连接服务器后返回的一些数据，可以使用也可以修改它们</param>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Controller.RunTimeController.AutoLogin(System.String,System.String,System.String)">
+            <summary>
+            客户端需要自行实现自动登录的事务
+            </summary>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Controller.RunTimeController.Close">
+            <summary>
+            关闭所有连接
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Controller.RunTimeController.WritelnSystemInfo(System.String)">
+            <summary>
+            输出消息
+            </summary>
+            <param name="msg"></param>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Controller.RunTimeController.Error(System.Exception)">
+            <summary>
+            自定处理异常的方法
+            -- 一般放在catch中 --
+            </summary>
+            <param name="e"></param>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Controller.RunTimeController.NewDataRequest(Milimoe.FunGame.Core.Library.Constant.DataRequestType)">
+            <summary>
+            基于本地已连接的Socket创建新的数据请求
+            </summary>
+            <param name="RequestType"></param>
+            <returns></returns>
+            <exception cref="T:Milimoe.FunGame.ConnectFailedException"></exception>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Controller.RunTimeController.NewLongRunningDataRequest(Milimoe.FunGame.Core.Library.Constant.DataRequestType)">
+            <summary>
+            基于本地已连接的Socket创建长时间运行的数据请求
+            </summary>
+            <param name="RequestType"></param>
+            <returns></returns>
+            <exception cref="T:Milimoe.FunGame.ConnectFailedException"></exception>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Controller.RunTimeController.StartReceiving">
+            <summary>
+            开始接收服务器信息
+            </summary>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Controller.RunTimeController.GetServerMessage">
+            <summary>
+            获取服务器已发送的信息为SocketObject数组
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Controller.RunTimeController.Receiving">
+            <summary>
+            具体接收服务器信息以及处理信息的方法
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Controller.RunTimeController.SocketHandler_Disconnect(Milimoe.FunGame.Core.Library.Common.Network.SocketObject)">
+            <summary>
+            客户端接收服务器断开连接的通知
+            </summary>
+            <param name="ServerMessage"></param>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Controller.RunTimeController.SocketHandler_System(Milimoe.FunGame.Core.Library.Common.Network.SocketObject)">
+            <summary>
+            客户端接收并处理服务器系统消息
+            </summary>
+            <param name="ServerMessage"></param>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Controller.RunTimeController.SocketHandler_HeartBeat(Milimoe.FunGame.Core.Library.Common.Network.SocketObject)">
+            <summary>
+            客户端接收并处理服务器心跳
+            </summary>
+            <param name="ServerMessage"></param>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Controller.RunTimeController.SocketHandler_ForceLogout(Milimoe.FunGame.Core.Library.Common.Network.SocketObject)">
+            <summary>
+            客户端接收强制退出登录的通知
+            </summary>
+            <param name="ServerMessage"></param>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Controller.RunTimeController.SocketHandler_Chat(Milimoe.FunGame.Core.Library.Common.Network.SocketObject)">
+            <summary>
+            客户端接收并处理聊天信息
+            </summary>
+            <param name="ServerMessage"></param>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Controller.RunTimeController.SocketHandler_UpdateRoomMaster(Milimoe.FunGame.Core.Library.Common.Network.SocketObject)">
+            <summary>
+            客户端接收并处理更换房主信息
+            </summary>
+            <param name="ServerMessage"></param>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Controller.RunTimeController.SocketHandler_MatchRoom(Milimoe.FunGame.Core.Library.Common.Network.SocketObject)">
+            <summary>
+            客户端接收并处理匹配房间成功信息
+            </summary>
+            <param name="ServerMessage"></param>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Controller.RunTimeController.SocketHandler_StartGame(Milimoe.FunGame.Core.Library.Common.Network.SocketObject)">
+            <summary>
+            客户端接收并处理开始游戏信息
+            </summary>
+            <param name="ServerMessage"></param>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Controller.RunTimeController.SocketHandler_EndGame(Milimoe.FunGame.Core.Library.Common.Network.SocketObject)">
+            <summary>
+            客户端接收并处理游戏结束信息
+            </summary>
+            <param name="ServerMessage"></param>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Controller.RunTimeController.SocketHandler_Gaming(Milimoe.FunGame.Core.Library.Common.Network.SocketObject)">
+            <summary>
+            客户端接收并处理局内消息
+            </summary>
+            <param name="ServerMessage"></param>
+        </member>
+        <member name="T:Milimoe.FunGame.Core.Controller.SocketHandlerController">
+            <summary>
+            <para>继承 AsyncAwaiter 用法：</para>
+            <para>1、调用Socket.Send()前，请设置为等待状态：SetWorking();</para>
+            <para>2、调用Socket.Send() == Success后，请等待任务完成：WaitForWorkDone();</para>
+            <para>3、在其他任何地方修改Working状态，均会使任务终止。</para>
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Controller.SocketHandlerController.Work">
+            <summary>
+            接收到的SocketObject实例
+            </summary>
+        </member>
+        <member name="F:Milimoe.FunGame.Core.Controller.SocketHandlerController._Socket">
+            <summary>
+            Socket
+            </summary>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Controller.SocketHandlerController.#ctor(Milimoe.FunGame.Core.Library.Common.Network.Socket)">
+            <summary>
+            继承请调用base构造
+            </summary>
+            <param name="socket">Socket</param>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Controller.SocketHandlerController.SocketHandler(Milimoe.FunGame.Core.Library.Common.Network.SocketObject)">
+            <summary>
+            继承请重写此方法
+            </summary>
+            <param name="SocketObject">SocketObject</param>
+        </member>
+        <member name="F:Milimoe.FunGame.Core.Controller.SocketHandlerController.IsDisposed">
+            <summary>
+            判断是否已经Disposed
+            </summary>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Controller.SocketHandlerController.Dispose">
+            <summary>
+            公开的Dispose方法
+            </summary>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Controller.SocketHandlerController.Dispose(System.Boolean)">
+            <summary>
+            关闭时
+            </summary>
+            <param name="Disposing"></param>
+        </member>
+        <member name="T:Milimoe.FunGame.Core.Controller.SocketHandlerController.DisposedEvent">
+            <summary>
+            关闭事件
+            </summary>
+        </member>
+        <member name="E:Milimoe.FunGame.Core.Controller.SocketHandlerController.Disposed">
+            <summary>
+            <para>Controller关闭时事件</para>
+            <para>不建议new Dispose()方法，建议使用事件</para>
+            <para>事件会在base.Dispose()执行前触发</para>
+            </summary>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Controller.SocketHandlerController.OnDisposed">
+            <summary>
+            触发关闭事件
+            </summary>
+        </member>
+        <member name="T:Milimoe.FunGame.Core.Entity.UserStatistics">
+            <summary>
+            记录 <see cref="T:Milimoe.FunGame.Core.Entity.User"/> 的生涯、赛季统计数据<para/>
+            Key为赛季(long)，每个key代表第key赛季，key = 0时为生涯数据。
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Interface.Base.IServerModel.Running">
+            <summary>
+            服务器实例是否在运行
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Interface.Base.IServerModel.Socket">
+            <summary>
+            客户端的套接字实例
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Interface.Base.IServerModel.User">
+            <summary>
+            客户端的用户实例，在用户登录后有效
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Interface.Base.IServerModel.ClientName">
+            <summary>
+            客户端的名称，默认是客户端的IP地址
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Interface.Base.IServerModel.IsDebugMode">
+            <summary>
+            客户端是否启动了开发者模式
+            </summary>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Interface.Base.IServerModel.Send(Milimoe.FunGame.Core.Library.Common.Network.ClientSocket,Milimoe.FunGame.Core.Library.Constant.SocketMessageType,System.Object[])">
+            <summary>
+            向客户端发送消息
+            </summary>
+            <param name="socket"></param>
+            <param name="type"></param>
+            <param name="objs"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Interface.Base.IServerModel.SendSystemMessage(Milimoe.FunGame.Core.Library.Constant.ShowMessageType,System.String,System.String,System.Int32,System.String[])">
+            <summary>
+            向客户端发送系统消息
+            </summary>
+            <param name="showtype"></param>
+            <param name="msg"></param>
+            <param name="title"></param>
+            <param name="autoclose"></param>
+            <param name="usernames"></param>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Interface.Base.IServerModel.GetClientName">
+            <summary>
+            获取客户端的名称，通常未登录时显示为客户端的IP地址，登录后显示为账号名
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Interface.Base.IServerModel.Read(Milimoe.FunGame.Core.Library.Common.Network.ClientSocket)">
+            <summary>
+            开始接收客户端消息
+            <para>请勿在 <see cref="T:Milimoe.FunGame.Core.Library.Common.Addon.GameModeServer"/> 中调用此方法</para>
+            </summary>
+            <param name="socket"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Interface.Base.IServerModel.Start">
+            <summary>
+            启动对客户端的监听
+            <para>请勿在 <see cref="T:Milimoe.FunGame.Core.Library.Common.Addon.GameModeServer"/> 中调用此方法</para>
+            </summary>
+        </member>
+        <member name="T:Milimoe.FunGame.Core.Interface.IEventHandler">
+            <summary>
+            窗体继承这些接口便能实现事件，或为插件预留。
+            </summary>
+        </member>
+        <member name="T:Milimoe.FunGame.Core.Interface.IGamingEventHandler">
+            <summary>
+            局内事件的接口，与 <see cref="T:Milimoe.FunGame.Core.Library.Common.Addon.GameMode"/> 配套使用
+            </summary>
+        </member>
+        <member name="T:Milimoe.FunGame.Core.Interface.IClient">
+            <summary>
+            这是最基本的接口，要求客户端实现
+            </summary>
+        </member>
+        <member name="T:Milimoe.FunGame.Core.Interface.IServer">
+            <summary>
+            服务器需要实现此接口
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Library.Common.Addon.CharacterMode.Name">
+            <summary>
+            模组名称
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Library.Common.Addon.CharacterMode.Description">
+            <summary>
+            模组描述
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Library.Common.Addon.CharacterMode.Version">
+            <summary>
+            模组版本
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Library.Common.Addon.CharacterMode.Author">
+            <summary>
+            模组作者
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Library.Common.Addon.CharacterMode.Characters">
+            <summary>
+            此模组中包含的角色
+            </summary>
+        </member>
+        <member name="F:Milimoe.FunGame.Core.Library.Common.Addon.CharacterMode.IsLoaded">
+            <summary>
+            加载标记
+            </summary>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Library.Common.Addon.CharacterMode.Load(System.Object[])">
+            <summary>
+            加载模组
+            </summary>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Library.Common.Addon.CharacterMode.AfterLoad">
+            <summary>
+            模组加载后需要做的事
+            </summary>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Library.Common.Addon.CharacterMode.BeforeLoad">
+            <summary>
+            允许返回false来阻止加载此模组
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:Milimoe.FunGame.Core.Library.Common.Addon.ExamplePlugin">
+            <summary>
+            必须继承基类：<see cref="T:Milimoe.FunGame.Core.Library.Common.Addon.Plugin"/><para/>
+            继承事件接口并实现其方法来使插件生效。例如继承：<seealso cref="T:Milimoe.FunGame.Core.Interface.ILoginEvent"/>
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Library.Common.Addon.GameMap.Name">
+            <summary>
+            地图名称
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Library.Common.Addon.GameMap.Description">
+            <summary>
+            地图描述
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Library.Common.Addon.GameMap.Version">
+            <summary>
+            地图版本
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Library.Common.Addon.GameMap.Author">
+            <summary>
+            地图作者
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Library.Common.Addon.GameMap.Width">
+            <summary>
+            宽度
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Library.Common.Addon.GameMap.Height">
+            <summary>
+            高度
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Library.Common.Addon.GameMap.Size">
+            <summary>
+            格子大小
+            </summary>
+        </member>
+        <member name="F:Milimoe.FunGame.Core.Library.Common.Addon.GameMap.IsLoaded">
+            <summary>
+            加载标记
+            </summary>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Library.Common.Addon.GameMap.Load(System.Object[])">
+            <summary>
+            加载地图
+            </summary>
+            <param name="objs"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Library.Common.Addon.GameMap.AfterLoad">
+            <summary>
+            加载后需要做的事
+            </summary>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Library.Common.Addon.GameMap.BeforeLoad">
+            <summary>
+            允许返回false来阻止加载此地图
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Library.Common.Addon.GameMode.Name">
+            <summary>
+            模组名称
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Library.Common.Addon.GameMode.Description">
+            <summary>
+            模组描述
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Library.Common.Addon.GameMode.Version">
+            <summary>
+            模组版本
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Library.Common.Addon.GameMode.Author">
+            <summary>
+            模组作者
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Library.Common.Addon.GameMode.DefaultMap">
+            <summary>
+            默认地图
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Library.Common.Addon.GameMode.Maps">
+            <summary>
+            模组所使用的地图
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Library.Common.Addon.GameMode.RoomType">
+            <summary>
+            适用的房间模式
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Library.Common.Addon.GameMode.Controller">
+            <summary>
+            包含了一些常用方法的控制器
+            </summary>
+        </member>
+        <member name="F:Milimoe.FunGame.Core.Library.Common.Addon.GameMode._Controller">
+            <summary>
+            控制器内部变量
+            </summary>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Library.Common.Addon.GameMode.StartUI(System.Object[])">
+            <summary>
+            如模组有界面，请重写此方法
+            此方法会在StartGame时调用
+            </summary>
+            <param name="args"></param>
+            <returns></returns>
+        </member>
+        <member name="F:Milimoe.FunGame.Core.Library.Common.Addon.GameMode.IsLoaded">
+            <summary>
+            加载标记
+            </summary>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Library.Common.Addon.GameMode.Load(System.Object[])">
+            <summary>
+            加载模组
+            </summary>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Library.Common.Addon.GameMode.AfterLoad">
+            <summary>
+            模组加载后需要做的事
+            </summary>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Library.Common.Addon.GameMode.BeforeLoad">
+            <summary>
+            允许返回false来阻止加载此模组
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Library.Common.Addon.GameMode.Init(System.Object[])">
+            <summary>
+            传递委托以便让模组调用
+            </summary>
+        </member>
+        <member name="F:Milimoe.FunGame.Core.Library.Common.Addon.GameMode.Session">
+            <summary>
+            Session对象
+            </summary>
+        </member>
+        <member name="F:Milimoe.FunGame.Core.Library.Common.Addon.GameMode.Config">
+            <summary>
+            Config对象
+            </summary>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Library.Common.Addon.GameMode.BindEvent">
+            <summary>
+            绑定事件。在<see cref="M:Milimoe.FunGame.Core.Library.Common.Addon.GameMode.BeforeLoad"/>后触发
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Library.Common.Addon.GameModeServer.Name">
+            <summary>
+            模组名称
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Library.Common.Addon.GameModeServer.Description">
+            <summary>
+            模组描述
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Library.Common.Addon.GameModeServer.Version">
+            <summary>
+            模组版本
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Library.Common.Addon.GameModeServer.Author">
+            <summary>
+            模组作者
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Library.Common.Addon.GameModeServer.DefaultMap">
+            <summary>
+            默认地图
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Library.Common.Addon.GameModeServer.Maps">
+            <summary>
+            模组所使用的地图
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Library.Common.Addon.GameModeServer.Controller">
+            <summary>
+            包含了一些常用方法的控制器
+            </summary>
+        </member>
+        <member name="F:Milimoe.FunGame.Core.Library.Common.Addon.GameModeServer._Controller">
+            <summary>
+            控制器内部变量
+            </summary>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Library.Common.Addon.GameModeServer.StartServer(System.String,Milimoe.FunGame.Core.Entity.Room,System.Collections.Generic.List{Milimoe.FunGame.Core.Entity.User},Milimoe.FunGame.Core.Interface.Base.IServerModel,System.Collections.Generic.Dictionary{System.String,Milimoe.FunGame.Core.Interface.Base.IServerModel},System.Object[])">
+            <summary>
+            启动服务器监听 请在此处实现服务器逻辑
+            </summary>
+            <param name="GameMode"></param>
+            <param name="Room"></param>
+            <param name="Users"></param>
+            <param name="RoomMasterServerModel"></param>
+            <param name="OthersServerModel"></param>
+            <param name="Args"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Library.Common.Addon.GameModeServer.GamingMessageHandler(System.String,Milimoe.FunGame.Core.Library.Constant.GamingType,System.Collections.Hashtable)">
+            <summary>
+            接收并处理GamingMessage
+            </summary>
+            <param name="username">发送此消息的账号</param>
+            <param name="type">消息类型</param>
+            <param name="data">消息参数</param>
+            <returns>底层会将哈希表中的数据发送给客户端</returns>
+        </member>
+        <member name="F:Milimoe.FunGame.Core.Library.Common.Addon.GameModeServer.IsLoaded">
+            <summary>
+            加载标记
+            </summary>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Library.Common.Addon.GameModeServer.Load(System.Object[])">
+            <summary>
+            加载模组
+            </summary>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Library.Common.Addon.GameModeServer.AfterLoad">
+            <summary>
+            模组加载后需要做的事
+            </summary>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Library.Common.Addon.GameModeServer.BeforeLoad">
+            <summary>
+            允许返回false来阻止加载此模组
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Library.Common.Addon.ItemMode.Name">
+            <summary>
+            模组名称
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Library.Common.Addon.ItemMode.Description">
+            <summary>
+            模组描述
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Library.Common.Addon.ItemMode.Version">
+            <summary>
+            模组版本
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Library.Common.Addon.ItemMode.Author">
+            <summary>
+            模组作者
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Library.Common.Addon.ItemMode.Items">
+            <summary>
+            此模组中包含的物品
+            </summary>
+        </member>
+        <member name="F:Milimoe.FunGame.Core.Library.Common.Addon.ItemMode.IsLoaded">
+            <summary>
+            加载标记
+            </summary>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Library.Common.Addon.ItemMode.Load(System.Object[])">
+            <summary>
+            加载模组
+            </summary>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Library.Common.Addon.ItemMode.AfterLoad">
+            <summary>
+            模组加载后需要做的事
+            </summary>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Library.Common.Addon.ItemMode.BeforeLoad">
+            <summary>
+            允许返回false来阻止加载此模组
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Library.Common.Addon.Plugin.Name">
+            <summary>
+            插件名称
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Library.Common.Addon.Plugin.Description">
+            <summary>
+            插件描述
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Library.Common.Addon.Plugin.Version">
+            <summary>
+            插件版本
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Library.Common.Addon.Plugin.Author">
+            <summary>
+            插件作者
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Library.Common.Addon.Plugin.Controller">
+            <summary>
+            包含了一些常用方法的控制器
+            </summary>
+        </member>
+        <member name="F:Milimoe.FunGame.Core.Library.Common.Addon.Plugin._Controller">
+            <summary>
+            控制器内部变量
+            </summary>
+        </member>
+        <member name="F:Milimoe.FunGame.Core.Library.Common.Addon.Plugin.IsLoaded">
+            <summary>
+            加载标记
+            </summary>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Library.Common.Addon.Plugin.Load(System.Object[])">
+            <summary>
+            加载插件
+            </summary>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Library.Common.Addon.Plugin.AfterLoad">
+            <summary>
+            插件加载后需要做的事
+            </summary>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Library.Common.Addon.Plugin.BeforeLoad">
+            <summary>
+            允许返回false来阻止加载此插件
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Library.Common.Addon.Plugin.Init(System.Object[])">
+            <summary>
+            传递委托以便让插件调用
+            </summary>
+        </member>
+        <member name="F:Milimoe.FunGame.Core.Library.Common.Addon.Plugin.Session">
+            <summary>
+            Session对象
+            </summary>
+        </member>
+        <member name="F:Milimoe.FunGame.Core.Library.Common.Addon.Plugin.Config">
+            <summary>
+            Config对象
+            </summary>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Library.Common.Addon.Plugin.BindEvent">
+            <summary>
+            绑定事件。在<see cref="M:Milimoe.FunGame.Core.Library.Common.Addon.Plugin.BeforeLoad"/>后触发
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Library.Common.Addon.SkillMode.Name">
+            <summary>
+            模组名称
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Library.Common.Addon.SkillMode.Description">
+            <summary>
+            模组描述
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Library.Common.Addon.SkillMode.Version">
+            <summary>
+            模组版本
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Library.Common.Addon.SkillMode.Author">
+            <summary>
+            模组作者
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Library.Common.Addon.SkillMode.Skills">
+            <summary>
+            此模组中包含的技能
+            </summary>
+        </member>
+        <member name="F:Milimoe.FunGame.Core.Library.Common.Addon.SkillMode.IsLoaded">
+            <summary>
+            加载标记
+            </summary>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Library.Common.Addon.SkillMode.Load(System.Object[])">
+            <summary>
+            加载模组
+            </summary>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Library.Common.Addon.SkillMode.AfterLoad">
+            <summary>
+            模组加载后需要做的事
+            </summary>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Library.Common.Addon.SkillMode.BeforeLoad">
+            <summary>
+            允许返回false来阻止加载此模组
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:Milimoe.FunGame.Core.Library.Common.Architecture.AsyncAwaiter`1">
+            <summary>
+            继承这个类可以获得异步等待的功能
+            <para>参考实现 <see cref="T:Milimoe.FunGame.Core.Controller.SocketHandlerController"/></para>
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Library.Common.Architecture.AsyncAwaiter`1.Work">
+            <summary>
+            接收到的实例
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Library.Common.Architecture.AsyncAwaiter`1.Working">
+            <summary>
+            是否处于等待的状态
+            </summary>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Library.Common.Architecture.AsyncAwaiter`1.SetWorking">
+            <summary>
+            异步操作前，请设置为等待状态
+            </summary>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Library.Common.Architecture.AsyncAwaiter`1.WaitForWorkDone">
+            <summary>
+            等待任务完成（需要自己异步）
+            </summary>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Library.Common.Architecture.AsyncAwaiter`1.WaitForWorkDoneAsync">
+            <summary>
+            异步等待任务完成
+            </summary>
+        </member>
+        <member name="T:Milimoe.FunGame.Core.Library.Common.Architecture.TaskAwaiter">
+            <summary>
+            任务的等待器，可以设置在任务完成后需要的操作
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Library.Common.Architecture.TaskAwaiter.IsCompleted">
+            <summary>
+            任务是否完成
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Library.Common.Architecture.TaskAwaiter.Exception">
+            <summary>
+            捕获到的异常
+            </summary>
+        </member>
+        <member name="F:Milimoe.FunGame.Core.Library.Common.Architecture.TaskAwaiter.awaiter">
+            <summary>
+            <para>内部实现类</para>
+            实现参见 <see cref="T:Milimoe.FunGame.Core.Service.TaskManager.TaskAwaiter"/>
+            </summary>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Library.Common.Architecture.TaskAwaiter.#ctor(Milimoe.FunGame.Core.Interface.Base.ITaskAwaiter)">
+            <summary>
+            构造一个等待器
+            </summary>
+            <param name="awaiter"></param>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Library.Common.Architecture.TaskAwaiter.OnCompleted(System.Action)">
+            <summary>
+            返回TaskAwaiter可以连续的调用方法<para/>
+            但是意义不大，前一个OnCompleted方法并不会等待下一个方法<para/>
+            可以理解为并行广播<para/>
+            </summary>
+            <param name="action"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Library.Common.Architecture.TaskAwaiter.OnError(System.Action{System.Exception})">
+            <summary>
+            在捕获到异常时，将触发Error事件
+            </summary>
+            <param name="action"></param>
+            <returns></returns>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Library.Common.Network.MailObject.Sender">
+            <summary>
+            发件人邮箱
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Library.Common.Network.MailObject.SenderName">
+            <summary>
+            发件人名称
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Library.Common.Network.MailObject.Subject">
+            <summary>
+            邮件主题
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Library.Common.Network.MailObject.Body">
+            <summary>
+            邮件内容
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Library.Common.Network.MailObject.Priority">
+            <summary>
+            邮件优先级
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Library.Common.Network.MailObject.HTML">
+            <summary>
+            内容是否支持HTML
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Library.Common.Network.MailObject.ToList">
+            <summary>
+            收件人列表
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Library.Common.Network.MailObject.CCList">
+            <summary>
+            抄送列表
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Library.Common.Network.MailObject.BCCList">
+            <summary>
+            密送列表
+            </summary>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Library.Common.Network.MailObject.#ctor(Milimoe.FunGame.Core.Api.Transmittal.MailSender)">
+            <summary>
+            使用MailSender工具类创建邮件对象
+            </summary>
+            <param name="Sender"></param>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Library.Common.Network.MailObject.#ctor(System.String,System.String)">
+            <summary>
+            使用地址和名称创建邮件对象
+            </summary>
+            <param name="Sender"></param>
+            <param name="SenderName"></param>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Library.Common.Network.MailObject.#ctor(Milimoe.FunGame.Core.Api.Transmittal.MailSender,System.String,System.String,System.String)">
+            <summary>
+            使用地址和名称创建邮件对象，同时写主题、内容、单个收件人
+            </summary>
+            <param name="Sender"></param>
+            <param name="Subject"></param>
+            <param name="Body"></param>
+            <param name="To"></param>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Library.Common.Network.MailObject.#ctor(Milimoe.FunGame.Core.Api.Transmittal.MailSender,System.String,System.String,System.String,System.String)">
+            <summary>
+            使用地址和名称创建邮件对象，同时写主题、内容、单个收件人、单个抄送
+            </summary>
+            <param name="Sender"></param>
+            <param name="Subject"></param>
+            <param name="Body"></param>
+            <param name="To"></param>
+            <param name="CC"></param>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Library.Common.Network.MailObject.#ctor(Milimoe.FunGame.Core.Api.Transmittal.MailSender,System.String,System.String,System.Net.Mail.MailPriority,System.Boolean,System.String[],System.String[],System.String[])">
+            <summary>
+            完整的创建邮件对象
+            </summary>
+            <param name="Sender"></param>
+            <param name="Subject"></param>
+            <param name="Body"></param>
+            <param name="Priority"></param>
+            <param name="HTML"></param>
+            <param name="ToList"></param>
+            <param name="CCList"></param>
+            <param name="BCCList"></param>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Library.Common.Network.MailObject.Send(Milimoe.FunGame.Core.Api.Transmittal.MailSender)">
+            <summary>
+            发送邮件
+            -- 适合创建一次性邮件并发送 --
+            </summary>
+            <param name="sender"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Library.Common.Network.MailObject.AddTo(System.String)">
+            <summary>
+            添加收件人
+            </summary>
+            <param name="to"></param>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Library.Common.Network.MailObject.AddTo(System.String[])">
+            <summary>
+            添加多个收件人
+            </summary>
+            <param name="to"></param>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Library.Common.Network.MailObject.AddCC(System.String)">
+            <summary>
+            添加抄送
+            </summary>
+            <param name="cc"></param>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Library.Common.Network.MailObject.AddCC(System.String[])">
+            <summary>
+            添加多个抄送
+            </summary>
+            <param name="cc"></param>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Library.Common.Network.MailObject.AddBCC(System.String)">
+            <summary>
+            添加密送
+            </summary>
+            <param name="bcc"></param>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Library.Common.Network.MailObject.AddBCC(System.String[])">
+            <summary>
+            添加多个密送
+            </summary>
+            <param name="bcc"></param>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Library.Common.Network.SocketObject.GetParam``1(System.Int32)">
+            <summary>
+            从参数列表中获取指定类型和索引的参数
+            </summary>
+            <typeparam name="T">类型</typeparam>
+            <param name="index">索引</param>
+            <returns>类型的参数</returns>
+            <exception cref="T:Milimoe.FunGame.IndexOutOfArrayLengthException">索引超过数组上限</exception>
+        </member>
+        <member name="T:Milimoe.FunGame.Core.Library.Constant.InterfaceSet">
+            <summary>
+            配合 <see cref="T:Milimoe.FunGame.Core.Library.Constant.InterfaceMethod"/> <see cref="T:Milimoe.FunGame.Core.Library.Constant.InterfaceType"/> 使用，也别忘了修改 <see cref="T:Milimoe.FunGame.Core.Api.Utility.Implement"/>
+            </summary>
+        </member>
+        <member name="T:Milimoe.FunGame.Core.Library.Constant.SocketSet">
+            <summary>
+            需要同步更新 <see cref="T:Milimoe.FunGame.Core.Library.Constant.SocketMessageType"/>
+            </summary>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Library.Constant.SocketSet.GetTypeString(Milimoe.FunGame.Core.Library.Constant.SocketMessageType)">
+            <summary>
+            将通信类型的枚举转换为字符串
+            </summary>
+            <param name="type">通信类型</param>
+            <returns>等效字符串</returns>
+        </member>
+        <member name="T:Milimoe.FunGame.Core.Library.Constant.DataRequestSet">
+            <summary>
+            需要同步更新 <see cref="T:Milimoe.FunGame.Core.Library.Constant.DataRequestType"/>
+            </summary>
+        </member>
+        <member name="F:Milimoe.FunGame.Core.Library.Constant.DataRequestSet.RunTime_Logout">
+            RunTime
+        </member>
+        <member name="F:Milimoe.FunGame.Core.Library.Constant.DataRequestSet.Main_GetNotice">
+            Main
+        </member>
+        <member name="F:Milimoe.FunGame.Core.Library.Constant.DataRequestSet.Reg_GetRegVerifyCode">
+            Register
+        </member>
+        <member name="F:Milimoe.FunGame.Core.Library.Constant.DataRequestSet.Login_Login">
+            Login
+        </member>
+        <member name="F:Milimoe.FunGame.Core.Library.Constant.DataRequestSet.Room_GetRoomSettings">
+            Room
+        </member>
+        <member name="F:Milimoe.FunGame.Core.Library.Constant.DataRequestSet.Gaming">
+            Gaming
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Library.Constant.DataRequestSet.GetTypeString(Milimoe.FunGame.Core.Library.Constant.DataRequestType)">
+            <summary>
+            获取Type的等效字符串
+            </summary>
+            <param name="type"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Library.Constant.GamingSet.GetTypeString(Milimoe.FunGame.Core.Library.Constant.GamingType)">
+            <summary>
+            获取Type的等效字符串
+            </summary>
+            <param name="type"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Library.Constant.RoomSet.GetTypeString(Milimoe.FunGame.Core.Library.Constant.RoomType)">
+            <summary>
+            获取Type的等效字符串
+            </summary>
+            <param name="type"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Library.Constant.RoomSet.GetRoomType(System.String)">
+            <summary>
+            获取字符串对应的枚举
+            </summary>
+            <param name="typestring"></param>
+            <returns></returns>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Library.Constant.FunGameInfo.FunGame_DebugMode">
+            <summary>
+            添加-debug启动项将开启DebugMode（仅适用于Desktop或Console）
+            <para>目前支持禁用心跳检测功能</para>
+            </summary>
+        </member>
+        <member name="T:Milimoe.FunGame.Core.Library.Constant.General">
+            <summary>
+            此类保存常用的对象常量
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Library.Constant.General.EntityInstance">
+            <summary>
+            空的实体类 用于object返回
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Library.Constant.General.UnknownUserInstance">
+            <summary>
+            默认的未知用户
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Library.Constant.General.GuestUserInstance">
+            <summary>
+            游客用户
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Library.Constant.General.LocalUserInstance">
+            <summary>
+            本地用户
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Library.Constant.General.HallInstance">
+            <summary>
+            大厅（空房间）实例
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Library.Constant.General.DefaultEncoding">
+            <summary>
+            默认的字符编码
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Library.Constant.General.GeneralDateTimeFormat">
+            <summary>
+            默认的时间格式
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Library.Constant.General.DefaultTime">
+            <summary>
+            默认的时间值（1970年8月1日8点0分0秒）
+            </summary>
+        </member>
+        <member name="F:Milimoe.FunGame.Core.Library.Constant.General.MaxRetryTimes">
+            <summary>
+            最多自动重试连接次数
+            </summary>
+        </member>
+        <member name="F:Milimoe.FunGame.Core.Library.Constant.General.MaxTask_1C2G">
+            <summary>
+            1C2G推荐的任务数量
+            </summary>
+        </member>
+        <member name="F:Milimoe.FunGame.Core.Library.Constant.General.MaxTask_2C2G">
+            <summary>
+            2C2G推荐的任务数量
+            </summary>
+        </member>
+        <member name="F:Milimoe.FunGame.Core.Library.Constant.General.MaxTask_4C4G">
+            <summary>
+            4C4G推荐的任务数量
+            </summary>
+        </member>
+        <member name="F:Milimoe.FunGame.Core.Library.Constant.General.SocketByteSize">
+            <summary>
+            默认Socket数据包大小
+            </summary>
+        </member>
+        <member name="F:Milimoe.FunGame.Core.Library.Constant.General.StreamByteSize">
+            <summary>
+            默认Stream传输大小
+            </summary>
+        </member>
+        <member name="T:Milimoe.FunGame.Core.Library.Constant.InterfaceMethod">
+            <summary>
+            配合 <see cref="T:Milimoe.FunGame.Core.Library.Constant.InterfaceType"/> <see cref="T:Milimoe.FunGame.Core.Library.Constant.InterfaceSet"/> 使用，也别忘了修改 <see cref="T:Milimoe.FunGame.Core.Api.Utility.Implement"/>
+            </summary>
+        </member>
+        <member name="T:Milimoe.FunGame.Core.Library.Constant.InterfaceType">
+            <summary>
+            配合 <see cref="T:Milimoe.FunGame.Core.Library.Constant.InterfaceMethod"/> <see cref="T:Milimoe.FunGame.Core.Library.Constant.InterfaceSet"/> 使用，也别忘了修改 <see cref="T:Milimoe.FunGame.Core.Api.Utility.Implement"/>
+            </summary>
+        </member>
+        <member name="T:Milimoe.FunGame.Core.Library.Constant.RoomType">
+            <summary>
+            配合 <see cref="T:Milimoe.FunGame.Core.Library.Constant.RoomSet"/> 使用
+            </summary>
+        </member>
+        <member name="T:Milimoe.FunGame.Core.Library.Constant.SocketMessageType">
+            <summary>
+            需要同步更新 <see cref="T:Milimoe.FunGame.Core.Library.Constant.SocketSet"/>
+            </summary>
+        </member>
+        <member name="T:Milimoe.FunGame.Core.Library.Constant.DataRequestType">
+            <summary>
+            需要同步更新 <see cref="T:Milimoe.FunGame.Core.Library.Constant.DataRequestSet"/>
+            </summary>
+        </member>
+        <member name="T:Milimoe.FunGame.Core.Library.Constant.GamingType">
+            <summary>
+            需要同步更新 <see cref="T:Milimoe.FunGame.Core.Library.Constant.GamingSet"/>
+            </summary>
+        </member>
+        <member name="F:Milimoe.FunGame.Core.Library.SQLScript.Constant.Command_Select">
+            Commands
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Model.FunGameConfig.FunGame_isAutoConnect">
+            <summary>
+            是否自动连接服务器
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Model.FunGameConfig.FunGame_isAutoLogin">
+            <summary>
+            是否自动登录
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Model.FunGameConfig.FunGame_isMatching">
+            <summary>
+            是否在匹配中
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Model.FunGameConfig.FunGame_isConnected">
+            <summary>
+            是否连接上服务器
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Model.FunGameConfig.FunGame_isRetrying">
+            <summary>
+            是否正在重连
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Model.FunGameConfig.FunGame_isAutoRetry">
+            <summary>
+            是否自动重连
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Model.FunGameConfig.FunGame_isInRoom">
+            <summary>
+            是否在房间中
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Model.FunGameConfig.FunGame_RoomType">
+            <summary>
+            当前所处的房间类型
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Model.FunGameConfig.FunGame_ServerName">
+            <summary>
+            服务器名称
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Model.FunGameConfig.FunGame_Notice">
+            <summary>
+            公告
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Model.FunGameConfig.FunGame_AutoLoginUser">
+            <summary>
+            自动登录的账号
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Model.FunGameConfig.FunGame_AutoLoginPassword">
+            <summary>
+            自动登录的密码
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Model.FunGameConfig.FunGame_AutoLoginKey">
+            <summary>
+            自动登录的秘钥
+            </summary>
+        </member>
+        <member name="T:Milimoe.FunGame.Core.Model.Gaming">
+            <summary>
+            游戏局内类
+            客户端需要使用创建此类单例
+            </summary>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Model.Gaming.StartGame(Milimoe.FunGame.Core.Library.Common.Addon.GameMode,Milimoe.FunGame.Core.Entity.Room,System.Collections.Generic.List{Milimoe.FunGame.Core.Entity.User})">
+            <summary>
+            传入游戏所需的参数，构造一个Gaming实例
+            </summary>
+            <param name="GameMode"></param>
+            <param name="Room"></param>
+            <param name="Users"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Model.Gaming.GamingHandler(Milimoe.FunGame.Core.Library.Constant.GamingType,System.Collections.Hashtable)">
+            <summary>
+            需在RunTimeController的SocketHandler_Gaming方法中调用此方法
+            <para>客户端也可以参照此方法自行实现</para>
+            <para>此方法目的是为了触发 <see cref="T:Milimoe.FunGame.Core.Library.Common.Addon.GameMode"/> 的局内事件实现</para>
+            </summary>
+            <param name="GamingType"></param>
+            <param name="Data"></param>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Model.Session.Server_Address">
+            <summary>
+            服务器地址
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Model.Session.Server_Port">
+            <summary>
+            服务器端口号
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Model.Session.SocketToken">
+            <summary>
+            SocketToken
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Model.Session.LoginKey">
+            <summary>
+            LoginKey
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Model.Session.LoginUser">
+            <summary>
+            已登录的用户
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Model.Session.LoginUserName">
+            <summary>
+            已登录用户名
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Model.Session.InRoom">
+            <summary>
+            所处的房间
+            </summary>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Service.AddonManager.LoadPlugins(System.Collections.Generic.Dictionary{System.String,Milimoe.FunGame.Core.Library.Common.Addon.Plugin},System.Collections.Hashtable,System.Object[])">
+            <summary>
+            从plugins目录加载所有插件
+            </summary>
+            <param name="plugins"></param>
+            <param name="delegates"></param>
+            <param name="otherobjs"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Service.AddonManager.LoadGameModes(System.Collections.Generic.Dictionary{System.String,Milimoe.FunGame.Core.Library.Common.Addon.GameMode},System.Collections.Generic.List{Milimoe.FunGame.Core.Entity.Character},System.Collections.Generic.List{Milimoe.FunGame.Core.Entity.Skill},System.Collections.Generic.List{Milimoe.FunGame.Core.Entity.Item},System.Collections.Hashtable,System.Object[])">
+            <summary>
+            从gamemodes目录加载所有模组
+            </summary>
+            <param name="gamemodes"></param>
+            <param name="characters"></param>
+            <param name="skills"></param>
+            <param name="items"></param>
+            <param name="delegates"></param>
+            <param name="otherobjs"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Service.AddonManager.LoadGameModesForServer(System.Collections.Generic.Dictionary{System.String,Milimoe.FunGame.Core.Library.Common.Addon.GameModeServer},System.Collections.Generic.List{Milimoe.FunGame.Core.Entity.Character},System.Collections.Generic.List{Milimoe.FunGame.Core.Entity.Skill},System.Collections.Generic.List{Milimoe.FunGame.Core.Entity.Item},System.Collections.Hashtable,System.Object[])">
+            <summary>
+            从gamemodes目录加载所有适用于服务器的模组
+            </summary>
+            <param name="gamemodes"></param>
+            <param name="characters"></param>
+            <param name="skills"></param>
+            <param name="items"></param>
+            <param name="delegates"></param>
+            <param name="otherobjs"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Service.AddonManager.LoadGameMaps(System.Collections.Generic.Dictionary{System.String,Milimoe.FunGame.Core.Library.Common.Addon.GameMap},System.Object[])">
+            <summary>
+            从gamemaps目录加载所有地图
+            </summary>
+            <param name="gamemaps"></param>
+            <param name="objs"></param>
+            <returns></returns>
+        </member>
+        <member name="F:Milimoe.FunGame.Core.Service.JsonManager.GeneralOptions">
+            <summary>
+            默认的序列化选项
+            </summary>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Service.JsonManager.GetString``1(``0)">
+            <summary>
+            获取Json字符串
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="obj"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Service.JsonManager.GetString``1(``0,System.Text.Json.JsonSerializerOptions)">
+            <summary>
+            获取Json字符串
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="obj"></param>
+            <param name="options"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Service.JsonManager.GetObject``1(System.String)">
+            <summary>
+            反序列化Json对象
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="json"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Service.JsonManager.GetObject``1(System.String,System.Text.Json.JsonSerializerOptions)">
+            <summary>
+            反序列化Json对象
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="json"></param>
+            <param name="options"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Service.JsonManager.GetObject(System.String)">
+            <summary>
+            反序列化Json对象，此方法可能无法返回正确的类型，请注意辨别
+            </summary>
+            <param name="json"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Service.JsonManager.GetObject(System.String,System.Text.Json.JsonSerializerOptions)">
+            <summary>
+            反序列化Json对象，此方法可能无法返回正确的类型，请注意辨别
+            </summary>
+            <param name="json"></param>
+            <param name="options"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Service.JsonManager.GetObject``1(Milimoe.FunGame.Core.Library.Common.Network.SocketObject,System.Int32)">
+            <summary>
+            反序列化SocketObject中索引为index的Json对象
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="obj"></param>
+            <param name="index"></param>
+            <returns></returns>
+            <exception cref="T:Milimoe.FunGame.IndexOutOfArrayLengthException"></exception>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Service.JsonManager.GetObject``1(System.Collections.Hashtable,System.String)">
+            <summary>
+            反序列化Hashtable中Key对应的Json对象
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="table"></param>
+            <param name="key"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Service.JsonManager.GetObject``1(System.Collections.Generic.IEnumerable{System.Object},System.Int32)">
+            <summary>
+            反序列化IEnumerable中的Json对象
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="e"></param>
+            <param name="index"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Service.JsonManager.GetObject``1(System.Collections.Generic.IEnumerable{System.Object},System.Int32,System.Text.Json.JsonSerializerOptions)">
+            <summary>
+            反序列化IEnumerable中的Json对象
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="e"></param>
+            <param name="index"></param>
+            <param name="options"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Service.JsonManager.GetObject``1(System.Collections.Hashtable,System.String,System.Text.Json.JsonSerializerOptions)">
+            <summary>
+            反序列化Hashtable中Key对应的Json对象
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="table"></param>
+            <param name="key"></param>
+            <param name="options"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Service.JsonManager.GetObjects``1(System.String)">
+            <summary>
+            反序列化多个Json对象
+            注意必须是相同的Json对象才可以使用此方法解析
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="json"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Service.JsonManager.GetObjects``1(System.String,System.Text.Json.JsonSerializerOptions)">
+            <summary>
+            反序列化多个Json对象
+            注意必须是相同的Json对象才可以使用此方法解析
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="json"></param>
+            <param name="options"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Service.JsonManager.IsCompleteJson``1(System.String)">
+            <summary>
+            检查字符串是否为完整的JSON对象
+            </summary>
+            <param name="json"></param>
+            <returns></returns>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Service.MailManager.SmtpClients">
+            <summary>
+            用于保存Smtp客户端
+            一个邮件服务对应一个Smtp客户端
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Service.MailManager.MailSenders">
+            <summary>
+            用于保存邮件服务
+            允许服务器同时存在多个服务
+            </summary>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Service.MailManager.GetSender(System.Guid)">
+            <summary>
+            获取某个已经保存过的邮件服务
+            </summary>
+            <param name="MailSenderID"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Service.MailManager.Send(Milimoe.FunGame.Core.Api.Transmittal.MailSender,Milimoe.FunGame.Core.Library.Common.Network.MailObject,System.String@)">
+            <summary>
+            统一调用此方法发送邮件
+            </summary>
+            <param name="Sender"></param>
+            <param name="Mail"></param>
+            <param name="ErrorMsg"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Service.MailManager.Dispose(Milimoe.FunGame.Core.Api.Transmittal.MailSender)">
+            <summary>
+            关闭邮件服务
+            </summary>
+            <param name="Sender"></param>
+            <returns></returns>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Service.ModelManager`1.Count">
+            <summary>
+            目前的Model数量
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Service.ModelManager`1.MaxModel">
+            <summary>
+            最大接受的Model数量
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Service.ModelManager`1.Models">
+            <summary>
+            可参与高并发的字典，但添加效率较低
+            </summary>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Service.ModelManager`1.#ctor(System.Int32)">
+            <summary>
+            Init ModelManager
+            </summary>
+            <param name="MaxModel">MaxModel</param>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Service.ModelManager`1.Item(System.String)">
+            <summary>
+            获取Model对象
+            </summary>
+            <param name="name">Model的Key</param>
+            <returns>Model对象</returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Service.ModelManager`1.Add(System.String,`0)">
+            <summary>
+            向Model管理器中添加Model
+            </summary>
+            <param name="name">Model的Key</param>
+            <param name="t">Model对象</param>
+            <returns>True：操作成功</returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Service.ModelManager`1.Remove(System.String)">
+            <summary>
+            从Model管理器中移除Model
+            </summary>
+            <param name="name">Model的Key</param>
+            <returns>True：操作成功</returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Service.ModelManager`1.Remove(System.String,`0@)">
+            <summary>
+            将Model移除，并取得这个Model
+            </summary>
+            <param name="name">Model的Key</param>
+            <param name="t">Model对象</param>
+            <returns>被移除的Model</returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Service.ModelManager`1.RemoveAndGet(System.String)">
+            <summary>
+            将Model移除，并取得这个Model
+            </summary>
+            <param name="name">Model的Key</param>
+            <returns>被移除的Model</returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Service.ModelManager`1.Clear">
+            <summary>
+            清空Model管理器
+            </summary>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Service.ModelManager`1.GetList">
+            <summary>
+            获取Model对象的列表
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Service.SocketManager.Socket">
+            <summary>
+            客户端专用Socket
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Service.SocketManager.ServerSocket">
+            <summary>
+            服务器端专用Socket
+            </summary>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Service.SocketManager.StartListening(System.Int32,System.Int32)">
+            <summary>
+            创建服务器监听Socket
+            </summary>
+            <param name="Port">监听端口号</param>
+            <param name="MaxConnection">最大连接数量</param>
+            <returns>服务器端专用Socket</returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Service.SocketManager.Accept">
+            <summary>
+            创建一个监听到客户端Socket
+            </summary>
+            <returns>客户端IP地址[0]和客户端Socket[1]</returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Service.SocketManager.Connect(System.String,System.Int32)">
+            <summary>
+            创建客户端Socket
+            </summary>
+            <param name="Address">服务器IP地址</param>
+            <param name="Port">服务器监听端口</param>
+            <returns>客户端专用Socket</returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Service.SocketManager.Send(System.Net.Sockets.Socket,Milimoe.FunGame.Core.Library.Common.Network.SocketObject)">
+            <summary>
+            用于服务器端向客户端Socket发送信息
+            </summary>
+            <param name="ClientSocket">客户端Socket</param>
+            <param name="SocketObject">Socket信息容器</param>
+            <returns>通信结果</returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Service.SocketManager.Send(Milimoe.FunGame.Core.Library.Common.Network.SocketObject)">
+            <summary>
+            用于客户端向服务器Socket发送信息
+            </summary>
+            <param name="SocketObject">Socket信息容器</param>
+            <returns>通信结果</returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Service.SocketManager.Receive(System.Net.Sockets.Socket)">
+            <summary>
+            接收数据流中的信息
+            <para/>如果是服务器接收信息需要传入客户端Socket <paramref name="ClientSocket"/>
+            </summary>
+            <param name="ClientSocket">如果是服务器接收信息需要传入客户端Socket</param>
+            <returns>SocketObjects</returns>
+        </member>
+        <member name="T:Milimoe.FunGame.Core.Service.SocketManager.SocketReceiveHandler">
+            <summary>
+            监听事件的委托
+            </summary>
+            <param name="SocketObject">SocketObject</param>
+        </member>
+        <member name="E:Milimoe.FunGame.Core.Service.SocketManager.SocketReceive">
+            <summary>
+            监听事件
+            </summary>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Service.SocketManager.OnSocketReceive(Milimoe.FunGame.Core.Library.Common.Network.SocketObject)">
+            <summary>
+            触发异步监听事件
+            </summary>
+            <param name="SocketObject">SocketObject</param>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Service.TaskManager.NewTask(System.Action)">
+            <summary>
+            开启一个任务：调用返回对象的OnCompleted()方法可以执行后续操作，支持异步
+            </summary>
+            <param name="action"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Service.TaskManager.NewTask(System.Func{System.Threading.Tasks.Task})">
+            <summary>
+            开启一个任务：调用返回对象的OnCompleted()方法可以执行后续操作，支持异步
+            </summary>
+            <param name="function"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Milimoe.FunGame.Core.Service.TaskManager.TaskAwaiter">
+            <summary>
+            内部实现类
+            </summary>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Service.TaskManager.TaskAwaiter.OnCompleted(System.Action)">
+            <summary>
+            返回ITaskAwaiter可以进一步调用方法<para/>
+            但是意义不大，前一个OnCompleted方法并不会等待下一个方法<para/>
+            可以理解为并行广播<para/>
+            </summary>
+            <param name="action"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Service.TaskManager.TaskAwaiter.OnError(System.Action{System.Exception})">
+            <summary>
+            在捕获到异常时，将触发Error事件
+            </summary>
+            <param name="action"></param>
+            <returns></returns>
+        </member>
+    </members>
+</doc>
