@@ -3,7 +3,7 @@
     public class OSMCore
     {
         public const string version = "v1.0";
-        public const string version2 = "Patch3 Test";
+        public const string version2 = "Patch3";
         public const string time = "Apr. 12nd, 2024";
 
         public static string Info => $"OSM Core {version} {version2}\r\nAuthor: Milimoe\r\nBuilt on {time}\r\nSee: https://github.com/milimoe";

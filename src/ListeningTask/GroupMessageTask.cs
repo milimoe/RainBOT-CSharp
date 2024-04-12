@@ -284,11 +284,8 @@ namespace Milimoe.RainBOT.ListeningTask
                         {
                             if (long.TryParse(str_qq.Trim().Replace("@", ""), out long qq))
                             {
-                                if (qq == GeneralSettings.BotQQ && !Daily.UserDailys.ContainsKey(qq))
-                                {
-                                    Daily.UserDailys.Remove(GeneralSettings.BotQQ);
-                                    await Bot.SendGroupMessage(e.group_id, "重置运势", "已重置" + Bot.GetMemberNickName(e.group_id, qq) + "（" + qq + "）的今日运势。");
-                                }
+                                Daily.UserDailys.Remove(GeneralSettings.BotQQ);
+                                await Bot.SendGroupMessage(e.group_id, "重置运势", "已重置" + Bot.GetMemberNickName(e.group_id, qq) + "（" + qq + "）的今日运势。");
                             }
                         }
                     });

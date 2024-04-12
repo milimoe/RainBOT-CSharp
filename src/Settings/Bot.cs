@@ -105,7 +105,7 @@ namespace Milimoe.RainBOT.Settings
                 BlackList.Times[user_id] = 6;
                 if (send_group)
                 {
-                    GroupMessageContent content = new(user_id);
+                    GroupMessageContent content = new(target_id);
                     content.message.Add(new AtMessage(user_id));
                     content.message.Add(new TextMessage("警告：你已因短时间内频繁操作被禁止使用BOT指令" + (GeneralSettings.BlackFrozenTime / 60) + "分钟" + (GeneralSettings.BlackFrozenTime % 60) + "秒。"));
                     _ = Task.Run(async () =>
@@ -118,7 +118,7 @@ namespace Milimoe.RainBOT.Settings
                 }
                 else
                 {
-                    FriendMessageContent content = new(user_id);
+                    FriendMessageContent content = new(target_id);
                     content.message.Add(new AtMessage(user_id));
                     content.message.Add(new TextMessage("警告：你已因短时间内频繁操作被禁止使用BOT指令" + (GeneralSettings.BlackFrozenTime / 60) + "分钟" + (GeneralSettings.BlackFrozenTime % 60) + "秒。"));
                     _ = Task.Run(async () =>
