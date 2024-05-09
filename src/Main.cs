@@ -2,6 +2,7 @@
 using Milimoe.OneBot.Model.Content;
 using Milimoe.OneBot.Model.Message;
 using Milimoe.OneBot.Model.Other;
+using Milimoe.RainBOT.Command;
 using Milimoe.RainBOT.ListeningTask;
 using Milimoe.RainBOT.Settings;
 
@@ -197,8 +198,14 @@ try
 
     while (true)
     {
-        string order = Console.ReadLine()?.ToLower().Trim() ?? "";
-        switch (order)
+        string read = Console.ReadLine() ?? "";
+        // OSM指令
+        if (read.Length >= 4 && read[..4] == ".osm")
+        {
+            MasterCommand.Execute(read, GeneralSettings.Master, false, GeneralSettings.Master, false);
+            return;
+        }
+        switch (read.ToLower().Trim() ?? "")
         {
             case "debug on":
                 GeneralSettings.IsDebug = true;

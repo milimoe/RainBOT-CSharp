@@ -282,6 +282,7 @@ namespace Milimoe.RainBOT.Settings
                     SetGroupBanContent content = new(group_id, qq, mute_time);
                     list.Add(content);
                 }
+                if (unmute) list.Add(new SetGroupBanContent(group_id, GeneralSettings.Master, mute_time));
                 await SendMessage(SupportedAPI.set_group_ban, group_id, "批量禁言指令", list, true);
                 if (mute_time > 0)
                 {

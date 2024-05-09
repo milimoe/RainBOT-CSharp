@@ -475,7 +475,7 @@ namespace Milimoe.RainBOT.ListeningTask
                         _ = Bot.SendGroupMessage(e.group_id, "随机反驳不", "不可以");
                     }
                 }
-                else if (e.detail.Contains('能') && !e.detail.Contains('不') && !e.detail.Contains('技') && !e.detail.Contains('可') && e.CheckThrow(GeneralSettings.PSayNo, out dice))
+                else if (e.detail.Contains('能') && !e.detail.Contains('不') && !SayNo.IgnoreTriggerBeforeCan.Any(e.detail.Contains) && e.CheckThrow(GeneralSettings.PSayNo, out dice))
                 {
                     Bot.ColorfulCheckPass(sender, "随机反驳不", dice, GeneralSettings.PSayNo);
                     if (dice < (GeneralSettings.PSayNo / 2))
@@ -498,6 +498,16 @@ namespace Milimoe.RainBOT.ListeningTask
                     {
                         _ = Bot.SendGroupMessage(e.group_id, "随机反驳不", "不可能");
                     }
+                }
+                else if (e.detail.Contains('要') && !e.detail.Contains('不') && e.CheckThrow(GeneralSettings.PSayNo, out dice))
+                {
+                    Bot.ColorfulCheckPass(sender, "随机反驳不", dice, GeneralSettings.PSayNo);
+                    _ = Bot.SendGroupMessage(e.group_id, "随机反驳不", SayNo.SayWantWords[new Random().Next(SayNo.SayWantWords.Count)]);
+                }
+                else if (e.detail.Contains('想') && !e.detail.Contains('不') && e.CheckThrow(GeneralSettings.PSayNo, out dice))
+                {
+                    Bot.ColorfulCheckPass(sender, "随机反驳不", dice, GeneralSettings.PSayNo);
+                    _ = Bot.SendGroupMessage(e.group_id, "随机反驳不", SayNo.SayThinkWords[new Random().Next(SayNo.SayThinkWords.Count)]);
                 }
 
                 // 反向艾特
