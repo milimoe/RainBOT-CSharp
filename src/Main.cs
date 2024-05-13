@@ -90,8 +90,11 @@ try
         Console.ForegroundColor = ConsoleColor.Gray;
     }
 
-    Console.WriteLine("初始化音频列表...");
+    Console.WriteLine("初始化音频/运势/词汇列表...");
     Music.InitMusicList();
+    Daily.InitDaily();
+    SayNo.InitSayNo();
+    Ignore.InitIgnore();
 
     Console.ForegroundColor = ConsoleColor.Green;
     Console.WriteLine("初始化完毕！");

@@ -8,11 +8,11 @@ namespace Milimoe.RainBOT.Settings
 
         public static void InitMusicList()
         {
-            PluginConfig Configs = new("rainbot", "musiclist");
-            Configs.Load();
-            foreach (string key in Configs.Keys)
+            PluginConfig configs = new("rainbot", "musiclist");
+            configs.Load();
+            foreach (string key in configs.Keys)
             {
-                if (Configs.TryGetValue(key, out object? value) && value != null && value.GetType() == typeof(string))
+                if (configs.TryGetValue(key, out object? value) && value != null && value.GetType() == typeof(string))
                 {
                     if (MusicList.ContainsKey(key)) MusicList[key] = (string)value;
                     else MusicList.Add(key, (string)value);

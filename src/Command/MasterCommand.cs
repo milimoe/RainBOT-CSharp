@@ -120,6 +120,9 @@ namespace Milimoe.RainBOT.Command
                 {
                     GeneralSettings.LoadSetting();
                     Music.InitMusicList();
+                    Daily.InitDaily();
+                    SayNo.InitSayNo();
+                    Ignore.InitIgnore();
                     SendMessage(send_group, target_id, "参数设定以及权限组重新加载完成。");
                 }
                 else Access_Denied(send_group, target_id);

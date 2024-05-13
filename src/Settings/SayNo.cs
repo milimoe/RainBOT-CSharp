@@ -1,226 +1,88 @@
-﻿namespace Milimoe.RainBOT.Settings
+﻿using Milimoe.OneBot.Framework.Utility;
+
+namespace Milimoe.RainBOT.Settings
 {
     public class SayNo
     {
-        public static HashSet<string> Trigger { get; } = [
-            "不",
-            "没",
-            "是",
-            "别"
-        ];
+        public static HashSet<string> Trigger { get; set; } = [];
 
-        public static HashSet<string> TriggerBeforeNo { get; } = [
-            "太",
-            "从来不",
-            "从来都",
-            "一直都",
-            "这很",
-            "这就是",
-            "实在是",
-            "必"
-        ];
+        public static HashSet<string> TriggerBeforeNo { get; set; } = [];
 
-        public static HashSet<string> IgnoreTriggerAfterNo { get; } = [
-            "了",
-            "就",
-            "都",
-            "过",
-            "太"
-        ];
-        
-        public static HashSet<string> IgnoreTriggerBeforeCan { get; } = [
-            "技",
-            "可",
-            "性",
-            "本",
-            "来",
-            "才",
-            "产",
-            "高",
-            "负",
-            "正",
-            "潜"
-        ];
+        public static HashSet<string> IgnoreTriggerAfterNo { get; set; } = [];
 
-        public static HashSet<string> TriggerAfterYes { get; } = [
-            "吗",
-            "呢",
-            "啊",
-            "么",
-            "吧",
-            "?",
-            "？"
-        ];
+        public static HashSet<string> IgnoreTriggerBeforeCan { get; set; } = [];
 
-        public static HashSet<string> WillNotSayNo { get; } = [
-            "支",
-            "把",
-            "人"
-        ];
+        public static HashSet<string> TriggerAfterYes { get; set; } = [];
 
-        public static List<string> SayNoWords { get; } = [
-            "你说不{0}就不{0}？",
-            "不一定",
-            "不想{0}可以不{0}",
-            "这都{0}？",
-            "不懂就问，{0}了又能怎样呢？",
-            "不{0}",
-            "必不{0}",
-            "我不好说",
-            "想{0}可以直接{0}",
-            "我觉得是别{0}",
-            "算了吧，最好别{0}",
-            "没出息的东西",
-            "没用的东西",
-            "纯fw",
-            "{0}不{0}就别来问群友了吧，成年人了可以自己拿主意",
-            "得了吧，没人在乎你{0}不{0}的",
-            "你说的这个东西跟我没关系啊，别问我了",
-            "从来不{0}",
-            "从来都{0}",
-            "这很{0}",
-            "这很不{0}",
-            "就这？",
-            "真没人{0}吧",
-            "为什么不{0}啊？",
-            "爱{0}不{0}",
-            "太{0}了",
-            "太能{0}了",
-            "你{0}不{0}影响我玩原神吗？",
-            "玩元神玩的",
-            "虾头",
-            "不会有人不{0}吧？",
-            "不会有人还没{0}吧？",
-            "看我心情",
-            "{0}又能怎样呢？",
-            "{0}不{0}又能怎样？？",
-            "不{0}的人就像不玩原神，不用我多说了吧？",
-            "感觉……不如原神",
-            "你{0}不{0}都不影响我玩《原神》，懂吗？",
-            "确实",
-            "有一说一，确实",
-            "不是谁都{0}的",
-            "可是我{0}",
-            "我也不{0}",
-            "你不{0}不代表别人不{0}",
-            "{0}",
-            "我觉得最好别{0}吧",
-            "为什么不{0}？是有人拦着你吗？",
-            "{0}不{0}不是你说了算的",
-            "不是，你觉得{0}不{0}对我有什么影响呢？",
-            "不是很懂，你说下你为什么不想{0}吧",
-            "你为什么不想{0}？你才20岁啊",
-            "笑了，真该{0}吧",
-            "笑了，真没人{0}吧",
-            "笑了，真没人在乎你{0}不{0}吧",
-            "好{0}",
-            "我就这么跟你说吧，骗哥们可以，别把你自己也骗到了就行。哥们被你骗了无所谓的，打个哈哈就过了，但希望你打完这段话后擦一下眼角，别让眼泪掉到手机屏幕上了就行。",
-            "只能说懂得都懂了兄弟们",
-            "你今天不{0}我看不起你啊",
-            "你凭啥不{0}啊？？",
-            "真没人在乎你{0}不{0}吧",
-            "差不多得了，这不{0}等到啥时候{0}？？",
-            "我就不{0}，怎么了？",
-            "你不{0}有的是人{0}",
-            "逆天",
-            "何出此言？"
-        ];
+        public static HashSet<string> WillNotSayNo { get; set; } = [];
 
-        public static List<string> SayDontHaveWords { get; } = [
-            "什么年代了，还有人没{0}？",
-            "我也没{0}",
-            "这很没{0}",
-            "你没{0}不代表别人没{0}",
-            "必没",
-            "我不好说",
-            "不会有人没{0}吧？",
-            "没{0}也就这样了",
-            "从来没有",
-            "爱有没有",
-            "你有没有都不影响我玩《原神》，懂吗？",
-            "太没{0}了",
-            "可是我有{0}",
-            "从来都有{0}",
-            "这还没{0}，你想等到你80岁了才有{0}吗？",
-            "逆天",
-            "何出此言？"
-        ];
+        public static List<string> SayNoWords { get; set; } = [];
 
-        public static List<string> SayNotYesWords { get; } = [
-            "是的",
-            "不是",
-            "是不是和我有关系吗？",
-            "我觉得最好不是",
-            "是不是又能怎样？",
-            "我觉得是",
-            "应该是吧",
-            "osm",
-            "你说是就是",
-            "从来不是",
-            "从来都是",
-            "这很不是",
-            "这很是",
-            "爱是不是",
-            "确实"
-        ];
+        public static List<string> SayDontHaveWords { get; set; } = [];
 
-        public static List<string> SayDontWords { get; } = [
-            "算了吧，最好别{0}",
-            "从来不{0}",
-            "从来都{0}",
-            "想{0}可以直接{0}",
-            "必不{0}",
-            "必{0}",
-            "不{0}明智之举",
-            "我觉得{0}不{0}都那样",
-            "为什么不{0}啊？",
-            "太{0}了",
-            "爱{0}不{0}",
-            "何出此言？"
-        ];
+        public static List<string> SayNotYesWords { get; set; } = [];
 
-        public static List<string> SayWantWords { get; } = [
-            "你要个叽叭",
-            "要不了一点",
-            "真别要吧",
-            "想要可以直接要",
-            "要不要关我什么事？",
-            "OK，顺便带我一个",
-            "千万别要",
-            "要不要真无所谓吧",
-            "我不要",
-            "太要了",
-            "你别要",
-            "感觉……不如《崩坏：星穹铁道》",
-            "赶紧的，耽误了我玩原神你们都得陪葬",
-            "喜欢就买下来"
-        ];
-        
-        public static List<string> SayThinkWords { get; } = [
-            "算了吧，最好别想",
-            "想想就得了",
-            "梦里啥都有",
-            "真没人想吧",
-            "必不想",
-            "也就你想了，你看这里还有谁想？",
-            "笑了，谁关心你想不想的",
-            "你别想",
-            "别想了",
-            "太想了",
-            "搞得我也想了",
-            "噗，没忍住。",
-            "^^",
-            "逆天",
-            "你想你的，我得玩《绝区零》了。",
-            "差不多得了"
-        ];
+        public static List<string> SayDontWords { get; set; } = [];
 
-        public static List<string> SaySpecialNoWords { get; } = [
-            "从来不",
-            "从来都",
-            "一直都",
-            "这很",
-            "必"
-        ];
-    }
+        public static List<string> SayWantWords { get; set; } = [];
+
+        public static List<string> SayThinkWords { get; set; } = [];
+
+        public static List<string> SaySpecialNoWords { get; set; } = [];
+
+        public static void InitSayNo()
+        {
+            PluginConfig configs = new("rainbot", "sayno");
+            configs.Load();
+            foreach (string key in configs.Keys)
+            {
+                if (configs.TryGetValue(key, out object? value) && value != null)
+                {
+                    switch (key)
+                    {
+                        case "Trigger":
+                            Trigger = new HashSet<string>((List<string>)value);
+                            break;
+                        case "TriggerBeforeNo":
+                            TriggerBeforeNo = new HashSet<string>((List<string>)value);
+                            break;
+                        case "IgnoreTriggerAfterNo":
+                            IgnoreTriggerAfterNo = new HashSet<string>((List<string>)value);
+                            break;
+                        case "IgnoreTriggerBeforeCan":
+                            IgnoreTriggerBeforeCan = new HashSet<string>((List<string>)value);
+                            break;
+                        case "TriggerAfterYes":
+                            TriggerAfterYes = new HashSet<string>((List<string>)value);
+                            break;
+                        case "WillNotSayNo":
+                            WillNotSayNo = new HashSet<string>((List<string>)value);
+                            break;
+                        case "SayNoWords":
+                            SayNoWords = (List<string>)value;
+                            break;
+                        case "SayDontHaveWords":
+                            SayDontHaveWords = (List<string>)value;
+                            break;
+                        case "SayNotYesWords":
+                            SayNotYesWords = (List<string>)value;
+                            break;
+                        case "SayDontWords":
+                            SayDontWords = (List<string>)value;
+                            break;
+                        case "SayWantWords":
+                            SayWantWords = (List<string>)value;
+                            break;
+                        case "SayThinkWords":
+                            SayThinkWords = (List<string>)value;
+                            break;
+                        case "SaySpecialNoWords":
+                            SaySpecialNoWords = (List<string>)value;
+                            break;
+                    }
+                }
+            }
+        }
 }
+
+    }
