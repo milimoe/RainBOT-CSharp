@@ -101,6 +101,37 @@ namespace Milimoe.RainBOT.Command
             {
                 TaskUtility.NewTask(async () => await Bot.Mute(user_id, target_id, command));
             }
+            else if (command.Contains(".osm sayno"))
+            {
+                string str = command.Replace(".osm sayno", "").Trim();
+                string[] strs = Regex.Split(str, @"\s+");
+                if (strs.Length >= 3)
+                {
+                    string part = strs[0].ToString().Trim();
+                    string addorremove = strs[1].ToString().Trim();
+                    string value = string.Join("", strs[2..]).Trim();
+                    if (addorremove == "add" || addorremove == "remove" || addorremove == "+" || addorremove == "-")
+                    {
+                        bool isadd = addorremove == "add" || addorremove == "+";
+                        bool access = (isadd && (GeneralSettings.Master == user_id || GeneralSettings.SayNoAccessGroup.Contains(user_id))) || (!isadd && GeneralSettings.Master == user_id);
+                        if (access)
+                        {
+                            if (SayNo.AddWord(part, isadd, value))
+                            {
+                                string msg = AddValue_SayNo(part, isadd, value);
+                                SendMessage(send_group, target_id, msg);
+                                return;
+                            }
+                        }
+                        else
+                        {
+                            Access_Denied(send_group, target_id);
+                            return;
+                        }
+                    }
+                }
+                SendMessage(send_group, target_id, Execute_Worker(".osm missingcommand", ""));
+            }
             else if (command.Contains(".osm refresh"))
             {
                 if (user_id == GeneralSettings.Master)
@@ -458,6 +489,20 @@ namespace Milimoe.RainBOT.Command
                                 }
                             }
                             break;
+                        case "saynoaccessgroup":
+                            if (args.Length > 1 && long.TryParse(args[1].Replace("@", "").Trim(), out long saynoaccess_qq))
+                            {
+                                string args0 = args[0].ToString().Trim();
+                                if (args0 == "add" || args0 == "remove" || args0 == "+" || args0 == "-")
+                                {
+                                    isadd = args0 == "add" || args0 == "+";
+                                    if (isadd) GeneralSettings.SayNoAccessGroup.Add(saynoaccess_qq);
+                                    else GeneralSettings.SayNoAccessGroup.Remove(saynoaccess_qq);
+                                    msg = AddRemoveAccessGroupMember("词汇编写组成员", isadd, saynoaccess_qq);
+                                    return msg;
+                                }
+                            }
+                            break;
                         case "osmcoregroup":
                             if (args.Length > 1 && long.TryParse(args[1].Trim(), out long osmcoregroup_id))
                             {
@@ -479,7 +524,7 @@ namespace Milimoe.RainBOT.Command
         }
 
         public static void Access_Denied(bool send_group, long target_id) => SendMessage(send_group, target_id, "你没有权限使用此指令。");
-        
+
         public static void SendMessage(bool send_group, long target_id, string msg)
         {
             _ = send_group ? Bot.SendGroupMessage(target_id, "OSM指令", msg) : Bot.SendFriendMessage(target_id, "OSM指令", msg);
@@ -502,6 +547,16 @@ namespace Milimoe.RainBOT.Command
             Console.WriteLine(msg);
             Console.ForegroundColor = ConsoleColor.Gray;
             GeneralSettings.SaveConfig();
+            return msg;
+        }
+
+        public static string AddValue_SayNo(string part, bool isadd, string value, ConsoleColor color = ConsoleColor.Cyan)
+        {
+            string msg = "OSM Core：" + part + $"已{(isadd ? "添加" : "移除")}：" + value + "。";
+            Console.ForegroundColor = color;
+            Console.WriteLine(msg);
+            Console.ForegroundColor = ConsoleColor.Gray;
+            SayNo.SaveConfig();
             return msg;
         }
     }

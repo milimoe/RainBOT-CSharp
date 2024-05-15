@@ -30,6 +30,8 @@ namespace Milimoe.RainBOT.Settings
 
         public static List<string> SaySpecialNoWords { get; set; } = [];
 
+        public static PluginConfig Configs { get; set; } = new("rainbot", "sayno");
+
         public static void InitSayNo()
         {
             PluginConfig configs = new("rainbot", "sayno");
@@ -83,6 +85,92 @@ namespace Milimoe.RainBOT.Settings
                 }
             }
         }
-}
 
+        public static void SaveConfig()
+        {
+            Configs.Add("Trigger", Trigger);
+            Configs.Add("TriggerBeforeNo", TriggerBeforeNo);
+            Configs.Add("IgnoreTriggerAfterNo", IgnoreTriggerAfterNo);
+            Configs.Add("IgnoreTriggerBeforeCan", IgnoreTriggerBeforeCan);
+            Configs.Add("TriggerAfterYes", TriggerAfterYes);
+            Configs.Add("WillNotSayNo", WillNotSayNo);
+            Configs.Add("SayNoWords", SayNoWords);
+            Configs.Add("SayDontHaveWords", SayDontHaveWords);
+            Configs.Add("SayNotYesWords", SayNotYesWords);
+            Configs.Add("SayDontWords", SayDontWords);
+            Configs.Add("SayWantWords", SayWantWords);
+            Configs.Add("SayThinkWords", SayThinkWords);
+            Configs.Add("SaySpecialNoWords", SaySpecialNoWords);
+            Configs.Save();
+        }
+
+        public static bool AddWord(string part, bool isadd, string value)
+        {
+            HashSet<string> set = [];
+            List<string> list = [];
+            bool islist = false;
+            switch (part.ToLower())
+            {
+                case "trigger":
+                    set = Trigger;
+                    break;
+                case "triggerbeforeno":
+                    set = TriggerBeforeNo;
+                    break;
+                case "ignoretriggerafterno":
+                    set = IgnoreTriggerAfterNo;
+                    break;
+                case "ignoretriggerbeforecan":
+                    set = IgnoreTriggerBeforeCan;
+                    break;
+                case "triggerafteryes":
+                    set = TriggerAfterYes;
+                    break;
+                case "willnotsayno":
+                    set = WillNotSayNo;
+                    break;
+                case "saynowords":
+                    islist = true;
+                    list = SayNoWords;
+                    break;
+                case "saydonthavewords":
+                    islist = true;
+                    list = SayDontHaveWords;
+                    break;
+                case "saynotyeswords":
+                    islist = true;
+                    list = SayNotYesWords;
+                    break;
+                case "saydontwords":
+                    islist = true;
+                    list = SayDontWords;
+                    break;
+                case "saywantwords":
+                    islist = true;
+                    list = SayWantWords;
+                    break;
+                case "saythinkwords":
+                    islist = true;
+                    list = SayThinkWords;
+                    break;
+                case "sayspecialnowords":
+                    islist = true;
+                    list = SaySpecialNoWords;
+                    break;
+                default:
+                    return false;
+            }
+            if (isadd)
+            {
+                if (islist) list.Add(value);
+                else set.Add(value);
+            }
+            else
+            {
+                if (islist) list.Remove(value);
+                else set.Remove(value);
+            }
+            return true;
+        }
     }
+}
