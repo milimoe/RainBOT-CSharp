@@ -160,6 +160,7 @@ namespace Milimoe.RainBOT.Settings
             if (delay > 0)
             {
                 await Task.Delay(delay);
+                if (!GeneralSettings.IsRun) return;
             }
             await SendMessage(SupportedAPI.send_group_msg, group_id, function, content, true);
         }
@@ -171,6 +172,7 @@ namespace Milimoe.RainBOT.Settings
             if (delay > 0)
             {
                 await Task.Delay(delay);
+                if (!GeneralSettings.IsRun) return;
             }
             await SendMessage(SupportedAPI.send_group_msg, group_id, function, content, true);
         }
