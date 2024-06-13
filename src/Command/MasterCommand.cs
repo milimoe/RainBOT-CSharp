@@ -41,6 +41,18 @@ namespace Milimoe.RainBOT.Command
                         msg += $"\r\n随机反驳不概率：{GeneralSettings.PSayNo}%";
                     }
                     else msg += "\r\n随机反驳不：关闭";
+                    if (GeneralSettings.IsCallBrother)
+                    {
+                        msg += "\r\n随机叫哥：开启";
+                        msg += $"\r\n随机叫哥概率：{GeneralSettings.PCallBrother}%";
+                    }
+                    else msg += "\r\n随机叫哥：关闭";
+                    if (GeneralSettings.IsReverseAt)
+                    {
+                        msg += "\r\n反向艾特：开启";
+                        msg += $"\r\n反向艾特概率：{GeneralSettings.PReverseAt}%";
+                    }
+                    else msg += "\r\n反向艾特：关闭";
                     if (GeneralSettings.IsMute)
                     {
                         msg += "\r\n禁言抽奖：开启";
