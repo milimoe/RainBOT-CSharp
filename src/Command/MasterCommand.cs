@@ -144,7 +144,7 @@ namespace Milimoe.RainBOT.Command
                 }
                 else
                 {
-                    string msg = "欢迎访问OSM核心功能「随机反驳不」的操作菜单。\r\n" +
+                    string msg = "欢迎访问OSM核心功能「随机反驳不」的操作指南。\r\n" +
                         "① 添加词汇的指令是：.osm sayno <list> <+/-> <value>\r\n" +
                         "② 「随机反驳不」支持以下13个列表，前面6个是关键词表，后7个Say开头的才是词汇表，没特殊情况不要添加关键词：\r\n" +
                         "关键词列表：trigger（基本触发词）、triggerbeforeno（在不之前出现的特殊触发词）、ignoretriggerafterno（在不之后出现则忽略）、ignoretriggerbeforecan（在能之前出现则忽略）、" +
