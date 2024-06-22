@@ -178,5 +178,30 @@ namespace Milimoe.RainBOT.Settings
             Configs.Add("OSMCoreGroup", OSMCoreGroup);
             Configs.Save();
         }
+
+        public static void ShowAccessGroupMemberList(long target, string group, bool isgroup)
+        {
+            List<long> list = [];
+            switch (group.ToLower())
+            {
+                case "muteaccessgroup":
+                    list = MuteAccessGroup;
+                    break;
+                case "unmuteaccessgroup":
+                    list = UnMuteAccessGroup;
+                    break;
+                case "recallaccessgroup":
+                    list = RecallAccessGroup;
+                    break;
+                case "saynoaccessgroup":
+                    list = SayNoAccessGroup;
+                    break;
+                case "osmcoregroup":
+                    list = OSMCoreGroup;
+                    break;
+            }
+            string msg = list.Count > 0 ? "权限组" + group + "拥有一下成员：" + "\r\n" + string.Join("\r\n", list) : "此权限组不存在或没有任何成员。";
+            _ = isgroup ? Bot.SendGroupMessage(target, "显示列表成员", msg) : Bot.SendFriendMessage(target, "显示列表成员", msg);
+        }
     }
 }

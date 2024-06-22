@@ -172,5 +172,73 @@ namespace Milimoe.RainBOT.Settings
             }
             return true;
         }
+
+        public static void ShowList(long target, string part, bool isgroup)
+        {
+            HashSet<string> set = [];
+            List<string> list = [];
+            bool islist = false;
+            switch (part.ToLower())
+            {
+                case "trigger":
+                    set = Trigger;
+                    break;
+                case "triggerbeforeno":
+                    set = TriggerBeforeNo;
+                    break;
+                case "ignoretriggerafterno":
+                    set = IgnoreTriggerAfterNo;
+                    break;
+                case "ignoretriggerbeforecan":
+                    set = IgnoreTriggerBeforeCan;
+                    break;
+                case "triggerafteryes":
+                    set = TriggerAfterYes;
+                    break;
+                case "willnotsayno":
+                    set = WillNotSayNo;
+                    break;
+                case "saynowords":
+                    islist = true;
+                    list = SayNoWords;
+                    break;
+                case "saydonthavewords":
+                    islist = true;
+                    list = SayDontHaveWords;
+                    break;
+                case "saynotyeswords":
+                    islist = true;
+                    list = SayNotYesWords;
+                    break;
+                case "saydontwords":
+                    islist = true;
+                    list = SayDontWords;
+                    break;
+                case "saywantwords":
+                    islist = true;
+                    list = SayWantWords;
+                    break;
+                case "saythinkwords":
+                    islist = true;
+                    list = SayThinkWords;
+                    break;
+                case "sayspecialnowords":
+                    islist = true;
+                    list = SaySpecialNoWords;
+                    break;
+                default:
+                    break;
+            }
+            string msg;
+            if (islist)
+            {
+                msg = list.Count > 0 ? "列表" + part + "拥有一下成员：" + "\r\n"+ string.Join("\r\n", list) : "此列表不存在或没有任何成员。";
+            }
+            else
+            {
+                msg = set.Count > 0 ? "列表" + part + "拥有一下成员：" + "\r\n" + string.Join("\r\n", set) : "此列表不存在或没有任何成员。";
+            }
+            _ = isgroup ? Bot.SendGroupMessage(target, "显示列表成员", msg) : Bot.SendFriendMessage(target, "显示列表成员", msg);
+        }
     }
 }

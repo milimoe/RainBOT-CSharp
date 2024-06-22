@@ -142,7 +142,39 @@ namespace Milimoe.RainBOT.Command
                         }
                     }
                 }
-                SendMessage(send_group, target_id, Execute_Worker(".osm missingcommand", ""));
+                else
+                {
+                    string msg = "欢迎访问OSM核心功能「随机反驳不」的操作菜单。\r\n" +
+                        "① 添加词汇的指令是：.osm sayno <list> <+/-> <value>\r\n" +
+                        "② 「随机反驳不」支持以下13个列表，前面6个是关键词表，后7个Say开头的才是词汇表，没特殊情况不要添加关键词：\r\n" +
+                        "关键词列表：trigger（基本触发词）、triggerbeforeno（在不之前出现的特殊触发词）、ignoretriggerafterno（在不之后出现则忽略）、ignoretriggerbeforecan（在能之前出现则忽略）、" +
+                        "triggerafteryes（在是之后出现则触发）、willnotsayno（不会触发反驳不的词）\r\n" +
+                        "词汇表：saynowords（反驳不）、saydonthavewords（反驳没）、saynotyeswords（反驳是）、saydontwords（反驳别）、saywantwords（反驳要）、saythinkwords（反驳想）、" +
+                        "sayspecialnowords（特殊反驳不，这个列表触发的可以反驳2个字）\r\n" +
+                        "③ 指令中间必须有空格隔开。如果是关键词是不、别、没，可以使用{0}来指代关键词后面的字。";
+                    if (GeneralSettings.SayNoAccessGroup.Count > 0)
+                    {
+                        msg += "\r\n④ 仅有以下成员允许操作「随机反驳不」列表：\r\n" + string.Join("\r\n", GeneralSettings.SayNoAccessGroup);
+                    }
+                    SendMessage(send_group, target_id, msg);
+                }
+            }
+            else if (command.Contains(".osm showlist"))
+            {
+                string str = command.Replace(".osm showlist", "").Trim();
+                string[] strs = Regex.Split(str, @"\s+");
+                if (strs.Length > 0)
+                {
+                    string part = strs[0].ToString().Trim();
+                    if (part.Contains("group"))
+                    {
+                        GeneralSettings.ShowAccessGroupMemberList(target_id, part, send_group);
+                    }
+                    else
+                    {
+                        SayNo.ShowList(target_id, part, send_group);
+                    }
+                }
             }
             else if (command.Contains(".osm refresh"))
             {

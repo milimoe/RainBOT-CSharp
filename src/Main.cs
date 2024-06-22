@@ -206,7 +206,7 @@ try
         if (read.Length >= 4 && read[..4] == ".osm")
         {
             MasterCommand.Execute(read, GeneralSettings.Master, false, GeneralSettings.Master, false);
-            return;
+            continue;
         }
         switch (read.ToLower().Trim() ?? "")
         {

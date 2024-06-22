@@ -545,7 +545,7 @@ namespace Milimoe.RainBOT.ListeningTask
                 }
 
                 // 随机复读
-                if (GeneralSettings.IsRepeat && !Ignore.RepeatIgnore.Contains(e.detail) && e.CheckThrow(GeneralSettings.PRepeat, out dice))
+                if (GeneralSettings.IsRepeat && !Ignore.RepeatIgnore.Any(e.detail.Contains) && e.CheckThrow(GeneralSettings.PRepeat, out dice))
                 {
                     int delay = GeneralSettings.RepeatDelay[0] + new Random().Next(GeneralSettings.RepeatDelay[1] - GeneralSettings.RepeatDelay[0]);
                     Bot.ColorfulCheckPass(sender, "随机复读", dice, GeneralSettings.PRepeat, delay);
