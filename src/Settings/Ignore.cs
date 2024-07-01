@@ -92,7 +92,7 @@ namespace Milimoe.RainBOT.Settings
                     list = QQGroupIgnore.Select(x => x.ToString()).ToList();
                     break;
             }
-            string msg = list.Count > 0 ? "列表" + group + "拥有一下成员：" + "\r\n" + string.Join("\r\n", list) : "此列表不存在或没有任何成员。";
+            string msg = list.Count > 0 ? "列表" + group + "拥有以下成员：" + "\r\n" + string.Join("\r\n", list) : "此列表不存在或没有任何成员。";
             _ = isgroup ? Bot.SendGroupMessage(target, "显示列表成员", msg) : Bot.SendFriendMessage(target, "显示列表成员", msg);
         }
     }
