@@ -159,6 +159,46 @@ namespace Milimoe.RainBOT.Command
                     SendMessage(send_group, target_id, msg);
                 }
             }
+            else if (command.Contains(".osm ignore"))
+            {
+                if (user_id == GeneralSettings.Master)
+                {
+                    string str = command.Replace(".osm ignore", "").Trim();
+                    string[] strs = Regex.Split(str, @"\s+");
+                    if (strs.Length >= 3)
+                    {
+                        string part = strs[0].ToString().Trim();
+                        string addorremove = strs[1].ToString().Trim();
+                        string value = string.Join("", strs[2..]).Trim();
+                        if (addorremove == "add" || addorremove == "remove" || addorremove == "+" || addorremove == "-")
+                        {
+                            bool isadd = addorremove == "add" || addorremove == "+";
+                            bool access = GeneralSettings.Master == user_id;
+                            if (access)
+                            {
+                                if (Ignore.AddValue(part, isadd, value))
+                                {
+                                    string msg = AddValue_Ignore(part, isadd, value);
+                                    SendMessage(send_group, target_id, msg);
+                                    return;
+                                }
+                            }
+                            else
+                            {
+                                Access_Denied(send_group, target_id);
+                                return;
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    Access_Denied(send_group, target_id);
+                    return;
+                }
+                SendMessage(send_group, target_id, Execute_Worker(".osm missingcommand", ""));
+                return;
+            }
             else if (command.Contains(".osm showlist"))
             {
                 string str = command.Replace(".osm showlist", "").Trim();
@@ -169,6 +209,10 @@ namespace Milimoe.RainBOT.Command
                     if (part.Contains("group"))
                     {
                         GeneralSettings.ShowAccessGroupMemberList(target_id, part, send_group);
+                    }
+                    if (part.Contains("ignore"))
+                    {
+                        Ignore.ShowList(target_id, part, send_group);
                     }
                     else
                     {
@@ -601,6 +645,16 @@ namespace Milimoe.RainBOT.Command
             Console.WriteLine(msg);
             Console.ForegroundColor = ConsoleColor.Gray;
             SayNo.SaveConfig();
+            return msg;
+        }
+
+        public static string AddValue_Ignore(string part, bool isadd, string value, ConsoleColor color = ConsoleColor.Cyan)
+        {
+            string msg = "OSM Core：" + part + $"已{(isadd ? "添加" : "移除")}：" + value + "。";
+            Console.ForegroundColor = color;
+            Console.WriteLine(msg);
+            Console.ForegroundColor = ConsoleColor.Gray;
+            Ignore.SaveConfig();
             return msg;
         }
     }
