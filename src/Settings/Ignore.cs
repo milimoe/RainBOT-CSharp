@@ -45,19 +45,26 @@ namespace Milimoe.RainBOT.Settings
         {
             try
             {
+                string strv = value.ToString() ?? "";
                 switch (part.ToLower())
                 {
                     case "repeatignore":
-                        if (isadd) RepeatIgnore.Add((string)value);
-                        else RepeatIgnore.Remove((string)value);
+                        if (isadd) RepeatIgnore.Add(strv);
+                        else RepeatIgnore.Remove(strv);
                         break;
                     case "callbrotherqqignore":
-                        if (isadd) CallBrotherQQIgnore.Add((long)value);
-                        else CallBrotherQQIgnore.Remove((long)value);
+                        if (long.TryParse(strv, out long lv))
+                        {
+                            if (isadd) CallBrotherQQIgnore.Add(lv);
+                            else CallBrotherQQIgnore.Remove(lv);
+                        }
                         break;
                     case "qqgroupignore":
-                        if (isadd) QQGroupIgnore.Add((long)value);
-                        else QQGroupIgnore.Remove((long)value);
+                        if (long.TryParse(strv, out lv))
+                        {
+                            if (isadd) QQGroupIgnore.Add(lv);
+                            else QQGroupIgnore.Remove(lv);
+                        }
                         break;
                     default:
                         return false;
