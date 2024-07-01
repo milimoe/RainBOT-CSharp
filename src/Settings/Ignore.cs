@@ -6,7 +6,7 @@ namespace Milimoe.RainBOT.Settings
     {
         public static HashSet<string> RepeatIgnore { get; set; } = [];
 
-        public static List<string> CallBrotherQQIgnore { get; set; } = [];
+        public static List<long> CallBrotherQQIgnore { get; set; } = [];
 
         /// <summary>
         /// 这个属性暂时没用到 标记一下
@@ -25,7 +25,7 @@ namespace Milimoe.RainBOT.Settings
             }
             if (configs.TryGetValue("CallBrotherQQIgnore", out value) && value != null)
             {
-                CallBrotherQQIgnore = new List<string>((List<string>)value);
+                CallBrotherQQIgnore = new List<long>((List<long>)value);
             }
             if (configs.TryGetValue("QQGroupIgnore", out value) && value != null)
             {
@@ -52,8 +52,8 @@ namespace Milimoe.RainBOT.Settings
                         else RepeatIgnore.Remove((string)value);
                         break;
                     case "callbrotherqqignore":
-                        if (isadd) CallBrotherQQIgnore.Add((string)value);
-                        else CallBrotherQQIgnore.Remove((string)value);
+                        if (isadd) CallBrotherQQIgnore.Add((long)value);
+                        else CallBrotherQQIgnore.Remove((long)value);
                         break;
                     case "qqgroupignore":
                         if (isadd) QQGroupIgnore.Add((long)value);
@@ -79,7 +79,7 @@ namespace Milimoe.RainBOT.Settings
                     list = [..RepeatIgnore];
                     break;
                 case "callbrotherqqignore":
-                    list = CallBrotherQQIgnore;
+                    list = CallBrotherQQIgnore.Select(x => x.ToString()).ToList();
                     break;
                 case "qqgroupignore":
                     list = QQGroupIgnore.Select(x => x.ToString()).ToList();

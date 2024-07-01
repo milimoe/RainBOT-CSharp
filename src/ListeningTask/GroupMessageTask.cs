@@ -557,7 +557,7 @@ namespace Milimoe.RainBOT.ListeningTask
                 }
 
                 // 随机叫哥
-                if (GeneralSettings.IsCallBrother && e.CheckThrow(GeneralSettings.PCallBrother, out dice))
+                if (GeneralSettings.IsCallBrother && !Ignore.CallBrotherQQIgnore.Contains(e.user_id) && e.CheckThrow(GeneralSettings.PCallBrother, out dice))
                 {
                     int delay = GeneralSettings.RepeatDelay[0] + new Random().Next(GeneralSettings.RepeatDelay[1]);
                     Bot.ColorfulCheckPass(sender, "随机叫哥", dice, GeneralSettings.PCallBrother, delay);
