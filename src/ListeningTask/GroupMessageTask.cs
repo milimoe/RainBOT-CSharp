@@ -77,6 +77,34 @@ namespace Milimoe.RainBOT.ListeningTask
                     return;
                 }
 
+                // 12点大挑战
+                if (e.detail == "加入12点" || e.detail == "加入12点大挑战")
+                {
+                    if (GeneralSettings.Challenge12ClockGroup.Contains(e.user_id))
+                    {
+                        _ = Bot.SendGroupMessage(e.group_id, "12点大挑战", "请勿重复加入。");
+                    }
+                    else
+                    {
+                        GeneralSettings.Challenge12ClockGroup.Add(e.user_id);
+                        _ = Bot.SendGroupMessage(e.group_id, "12点大挑战", "你已成功加入~\r\n发送【退出12点】退出挑战。");
+                        GeneralSettings.SaveConfig();
+                    }
+                    return;
+                }
+                else if ((e.detail == "退出12点" || e.detail == "退出12点大挑战") && GeneralSettings.Challenge12ClockGroup.Contains(e.user_id))
+                {
+                    GeneralSettings.Challenge12ClockGroup.Remove(e.user_id);
+                    _ = Bot.SendGroupMessage(e.group_id, "12点大挑战", "你已成功退出~\r\n发送【加入12点】即可再次参加。");
+                    GeneralSettings.SaveConfig();
+                    return;
+                }
+                else if (e.detail == "12点大挑战")
+                {
+                    _ = Bot.SendGroupMessage(e.group_id, "12点大挑战", "欢迎加入12点大挑战。参加本挑战后，你将在每晚的12点获得8小时禁言和优质的睡眠，确保第二天的精神饱满！\r\n发送【加入12点】即可参加。");
+                    return;
+                }
+
                 // 发图API
                 if (e.detail == "来图")
                 {

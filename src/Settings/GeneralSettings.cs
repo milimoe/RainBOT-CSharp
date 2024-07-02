@@ -1,4 +1,5 @@
-﻿using Milimoe.OneBot.Framework.Utility;
+﻿using System.Drawing;
+using Milimoe.OneBot.Framework.Utility;
 
 namespace Milimoe.RainBOT.Settings
 {
@@ -51,6 +52,8 @@ namespace Milimoe.RainBOT.Settings
         public static List<long> SayNoAccessGroup { get; set; } = [];
 
         public static List<long> OSMCoreGroup { get; set; } = [];
+        
+        public static List<long> Challenge12ClockGroup { get; set; } = [];
 
         public static PluginConfig Configs { get; set; } = new("rainbot", "config");
 
@@ -150,6 +153,10 @@ namespace Milimoe.RainBOT.Settings
             {
                 OSMCoreGroup = (List<long>)value;
             }
+            if (configs.TryGetValue("Challenge12ClockGroup", out value) && value != null)
+            {
+                Challenge12ClockGroup = (List<long>)value;
+            }
         }
 
         public static void SaveConfig()
@@ -176,6 +183,7 @@ namespace Milimoe.RainBOT.Settings
             Configs.Add("RecallAccessGroup", RecallAccessGroup);
             Configs.Add("SayNoAccessGroup", SayNoAccessGroup);
             Configs.Add("OSMCoreGroup", OSMCoreGroup);
+            Configs.Add("Challenge12ClockGroup", Challenge12ClockGroup);
             Configs.Save();
         }
 
@@ -198,6 +206,9 @@ namespace Milimoe.RainBOT.Settings
                     break;
                 case "osmcoregroup":
                     list = OSMCoreGroup;
+                    break;
+                case "challenge12clockgroup":
+                    list = Challenge12ClockGroup;
                     break;
             }
             string msg = list.Count > 0 ? "权限组" + group + "拥有以下成员：" + "\r\n" + string.Join("\r\n", list) : "此权限组不存在或没有任何成员。";

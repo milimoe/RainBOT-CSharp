@@ -1,4 +1,5 @@
 ﻿using Milimoe.OneBot.Framework;
+using Milimoe.OneBot.Framework.Interface;
 using Milimoe.OneBot.Model.Content;
 using Milimoe.OneBot.Model.Message;
 using Milimoe.OneBot.Model.Other;
@@ -140,6 +141,8 @@ try
                     Console.ForegroundColor = ConsoleColor.Magenta;
                     Console.WriteLine("已重置所有人的今日运势。");
                     Console.ForegroundColor = ConsoleColor.Gray;
+                    // 发放12点大挑战的奖励
+                    await Bot.Send12ClockPresents();
                 }
                 if (now.Hour == 0 && now.Minute == 1)
                 {

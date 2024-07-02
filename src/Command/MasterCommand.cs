@@ -210,7 +210,7 @@ namespace Milimoe.RainBOT.Command
                     {
                         GeneralSettings.ShowAccessGroupMemberList(target_id, part, send_group);
                     }
-                    if (part.Contains("ignore"))
+                    else if (part.Contains("ignore"))
                     {
                         Ignore.ShowList(target_id, part, send_group);
                     }
