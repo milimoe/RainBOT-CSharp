@@ -13,6 +13,8 @@ namespace Milimoe.RainBOT.Settings
         /// </summary>
         public static List<long> QQGroupIgnore { get; set; } = [];
 
+        public static List<long> RepeatQQIgnore { get; set; } = [];
+
         public static PluginConfig Configs { get; set; } = new("rainbot", "ignore");
 
         public static void InitIgnore()
@@ -31,6 +33,10 @@ namespace Milimoe.RainBOT.Settings
             {
                 QQGroupIgnore = (List<long>)value;
             }
+            if (configs.TryGetValue("RepeatQQIgnore", out value) && value != null)
+            {
+                RepeatQQIgnore = (List<long>)value;
+            }
         }
 
         public static void SaveConfig()
@@ -38,6 +44,7 @@ namespace Milimoe.RainBOT.Settings
             Configs.Add("RepeatIgnore", RepeatIgnore);
             Configs.Add("CallBrotherQQIgnore", CallBrotherQQIgnore);
             Configs.Add("QQGroupIgnore", QQGroupIgnore);
+            Configs.Add("RepeatQQIgnore", RepeatQQIgnore);
             Configs.Save();
         }
 
@@ -66,6 +73,13 @@ namespace Milimoe.RainBOT.Settings
                             else QQGroupIgnore.Remove(lv);
                         }
                         break;
+                    case "repeatqqignore":
+                        if (long.TryParse(strv, out lv))
+                        {
+                            if (isadd) RepeatQQIgnore.Add(lv);
+                            else RepeatQQIgnore.Remove(lv);
+                        }
+                        break;
                     default:
                         return false;
                 }
@@ -90,6 +104,9 @@ namespace Milimoe.RainBOT.Settings
                     break;
                 case "qqgroupignore":
                     list = QQGroupIgnore.Select(x => x.ToString()).ToList();
+                    break;
+                case "repeatqqignore":
+                    list = RepeatQQIgnore.Select(x => x.ToString()).ToList();
                     break;
             }
             string msg = list.Count > 0 ? "列表" + group + "拥有以下成员：" + "\r\n" + string.Join("\r\n", list) : "此列表不存在或没有任何成员。";
