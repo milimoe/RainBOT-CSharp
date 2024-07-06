@@ -177,6 +177,17 @@ namespace Milimoe.RainBOT.ListeningTask
                         return;
                     });
                 }
+                if (e.detail == "买家秀")
+                {
+                    TaskUtility.NewTask(async () =>
+                    {
+                        if (!await Bot.CheckBlackList(true, e.user_id, e.group_id)) return;
+                        GroupMessageContent content = new(e.group_id);
+                        content.message.Add(new ImageMessage("https://api.03c3.cn/api/taobaoBuyerShow"));
+                        await Bot.SendGroupMessage(e.group_id, "Image", content);
+                        return;
+                    });
+                }
                 if (e.detail.Contains("来龙"))
                 {
                     TaskUtility.NewTask(async () =>
