@@ -569,7 +569,7 @@ namespace Milimoe.RainBOT.ListeningTask
                 IEnumerable<AtMessage> temp_at = e.message.Where(m => m.type == "at").Cast<AtMessage>().Where(m => m.data.qq == $"{GeneralSettings.BotQQ}");
                 if (temp_at.Any())
                 {
-                    if (GeneralSettings.IsReverseAt && e.CheckThrow(GeneralSettings.PReverseAt, out dice))
+                    if (GeneralSettings.IsReverseAt && !Ignore.ReverseAtIgnore.Contains(e.user_id) && e.CheckThrow(GeneralSettings.PReverseAt, out dice))
                     {
                         Bot.ColorfulCheckPass(sender, "反向艾特", dice, GeneralSettings.PReverseAt);
                         foreach (AtMessage at in temp_at)
