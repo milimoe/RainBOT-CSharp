@@ -282,6 +282,7 @@ namespace Milimoe.RainBOT.ListeningTask
                             }
                             content.message.Add(new ImageMessage(img));
                             await Bot.SendGroupMessage(e.group_id, "我的运势配图", content);
+                            Daily.SaveDaily();
                         }
                     });
                     return;
@@ -296,6 +297,7 @@ namespace Milimoe.RainBOT.ListeningTask
                         content.message.Add(new AtMessage(e.user_id));
                         content.message.Add(new TextMessage("你的今日运势已重置。"));
                         await Bot.SendGroupMessage(e.group_id, "重置运势", content);
+                        Daily.SaveDaily();
                     });
                     return;
                 }
@@ -313,6 +315,7 @@ namespace Milimoe.RainBOT.ListeningTask
                                 {
                                     string text = Daily.DailyContent[new Random().Next(Daily.DailyContent.Count)];
                                     Daily.UserDailys.Add(GeneralSettings.BotQQ, text);
+                                    Daily.SaveDaily();
                                 }
                                 if (Daily.UserDailys.TryGetValue(qq, out string? daily) && daily != null)
                                 {
@@ -341,6 +344,7 @@ namespace Milimoe.RainBOT.ListeningTask
                             {
                                 Daily.UserDailys.Remove(GeneralSettings.BotQQ);
                                 await Bot.SendGroupMessage(e.group_id, "重置运势", "已重置" + Bot.GetMemberNickName(e.group_id, qq) + "（" + qq + "）的今日运势。");
+                                Daily.SaveDaily();
                             }
                         }
                     });

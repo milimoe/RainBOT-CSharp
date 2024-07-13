@@ -138,6 +138,7 @@ try
                     Daily.ClearDailys = false;
                     // 清空运势
                     Daily.UserDailys.Clear();
+                    Daily.SaveDaily();
                     Console.ForegroundColor = ConsoleColor.Magenta;
                     Console.WriteLine("已重置所有人的今日运势。");
                     Console.ForegroundColor = ConsoleColor.Gray;
