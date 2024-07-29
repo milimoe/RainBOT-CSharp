@@ -128,7 +128,7 @@ namespace Milimoe.RainBOT.ListeningTask
                     {
                         if (!await Bot.CheckBlackList(true, e.user_id, e.group_id)) return;
                         GroupMessageContent content = new(e.group_id);
-                        content.message.Add(new ImageMessage("https://iw233.cn/api.php?sort=random"));
+                        content.message.Add(new ImageMessage("https://iw233.cn/api.php?sort=cdntop"));
                         await Bot.SendGroupMessage(e.group_id, "Image", content);
                         return;
                     });
