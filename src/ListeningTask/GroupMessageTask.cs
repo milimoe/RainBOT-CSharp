@@ -1,5 +1,4 @@
 ﻿using Milimoe.OneBot.Framework;
-using Milimoe.OneBot.Framework.Utility;
 using Milimoe.OneBot.Model.Content;
 using Milimoe.OneBot.Model.Event;
 using Milimoe.OneBot.Model.Message;
@@ -16,13 +15,14 @@ namespace Milimoe.RainBOT.ListeningTask
         private readonly static string[] EEWords = ["ee", "鹅鹅", "呃呃", "谔谔", "饿饿"];
         private readonly static string[] MuteCommands = ["禁言", "解禁"];
 
-        public static void ListeningTask_handler(GroupMessageEvent e, out GroupMsgEventQuickReply? quick_reply)
+        public static async Task<GroupMsgEventQuickReply?> ListeningTask_handler(GroupMessageEvent e)
         {
-            quick_reply = null;
+            GroupMsgEventQuickReply? quick_reply = null;
+
             try
             {
                 Sender sender = e.sender;
-                if (e.user_id == 0 || e.sender.user_id == 0) return;
+                if (e.user_id == 0 || e.sender.user_id == 0) return quick_reply;
 
                 Console.WriteLine($"{DateTime.Now:yyyy/MM/dd HH:mm:ss} G/{e.group_id}{(e.detail.Trim() == "" ? "" : " -> " + e.detail)} by {sender.user_id}（{(sender.card != "" ? sender.card : sender.nickname)}）");
                 if (GeneralSettings.IsDebug)
@@ -38,30 +38,27 @@ namespace Milimoe.RainBOT.ListeningTask
                 // OSM指令
                 if (e.detail.Length >= 4 && e.detail[..4] == ".osm")
                 {
-                    TaskUtility.NewTask(async () =>
-                    {
-                        if (!await Bot.CheckBlackList(true, e.user_id, e.group_id)) return;
-                        MasterCommand.Execute(e.detail, e.user_id, onOSMCore, e.group_id, true);
-                        return;
-                    });
+                    if (!await Bot.CheckBlackList(true, e.user_id, e.group_id)) return quick_reply;
+                    MasterCommand.Execute(e.detail, e.user_id, onOSMCore, e.group_id, true);
+                    return quick_reply;
                 }
 
                 if (e.detail.Length >= 5 && (e.detail[..5] == "禁言所有人" || e.detail[..5] == "解禁所有人") && (e.user_id == GeneralSettings.Master || GeneralSettings.UnMuteAccessGroup.Union(GeneralSettings.MuteAccessGroup).Contains(e.user_id)) && Bot.GroupMembers.TryGetValue(e.group_id, out List<Member>? members) && members != null)
                 {
-                    TaskUtility.NewTask(async () => await Bot.Mute(e.user_id, e.group_id, e.detail, members.Where(m => m.user_id != GeneralSettings.Master).Select(m => m.user_id)));
-                    return;
+                    await Bot.Mute(e.user_id, e.group_id, e.detail, members.Where(m => m.user_id != GeneralSettings.Master).Select(m => m.user_id));
+                    return quick_reply;
                 }
 
                 if (e.detail != "禁言抽奖" && e.detail.Length >= 2 && MuteCommands.Any(e.detail[..2].Contains))
                 {
-                    TaskUtility.NewTask(async () => await Bot.Mute(e.user_id, e.group_id, e.detail));
-                    return;
+                    await Bot.Mute(e.user_id, e.group_id, e.detail);
+                    return quick_reply;
                 }
 
                 if (e.detail.Length >= 4 && e.detail[..4] == "跨群禁言")
                 {
-                    TaskUtility.NewTask(async () => await Bot.MuteGroup(e.user_id, e.group_id, e.detail));
-                    return;
+                    await Bot.MuteGroup(e.user_id, e.group_id, e.detail);
+                    return quick_reply;
                 }
 
                 // 撤回消息
@@ -70,326 +67,272 @@ namespace Milimoe.RainBOT.ListeningTask
                     ReplyMessage reply = (ReplyMessage)e.message.Where(m => m.type == "reply").First();
                     if (int.TryParse(reply.data.id, out int id))
                     {
-                        TaskUtility.NewTask(async () => await Bot.SendMessage(SupportedAPI.delete_msg, e.group_id, "撤回", new DeleteMsgContent(id), true));
-                        TaskUtility.NewTask(async () => await Bot.SendMessage(SupportedAPI.delete_msg, e.group_id, "撤回", new DeleteMsgContent(e.real_id), true));
-                        return;
+                        await Bot.SendMessage(SupportedAPI.delete_msg, e.group_id, "撤回", new DeleteMsgContent(id), true);
+                        await Bot.SendMessage(SupportedAPI.delete_msg, e.group_id, "撤回", new DeleteMsgContent(e.real_id), true);
+                        return quick_reply;
                     }
                 }
 
                 if (!GeneralSettings.IsRun)
                 {
-                    return;
+                    return quick_reply;
                 }
 
                 // 12点大挑战
                 if (e.detail == "加入12点" || e.detail == "加入12点大挑战")
                 {
-                    TaskUtility.NewTask(async () =>
+                    if (!await Bot.CheckBlackList(true, e.user_id, e.group_id)) return quick_reply;
+                    if (GeneralSettings.Challenge12ClockGroup.Contains(e.user_id))
                     {
-                        if (!await Bot.CheckBlackList(true, e.user_id, e.group_id)) return;
-                        if (GeneralSettings.Challenge12ClockGroup.Contains(e.user_id))
-                        {
-                            await Bot.SendGroupMessage(e.group_id, "12点大挑战", "请勿重复加入。");
-                        }
-                        else
-                        {
-                            GeneralSettings.Challenge12ClockGroup.Add(e.user_id);
-                            await Bot.SendGroupMessage(e.group_id, "12点大挑战", "你已成功加入~\r\n发送【退出12点】退出挑战。");
-                            GeneralSettings.SaveConfig();
-                        }
-                        return;
-                    });
+                        await Bot.SendGroupMessage(e.group_id, "12点大挑战", "请勿重复加入。");
+                    }
+                    else
+                    {
+                        GeneralSettings.Challenge12ClockGroup.Add(e.user_id);
+                        await Bot.SendGroupMessage(e.group_id, "12点大挑战", "你已成功加入~\r\n发送【退出12点】退出挑战。");
+                        GeneralSettings.SaveConfig();
+                    }
+                    return quick_reply;
                 }
                 else if ((e.detail == "退出12点" || e.detail == "退出12点大挑战") && GeneralSettings.Challenge12ClockGroup.Contains(e.user_id))
                 {
-                    TaskUtility.NewTask(async () =>
-                    {
-                        if (!await Bot.CheckBlackList(true, e.user_id, e.group_id)) return;
-                        GeneralSettings.Challenge12ClockGroup.Remove(e.user_id);
-                        await Bot.SendGroupMessage(e.group_id, "12点大挑战", "你已成功退出~\r\n发送【加入12点】即可再次参加。");
-                        GeneralSettings.SaveConfig();
-                        return;
-                    });
+                    if (!await Bot.CheckBlackList(true, e.user_id, e.group_id)) return quick_reply;
+                    GeneralSettings.Challenge12ClockGroup.Remove(e.user_id);
+                    await Bot.SendGroupMessage(e.group_id, "12点大挑战", "你已成功退出~\r\n发送【加入12点】即可再次参加。");
+                    GeneralSettings.SaveConfig();
+                    return quick_reply;
                 }
                 else if (e.detail == "12点大挑战")
                 {
-                    TaskUtility.NewTask(async () =>
-                    {
-                        if (!await Bot.CheckBlackList(true, e.user_id, e.group_id)) return;
-                        _ = Bot.SendGroupMessage(e.group_id, "12点大挑战", "欢迎加入12点大挑战。参加本挑战后，你将在每晚的12点获得8小时禁言和优质的睡眠，确保第二天的精神饱满！\r\n发送【加入12点】即可参加。");
-                        return;
-                    });
+                    if (!await Bot.CheckBlackList(true, e.user_id, e.group_id)) return quick_reply;
+                    await Bot.SendGroupMessage(e.group_id, "12点大挑战", "欢迎加入12点大挑战。参加本挑战后，你将在每晚的12点获得8小时禁言和优质的睡眠，确保第二天的精神饱满！\r\n发送【加入12点】即可参加。");
+                    return quick_reply;
                 }
 
                 // 发图API
                 if (e.detail == "来图")
                 {
-                    TaskUtility.NewTask(async () =>
-                    {
-                        if (!await Bot.CheckBlackList(true, e.user_id, e.group_id)) return;
-                        GroupMessageContent content = new(e.group_id);
-                        content.message.Add(new ImageMessage("https://iw233.cn/api.php?sort=cdntop"));
-                        await Bot.SendGroupMessage(e.group_id, "Image", content);
-                        return;
-                    });
+                    if (!await Bot.CheckBlackList(true, e.user_id, e.group_id)) return quick_reply;
+                    GroupMessageContent content = new(e.group_id);
+                    content.message.Add(new ImageMessage("https://iw233.cn/api.php?sort=random"));
+                    await Bot.SendGroupMessage(e.group_id, "Image", content);
+                    return quick_reply;
                 }
                 if (e.detail.Contains("白毛"))
                 {
-                    TaskUtility.NewTask(async () =>
-                    {
-                        if (!await Bot.CheckBlackList(true, e.user_id, e.group_id)) return;
-                        GroupMessageContent content = new(e.group_id);
-                        content.message.Add(new ImageMessage("https://iw233.cn/api.php?sort=yin"));
-                        await Bot.SendGroupMessage(e.group_id, "Image", content);
-                        return;
-                    });
+                    if (!await Bot.CheckBlackList(true, e.user_id, e.group_id)) return quick_reply;
+                    GroupMessageContent content = new(e.group_id);
+                    content.message.Add(new ImageMessage("https://iw233.cn/api.php?sort=yin"));
+                    await Bot.SendGroupMessage(e.group_id, "Image", content);
+                    return quick_reply;
                 }
                 if (e.detail == "猫耳")
                 {
-                    TaskUtility.NewTask(async () =>
-                    {
-                        if (!await Bot.CheckBlackList(true, e.user_id, e.group_id)) return;
-                        GroupMessageContent content = new(e.group_id);
-                        content.message.Add(new ImageMessage("https://iw233.cn/api.php?sort=cat"));
-                        await Bot.SendGroupMessage(e.group_id, "Image", content);
-                        return;
-                    });
+                    if (!await Bot.CheckBlackList(true, e.user_id, e.group_id)) return quick_reply;
+                    GroupMessageContent content = new(e.group_id);
+                    content.message.Add(new ImageMessage("https://iw233.cn/api.php?sort=cat"));
+                    await Bot.SendGroupMessage(e.group_id, "Image", content);
+                    return quick_reply;
                 }
                 if (e.detail == "壁纸")
                 {
-                    TaskUtility.NewTask(async () =>
-                    {
-                        if (!await Bot.CheckBlackList(true, e.user_id, e.group_id)) return;
-                        GroupMessageContent content = new(e.group_id);
-                        content.message.Add(new ImageMessage("https://iw233.cn/api.php?sort=pc"));
-                        await Bot.SendGroupMessage(e.group_id, "Image", content);
-                        return;
-                    });
+                    if (!await Bot.CheckBlackList(true, e.user_id, e.group_id)) return quick_reply;
+                    GroupMessageContent content = new(e.group_id);
+                    content.message.Add(new ImageMessage("https://iw233.cn/api.php?sort=pc"));
+                    await Bot.SendGroupMessage(e.group_id, "Image", content);
+                    return quick_reply;
                 }
                 if (e.detail == "新闻")
                 {
-                    TaskUtility.NewTask(async () =>
-                    {
-                        if (!await Bot.CheckBlackList(true, e.user_id, e.group_id)) return;
-                        GroupMessageContent content = new(e.group_id);
-                        content.message.Add(new ImageMessage("https://api.03c3.cn/api/zb"));
-                        await Bot.SendGroupMessage(e.group_id, "Image", content);
-                        return;
-                    });
+                    if (!await Bot.CheckBlackList(true, e.user_id, e.group_id)) return quick_reply;
+                    GroupMessageContent content = new(e.group_id);
+                    content.message.Add(new ImageMessage("https://api.03c3.cn/api/zb"));
+                    await Bot.SendGroupMessage(e.group_id, "Image", content);
+                    return quick_reply;
                 }
                 if (e.detail == "买家秀")
                 {
-                    TaskUtility.NewTask(async () =>
-                    {
-                        if (!await Bot.CheckBlackList(true, e.user_id, e.group_id)) return;
-                        GroupMessageContent content = new(e.group_id);
-                        content.message.Add(new ImageMessage("https://api.03c3.cn/api/taobaoBuyerShow"));
-                        await Bot.SendGroupMessage(e.group_id, "Image", content);
-                        return;
-                    });
+                    if (!await Bot.CheckBlackList(true, e.user_id, e.group_id)) return quick_reply;
+                    GroupMessageContent content = new(e.group_id);
+                    content.message.Add(new ImageMessage("https://api.03c3.cn/api/taobaoBuyerShow"));
+                    await Bot.SendGroupMessage(e.group_id, "Image", content);
+                    return quick_reply;
                 }
                 if (e.detail.Contains("来龙"))
                 {
-                    TaskUtility.NewTask(async () =>
-                    {
-                        if (!await Bot.CheckBlackList(true, e.user_id, e.group_id)) return;
-                        GroupMessageContent content = new(e.group_id);
-                        content.message.Add(new ImageMessage("file:///" + AppDomain.CurrentDomain.BaseDirectory.ToString() + @"img\long\long (" + (new Random().Next(1540) + 1) + ").jpg"));
-                        await Bot.SendGroupMessage(e.group_id, "Image", content);
-                        return;
-                    });
+                    if (!await Bot.CheckBlackList(true, e.user_id, e.group_id)) return quick_reply;
+                    GroupMessageContent content = new(e.group_id);
+                    content.message.Add(new ImageMessage("file:///" + AppDomain.CurrentDomain.BaseDirectory.ToString() + @"img\long\long (" + (new Random().Next(1540) + 1) + ").jpg"));
+                    await Bot.SendGroupMessage(e.group_id, "Image", content);
+                    return quick_reply;
                 }
                 if (e.detail == "一眼丁真" || e.detail == "一眼顶针")
                 {
-                    TaskUtility.NewTask(async () =>
-                    {
-                        if (!await Bot.CheckBlackList(true, e.user_id, e.group_id)) return;
-                        GroupMessageContent content = new(e.group_id);
-                        content.message.Add(new ImageMessage("file:///" + AppDomain.CurrentDomain.BaseDirectory.ToString() + @"img\dingzhen\dz" + (new Random().Next(82) + 1) + ".jpg"));
-                        await Bot.SendGroupMessage(e.group_id, "Image", content);
-                        return;
-                    });
+                    if (!await Bot.CheckBlackList(true, e.user_id, e.group_id)) return quick_reply;
+                    GroupMessageContent content = new(e.group_id);
+                    content.message.Add(new ImageMessage("file:///" + AppDomain.CurrentDomain.BaseDirectory.ToString() + @"img\dingzhen\dz" + (new Random().Next(82) + 1) + ".jpg"));
+                    await Bot.SendGroupMessage(e.group_id, "Image", content);
+                    return quick_reply;
                 }
                 if (EEWords.Any(e.detail.Contains) && e.CheckThrow(20, out _))
                 {
                     GroupMessageContent content = new(e.group_id);
                     content.message.Add(new ImageMessage("file:///" + AppDomain.CurrentDomain.BaseDirectory.ToString() + @"img\ee.png"));
-                    _ = Bot.SendGroupMessage(e.group_id, "Image", content);
-                    return;
+                    await Bot.SendGroupMessage(e.group_id, "Image", content);
+                    return quick_reply;
                 }
 
                 // 发音频API
                 var match_music = Music.MusicList.Keys.Where(s => e.detail.Contains(s, StringComparison.CurrentCultureIgnoreCase));
                 if (match_music.Any())
                 {
-                    TaskUtility.NewTask(async () =>
-                    {
-                        if (!await Bot.CheckBlackList(true, e.user_id, e.group_id)) return;
-                        GroupMessageContent content = new(e.group_id);
-                        content.message.Add(new RecordMessage(Music.MusicList[match_music.First()]));
-                        await Bot.SendGroupMessage(e.group_id, "Record", content);
-                    });
-                    return;
+                    if (!await Bot.CheckBlackList(true, e.user_id, e.group_id)) return quick_reply;
+                    GroupMessageContent content = new(e.group_id);
+                    content.message.Add(new RecordMessage(Music.MusicList[match_music.First()]));
+                    await Bot.SendGroupMessage(e.group_id, "Record", content);
+                    return quick_reply;
                 }
 
                 // 我的运势
                 if (e.detail == "我的运势")
                 {
-                    TaskUtility.NewTask(async () =>
+                    if (!await Bot.CheckBlackList(true, e.user_id, e.group_id)) return quick_reply;
+                    GroupMessageContent content = new(e.group_id);
+                    content.message.Add(new AtMessage(e.user_id));
+                    if (Daily.UserDailys.TryGetValue(e.user_id, out string? value) && value != null && value.Trim() != "")
                     {
-                        if (!await Bot.CheckBlackList(true, e.user_id, e.group_id)) return;
-                        GroupMessageContent content = new(e.group_id);
-                        content.message.Add(new AtMessage(e.user_id));
-                        if (Daily.UserDailys.TryGetValue(e.user_id, out string? value) && value != null && value.Trim() != "")
+                        content.message.Add(new TextMessage("你已看过你的今日运势：\r\n"));
+                        content.message.Add(new TextMessage(value));
+                        await Bot.SendGroupMessage(e.group_id, "我的运势", content);
+                    }
+                    else
+                    {
+                        int seq = new Random().Next(Daily.DailyContent.Count);
+                        string text = Daily.DailyContent[seq];
+                        Daily.UserDailys.Add(e.user_id, text);
+                        content.message.Add(new TextMessage("你的今日运势是：\r\n" + text));
+                        await Bot.SendGroupMessage(e.group_id, "我的运势", content);
+                        // 配图
+                        content = new(e.group_id);
+                        string img = "file:///" + AppDomain.CurrentDomain.BaseDirectory.ToString() + @"img\zi\";
+                        if (seq >= 0 && seq <= 5)
                         {
-                            content.message.Add(new TextMessage("你已看过你的今日运势：\r\n"));
-                            content.message.Add(new TextMessage(value));
-                            await Bot.SendGroupMessage(e.group_id, "我的运势", content);
+                            img += "dj" + (new Random().Next(3) + 1) + ".png";
                         }
-                        else
+                        else if (seq >= 6 && seq <= 10)
                         {
-                            int seq = new Random().Next(Daily.DailyContent.Count);
-                            string text = Daily.DailyContent[seq];
-                            Daily.UserDailys.Add(e.user_id, text);
-                            content.message.Add(new TextMessage("你的今日运势是：\r\n" + text));
-                            await Bot.SendGroupMessage(e.group_id, "我的运势", content);
-                            // 配图
-                            content = new(e.group_id);
-                            string img = "file:///" + AppDomain.CurrentDomain.BaseDirectory.ToString() + @"img\zi\";
-                            if (seq >= 0 && seq <= 5)
-                            {
-                                img += "dj" + (new Random().Next(3) + 1) + ".png";
-                            }
-                            else if (seq >= 6 && seq <= 10)
-                            {
-                                img += "zj" + (new Random().Next(2) + 1) + ".png";
-                            }
-                            else if (seq >= 11 && seq <= 15)
-                            {
-                                img += "j" + (new Random().Next(4) + 1) + ".png";
-                            }
-                            else if (seq >= 16 && seq <= 22)
-                            {
-                                img += "mj" + (new Random().Next(2) + 1) + ".png";
-                            }
-                            else if (seq >= 23 && seq <= 25)
-                            {
-                                img += "dx" + (new Random().Next(2) + 1) + ".png";
-                            }
-                            else if (seq >= 26 && seq <= 29)
-                            {
-                                img += "x" + (new Random().Next(2) + 1) + ".png";
-                            }
-                            content.message.Add(new ImageMessage(img));
-                            await Bot.SendGroupMessage(e.group_id, "我的运势配图", content);
-                            Daily.SaveDaily();
+                            img += "zj" + (new Random().Next(2) + 1) + ".png";
                         }
-                    });
-                    return;
+                        else if (seq >= 11 && seq <= 15)
+                        {
+                            img += "j" + (new Random().Next(4) + 1) + ".png";
+                        }
+                        else if (seq >= 16 && seq <= 22)
+                        {
+                            img += "mj" + (new Random().Next(2) + 1) + ".png";
+                        }
+                        else if (seq >= 23 && seq <= 25)
+                        {
+                            img += "dx" + (new Random().Next(2) + 1) + ".png";
+                        }
+                        else if (seq >= 26 && seq <= 29)
+                        {
+                            img += "x" + (new Random().Next(2) + 1) + ".png";
+                        }
+                        content.message.Add(new ImageMessage(img));
+                        await Bot.SendGroupMessage(e.group_id, "我的运势配图", content);
+                        Daily.SaveDaily();
+                    }
+                    return quick_reply;
                 }
                 if (e.detail == "重置运势" && Daily.UserDailys.ContainsKey(e.user_id))
                 {
-                    TaskUtility.NewTask(async () =>
-                    {
-                        if (!await Bot.CheckBlackList(true, e.user_id, e.group_id)) return;
-                        Daily.UserDailys.Remove(e.user_id);
-                        GroupMessageContent content = new(e.group_id);
-                        content.message.Add(new AtMessage(e.user_id));
-                        content.message.Add(new TextMessage("你的今日运势已重置。"));
-                        await Bot.SendGroupMessage(e.group_id, "重置运势", content);
-                        Daily.SaveDaily();
-                    });
-                    return;
+                    if (!await Bot.CheckBlackList(true, e.user_id, e.group_id)) return quick_reply;
+                    Daily.UserDailys.Remove(e.user_id);
+                    GroupMessageContent content = new(e.group_id);
+                    content.message.Add(new AtMessage(e.user_id));
+                    content.message.Add(new TextMessage("你的今日运势已重置。"));
+                    await Bot.SendGroupMessage(e.group_id, "重置运势", content);
+                    Daily.SaveDaily();
+                    return quick_reply;
                 }
                 if (e.detail.Length > 4 && e.detail[..2] == "查看" && (e.detail[^2..] == "运势"))
                 {
-                    TaskUtility.NewTask(async () =>
+                    if (!await Bot.CheckBlackList(true, e.user_id, e.group_id)) return quick_reply;
+                    string[] strs = e.detail.Replace("查看", "").Replace("运势", "").Trim().Split(' ');
+                    foreach (string str_qq in strs)
                     {
-                        if (!await Bot.CheckBlackList(true, e.user_id, e.group_id)) return;
-                        string[] strs = e.detail.Replace("查看", "").Replace("运势", "").Trim().Split(' ');
-                        foreach (string str_qq in strs)
+                        if (long.TryParse(str_qq.Trim().Replace("@", ""), out long qq))
                         {
-                            if (long.TryParse(str_qq.Trim().Replace("@", ""), out long qq))
+                            if (qq == GeneralSettings.BotQQ && !Daily.UserDailys.ContainsKey(qq))
                             {
-                                if (qq == GeneralSettings.BotQQ && !Daily.UserDailys.ContainsKey(qq))
-                                {
-                                    string text = Daily.DailyContent[new Random().Next(Daily.DailyContent.Count)];
-                                    Daily.UserDailys.Add(GeneralSettings.BotQQ, text);
-                                    Daily.SaveDaily();
-                                }
-                                if (Daily.UserDailys.TryGetValue(qq, out string? daily) && daily != null)
-                                {
-                                    GroupMessageContent content = new(e.group_id);
-                                    content.message.Add(new TextMessage(Bot.GetMemberNickName(e.group_id, qq) + "（" + qq + "）的今日运势是：\r\n" + daily));
-                                    await Bot.SendGroupMessage(e.group_id, "查看运势", content);
-                                }
-                                else
-                                {
-                                    await Bot.SendGroupMessage(e.group_id, "查看运势", "TA今天还没有抽取运势哦，快去提醒TA！");
-                                }
+                                string text = Daily.DailyContent[new Random().Next(Daily.DailyContent.Count)];
+                                Daily.UserDailys.Add(GeneralSettings.BotQQ, text);
+                                Daily.SaveDaily();
+                            }
+                            if (Daily.UserDailys.TryGetValue(qq, out string? daily) && daily != null)
+                            {
+                                GroupMessageContent content = new(e.group_id);
+                                content.message.Add(new TextMessage(Bot.GetMemberNickName(e.group_id, qq) + "（" + qq + "）的今日运势是：\r\n" + daily));
+                                await Bot.SendGroupMessage(e.group_id, "查看运势", content);
+                            }
+                            else
+                            {
+                                await Bot.SendGroupMessage(e.group_id, "查看运势", "TA今天还没有抽取运势哦，快去提醒TA！");
                             }
                         }
-                    });
-                    return;
+                    }
+                    return quick_reply;
                 }
                 if (e.user_id == GeneralSettings.Master && e.detail.Length > 4 && e.detail[..2] == "重置" && (e.detail[^2..] == "运势"))
                 {
-                    TaskUtility.NewTask(async () =>
+                    if (!await Bot.CheckBlackList(true, e.user_id, e.group_id)) return quick_reply;
+                    string[] strs = e.detail.Replace("重置", "").Replace("运势", "").Trim().Split(' ');
+                    foreach (string str_qq in strs)
                     {
-                        if (!await Bot.CheckBlackList(true, e.user_id, e.group_id)) return;
-                        string[] strs = e.detail.Replace("重置", "").Replace("运势", "").Trim().Split(' ');
-                        foreach (string str_qq in strs)
+                        if (long.TryParse(str_qq.Trim().Replace("@", ""), out long qq))
                         {
-                            if (long.TryParse(str_qq.Trim().Replace("@", ""), out long qq))
-                            {
-                                Daily.UserDailys.Remove(GeneralSettings.BotQQ);
-                                await Bot.SendGroupMessage(e.group_id, "重置运势", "已重置" + Bot.GetMemberNickName(e.group_id, qq) + "（" + qq + "）的今日运势。");
-                                Daily.SaveDaily();
-                            }
+                            Daily.UserDailys.Remove(GeneralSettings.BotQQ);
+                            await Bot.SendGroupMessage(e.group_id, "重置运势", "已重置" + Bot.GetMemberNickName(e.group_id, qq) + "（" + qq + "）的今日运势。");
+                            Daily.SaveDaily();
                         }
-                    });
-                    return;
+                    }
+                    return quick_reply;
                 }
 
                 // 下面是开启了OSM Core的群组才能使用的功能
-                if (!onOSMCore) return;
+                if (!onOSMCore) return quick_reply;
 
                 // 禁言抽奖
                 if (GeneralSettings.IsMute && e.detail == "禁言抽奖" && !MuteRecall.WillMute.ContainsKey(e.user_id))
                 {
-                    TaskUtility.NewTask(async () =>
+                    if (!await Bot.CheckBlackList(true, e.user_id, e.group_id) || !Bot.BotIsAdmin(e.group_id)) return quick_reply;
+                    if (e.user_id != GeneralSettings.Master)
                     {
-                        if (!await Bot.CheckBlackList(true, e.user_id, e.group_id) || !Bot.BotIsAdmin(e.group_id)) return;
-                        if (e.user_id != GeneralSettings.Master)
-                        {
-                            await Bot.SendGroupMessage(e.group_id, "禁言抽奖", "2秒后开奖～\r\n如需要忏悔，请在开奖后3秒内发送忏悔，开奖前发送无效。");
-                            await Task.Delay(2000);
-                            if (!MuteRecall.WillMute.ContainsKey(e.user_id)) MuteRecall.WillMute.Add(e.user_id, e.user_id);
-                            long mute_time = GeneralSettings.MuteTime[0] + new Random().NextInt64(GeneralSettings.MuteTime[1] - GeneralSettings.MuteTime[0]);
-                            await Bot.SendGroupMessage(e.group_id, "禁言抽奖", "开奖啦！禁言时长：" + (mute_time / 60) + "分钟" + (mute_time % 60) + "秒。\r\n" + "你现在有3秒时间发送忏悔拒绝领奖！");
-                            await Task.Delay(3200);
-                            await Bot.SendMessage(SupportedAPI.set_group_ban, e.group_id, "禁言抽奖", new SetGroupBanContent(e.group_id, e.user_id, mute_time), true);
-                            MuteRecall.WillMute.Remove(e.user_id);
-                        }
-                        else
-                        {
-                            _ = Bot.SendGroupMessage(e.group_id, "禁言抽奖", "我不能禁言主人！");
-                        }
-                    });
-                    return;
+                        await Bot.SendGroupMessage(e.group_id, "禁言抽奖", "2秒后开奖～\r\n如需要忏悔，请在开奖后3秒内发送忏悔，开奖前发送无效。");
+                        await Task.Delay(2000);
+                        if (!MuteRecall.WillMute.ContainsKey(e.user_id)) MuteRecall.WillMute.Add(e.user_id, e.user_id);
+                        long mute_time = GeneralSettings.MuteTime[0] + new Random().NextInt64(GeneralSettings.MuteTime[1] - GeneralSettings.MuteTime[0]);
+                        await Bot.SendGroupMessage(e.group_id, "禁言抽奖", "开奖啦！禁言时长：" + (mute_time / 60) + "分钟" + (mute_time % 60) + "秒。\r\n" + "你现在有3秒时间发送忏悔拒绝领奖！");
+                        await Task.Delay(3200);
+                        await Bot.SendMessage(SupportedAPI.set_group_ban, e.group_id, "禁言抽奖", new SetGroupBanContent(e.group_id, e.user_id, mute_time), true);
+                        MuteRecall.WillMute.Remove(e.user_id);
+                    }
+                    else
+                    {
+                        await Bot.SendGroupMessage(e.group_id, "禁言抽奖", "我不能禁言主人！");
+                    }
+                    return quick_reply;
                 }
                 // 忏悔
                 else if (GeneralSettings.IsMute && e.detail == "忏悔" && MuteRecall.WillMute.ContainsKey(e.user_id))
                 {
-                    TaskUtility.NewTask(async () =>
-                    {
-                        if (!await Bot.CheckBlackList(true, e.user_id, e.group_id) || !Bot.BotIsAdmin(e.group_id)) return;
-                        await Task.Delay(3800);
-                        MuteRecall.WillMute.Remove(e.user_id);
-                        await Bot.SendMessage(SupportedAPI.set_group_ban, e.group_id, "忏悔", new SetGroupBanContent(e.group_id, e.user_id, 0), true);
-                        await Bot.SendGroupMessage(e.group_id, "忏悔", "忏悔成功！！希望你保持纯真，保持野性的美。");
-                    });
-                    return;
+                    if (!await Bot.CheckBlackList(true, e.user_id, e.group_id) || !Bot.BotIsAdmin(e.group_id)) return quick_reply;
+                    await Task.Delay(3800);
+                    MuteRecall.WillMute.Remove(e.user_id);
+                    await Bot.SendMessage(SupportedAPI.set_group_ban, e.group_id, "忏悔", new SetGroupBanContent(e.group_id, e.user_id, 0), true);
+                    await Bot.SendGroupMessage(e.group_id, "忏悔", "忏悔成功！！希望你保持纯真，保持野性的美。");
+                    return quick_reply;
                 }
 
                 // 随机反驳是
@@ -398,11 +341,11 @@ namespace Milimoe.RainBOT.ListeningTask
                     if (e.user_id != GeneralSettings.Master && e.CheckThrow(40, out dice))
                     {
                         Bot.ColorfulCheckPass(sender, "反驳是", dice, 40);
-                        _ = Bot.SendGroupMessage(e.group_id, "随机反驳是", "是你的头");
+                        await Bot.SendGroupMessage(e.group_id, "随机反驳是", "是你的头");
                     }
                     else if (e.user_id == GeneralSettings.Master)
                     {
-                        _ = Bot.SendGroupMessage(e.group_id, "随机反驳是", "是你的头");
+                        await Bot.SendGroupMessage(e.group_id, "随机反驳是", "是你的头");
                     }
                 }
 
@@ -466,7 +409,7 @@ namespace Milimoe.RainBOT.ListeningTask
                     }
                     if (content.message.Count > 0)
                     {
-                        _ = Bot.SendGroupMessage(e.group_id, "随机反驳不", content);
+                        await Bot.SendGroupMessage(e.group_id, "随机反驳不", content);
                     }
                 }
                 else if (SayNo.TriggerBeforeNo.Any(e.detail.Contains) && GeneralSettings.IsSayNo && e.CheckThrow(GeneralSettings.PSayNo, out dice))
@@ -519,7 +462,7 @@ namespace Milimoe.RainBOT.ListeningTask
                     }
                     if (content.message.Count > 0)
                     {
-                        _ = Bot.SendGroupMessage(e.group_id, "随机反驳不", content);
+                        await Bot.SendGroupMessage(e.group_id, "随机反驳不", content);
                     }
                 }
                 else if (e.detail.Contains("可以") && !e.detail.Contains('不') && e.CheckThrow(GeneralSettings.PSayNo, out dice))
@@ -527,11 +470,11 @@ namespace Milimoe.RainBOT.ListeningTask
                     Bot.ColorfulCheckPass(sender, "随机反驳不", dice, GeneralSettings.PSayNo);
                     if (dice < (GeneralSettings.PSayNo / 2))
                     {
-                        _ = Bot.SendGroupMessage(e.group_id, "随机反驳不", "可以");
+                        await Bot.SendGroupMessage(e.group_id, "随机反驳不", "可以");
                     }
                     else
                     {
-                        _ = Bot.SendGroupMessage(e.group_id, "随机反驳不", "不可以");
+                        await Bot.SendGroupMessage(e.group_id, "随机反驳不", "不可以");
                     }
                 }
                 else if (e.detail.Contains('能') && !e.detail.Contains('不') && !SayNo.IgnoreTriggerBeforeCan.Any(e.detail.Contains) && e.CheckThrow(GeneralSettings.PSayNo, out dice))
@@ -539,11 +482,11 @@ namespace Milimoe.RainBOT.ListeningTask
                     Bot.ColorfulCheckPass(sender, "随机反驳不", dice, GeneralSettings.PSayNo);
                     if (dice < (GeneralSettings.PSayNo / 2))
                     {
-                        _ = Bot.SendGroupMessage(e.group_id, "随机反驳不", "能");
+                        await Bot.SendGroupMessage(e.group_id, "随机反驳不", "能");
                     }
                     else
                     {
-                        _ = Bot.SendGroupMessage(e.group_id, "随机反驳不", "不能");
+                        await Bot.SendGroupMessage(e.group_id, "随机反驳不", "不能");
                     }
                 }
                 else if (e.detail.Contains("可能") && !e.detail.Contains('不') && e.CheckThrow(GeneralSettings.PSayNo, out dice))
@@ -551,22 +494,22 @@ namespace Milimoe.RainBOT.ListeningTask
                     Bot.ColorfulCheckPass(sender, "随机反驳不", dice, GeneralSettings.PSayNo);
                     if (dice < (GeneralSettings.PSayNo / 2))
                     {
-                        _ = Bot.SendGroupMessage(e.group_id, "随机反驳不", "可能");
+                        await Bot.SendGroupMessage(e.group_id, "随机反驳不", "可能");
                     }
                     else
                     {
-                        _ = Bot.SendGroupMessage(e.group_id, "随机反驳不", "不可能");
+                        await Bot.SendGroupMessage(e.group_id, "随机反驳不", "不可能");
                     }
                 }
                 else if (e.detail.Contains('要') && !e.detail.Contains('不') && e.CheckThrow(GeneralSettings.PSayNo, out dice))
                 {
                     Bot.ColorfulCheckPass(sender, "随机反驳不", dice, GeneralSettings.PSayNo);
-                    _ = Bot.SendGroupMessage(e.group_id, "随机反驳不", SayNo.SayWantWords[new Random().Next(SayNo.SayWantWords.Count)]);
+                    await Bot.SendGroupMessage(e.group_id, "随机反驳不", SayNo.SayWantWords[new Random().Next(SayNo.SayWantWords.Count)]);
                 }
                 else if (e.detail.Contains('想') && !e.detail.Contains('不') && e.CheckThrow(GeneralSettings.PSayNo, out dice))
                 {
                     Bot.ColorfulCheckPass(sender, "随机反驳不", dice, GeneralSettings.PSayNo);
-                    _ = Bot.SendGroupMessage(e.group_id, "随机反驳不", SayNo.SayThinkWords[new Random().Next(SayNo.SayThinkWords.Count)]);
+                    await Bot.SendGroupMessage(e.group_id, "随机反驳不", SayNo.SayThinkWords[new Random().Next(SayNo.SayThinkWords.Count)]);
                 }
 
                 // 反向艾特
@@ -581,10 +524,10 @@ namespace Milimoe.RainBOT.ListeningTask
                             at.data.qq = e.user_id.ToString();
                             GroupMessageContent content = new(e.group_id);
                             content.message.AddRange(e.message);
-                            _ = Bot.SendGroupMessage(e.group_id, "反向艾特", content);
+                            await Bot.SendGroupMessage(e.group_id, "反向艾特", content);
                         }
                     }
-                    return;
+                    return quick_reply;
                 }
 
                 // 随机OSM
@@ -599,8 +542,8 @@ namespace Milimoe.RainBOT.ListeningTask
                         _ => "file:///" + AppDomain.CurrentDomain.BaseDirectory.ToString() + @"img\osm.jpg",
                     };
                     content.message.Add(new ImageMessage(img));
-                    _ = Bot.SendGroupMessage(e.group_id, "Image", content);
-                    return;
+                    await Bot.SendGroupMessage(e.group_id, "Image", content);
+                    return quick_reply;
                 }
 
                 // 随机复读
@@ -611,8 +554,8 @@ namespace Milimoe.RainBOT.ListeningTask
                     Bot.ColorfulCheckPass(sender, "随机复读", dice, GeneralSettings.PRepeat, delay);
                     GroupMessageContent content = new(e.group_id);
                     content.message.AddRange(e.message);
-                    _ = Bot.SendGroupMessage(e.group_id, "随机复读", content, delay * 1000);
-                    return;
+                    await Bot.SendGroupMessage(e.group_id, "随机复读", content, delay * 1000);
+                    return quick_reply;
                 }
 
                 // 随机叫哥
@@ -627,8 +570,8 @@ namespace Milimoe.RainBOT.ListeningTask
                         GroupMessageContent content = new(e.group_id);
                         content.message.Add(new AtMessage(e.user_id));
                         content.message.Add(new TextMessage(string.Concat(name.AsSpan(pos, name.Length > 1 ? 2 : name.Length), "哥")));
-                        _ = Bot.SendGroupMessage(e.group_id, "随机叫哥", content, delay * 1000);
-                        return;
+                        await Bot.SendGroupMessage(e.group_id, "随机叫哥", content, delay * 1000);
+                        return quick_reply;
                     }
                 }
             }
@@ -638,6 +581,8 @@ namespace Milimoe.RainBOT.ListeningTask
                 Console.WriteLine(ex);
                 Console.ForegroundColor = ConsoleColor.Gray;
             }
+
+            return quick_reply;
         }
     }
 }

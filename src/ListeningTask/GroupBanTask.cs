@@ -8,7 +8,7 @@ namespace Milimoe.RainBOT.ListeningTask
 {
     public class GroupBanTask
     {
-        public static async void ListeningTask_handler(GroupBanEvent e)
+        public static async Task ListeningTask_handler(GroupBanEvent e)
         {
             try
             {
