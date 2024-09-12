@@ -49,6 +49,12 @@ namespace Milimoe.RainBOT.ListeningTask
                     return quick_reply;
                 }
 
+                if (e.detail == "挑战结束" && e.user_id == GeneralSettings.Master)
+                {
+                    await Bot.Unmute12ClockMembers();
+                    return quick_reply;
+                }
+
                 if (GeneralSettings.IsMute && e.detail == "忏悔")
                 {
                     if (!await Bot.CheckBlackList(false, e.user_id, e.user_id)) return quick_reply;

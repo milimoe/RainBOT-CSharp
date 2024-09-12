@@ -108,6 +108,11 @@ namespace Milimoe.RainBOT.ListeningTask
                     await Bot.SendGroupMessage(e.group_id, "12点大挑战", "欢迎加入12点大挑战。参加本挑战后，你将在每晚的12点获得8小时禁言和优质的睡眠，确保第二天的精神饱满！\r\n发送【加入12点】即可参加。");
                     return quick_reply;
                 }
+                else if (e.detail == "挑战结束" && e.user_id == GeneralSettings.Master)
+                {
+                    await Bot.Unmute12ClockMembers();
+                    return quick_reply;
+                }
 
                 // 发图API
                 if (e.detail == "来图")

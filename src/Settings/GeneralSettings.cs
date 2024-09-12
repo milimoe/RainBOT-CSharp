@@ -1,5 +1,4 @@
-﻿using System.Drawing;
-using Milimoe.OneBot.Framework.Utility;
+﻿using Milimoe.OneBot.Framework.Utility;
 
 namespace Milimoe.RainBOT.Settings
 {

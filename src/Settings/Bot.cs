@@ -354,5 +354,29 @@ namespace Milimoe.RainBOT.Settings
             Console.WriteLine("已向12点大挑战的成员发放奖励。");
             Console.ForegroundColor = ConsoleColor.Gray;
         }
+
+        public static async Task Unmute12ClockMembers()
+        {
+            foreach (long group_id in GroupMembers.Keys)
+            {
+                List<IContent> list = [];
+                foreach (Member m in GroupMembers[group_id])
+                {
+                    if (GeneralSettings.Challenge12ClockGroup.Contains(m.user_id))
+                    {
+                        MuteRecall.Muted.Remove(m.user_id);
+                        SetGroupBanContent content = new(group_id, m.user_id, 0);
+                        list.Add(content);
+                    }
+                }
+                if (list.Count > 0)
+                {
+                    await SendMessage(SupportedAPI.set_group_ban, group_id, "12点大挑战", list, true);
+                }
+            }
+            Console.ForegroundColor = ConsoleColor.Magenta;
+            Console.WriteLine("已解禁所有参与12点大挑战的成员。");
+            Console.ForegroundColor = ConsoleColor.Gray;
+        }
     }
 }
