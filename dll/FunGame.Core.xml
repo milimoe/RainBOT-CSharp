@@ -535,11 +535,22 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:Milimoe.FunGame.Core.Api.Utility.Factory.GetItem(Milimoe.FunGame.Core.Library.Constant.ItemType)">
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.Factory.GetSkill">
+            <summary>
+            获取技能实例
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.Factory.GetEffect">
+            <summary>
+            获取技能特效实例
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.Factory.GetItem">
             <summary>
             获取物品实例
             </summary>
-            <param name="type">Item类型 主动 或 被动</param>
             <returns></returns>
         </member>
         <member name="M:Milimoe.FunGame.Core.Api.Utility.Factory.GetRoom(System.Int64,System.String,System.Nullable{System.DateTime},Milimoe.FunGame.Core.Entity.User,Milimoe.FunGame.Core.Library.Constant.RoomType,System.String,System.String,Milimoe.FunGame.Core.Library.Constant.RoomState,System.Boolean,System.String)">
@@ -845,6 +856,22 @@
             <param name="hashtable"></param>
             <param name="key"></param>
             <param name="options"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.NetworkUtility.HttpGet``1(System.String)">
+            <summary>
+            发送 GET 请求
+            </summary>
+            <param name="url"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Api.Utility.NetworkUtility.HttpPost``1(System.String,System.String)">
+            <summary>
+            发送 POST 请求
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="url"></param>
+            <param name="json"></param>
             <returns></returns>
         </member>
         <member name="T:Milimoe.FunGame.Core.Api.Utility.DateTimeUtility">
@@ -1983,6 +2010,11 @@
             角色的详细资料
             </summary>
         </member>
+        <member name="P:Milimoe.FunGame.Core.Entity.Character.EquipSlot">
+            <summary>
+            角色的详细资料
+            </summary>
+        </member>
         <member name="P:Milimoe.FunGame.Core.Entity.Character.MagicType">
             <summary>
             魔法属性
@@ -2473,7 +2505,7 @@
         </member>
         <member name="M:Milimoe.FunGame.Core.Entity.Character.Equals(Milimoe.FunGame.Core.Interface.Entity.IBaseEntity)">
             <summary>
-            比较一个角色（只比较 <see cref="P:Milimoe.FunGame.Core.Entity.Character.Name"/>）
+            比较一个角色（只比较 <see cref="M:Milimoe.FunGame.Core.Entity.Character.ToString"/>）
             </summary>
             <param name="other"></param>
             <returns></returns>
@@ -2522,6 +2554,22 @@
             [ 推荐从模组中复制后使用对象 ]
             </summary>
             <returns></returns>
+        </member>
+        <member name="T:Milimoe.FunGame.Core.Entity.CharacterProfile">
+            <summary>
+            角色的一些个人信息
+            </summary>
+            <param name="name"></param>
+            <param name="firstname"></param>
+            <param name="nickname"></param>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Entity.CharacterProfile.#ctor(System.String,System.String,System.String)">
+            <summary>
+            角色的一些个人信息
+            </summary>
+            <param name="name"></param>
+            <param name="firstname"></param>
+            <param name="nickname"></param>
         </member>
         <member name="P:Milimoe.FunGame.Core.Entity.CharacterProfile.Name">
             <summary>
@@ -2578,12 +2626,149 @@
             角色的故事
             </summary>
         </member>
-        <member name="T:Milimoe.FunGame.Core.Entity.Effect">
+        <member name="T:Milimoe.FunGame.Core.Entity.EquipSlot">
             <summary>
-            特殊效果类，需要继承
+            角色的装备槽位
             </summary>
         </member>
-        <member name="M:Milimoe.FunGame.Core.Entity.Effect.#ctor(Milimoe.FunGame.Core.Entity.Skill)">
+        <member name="M:Milimoe.FunGame.Core.Entity.EquipSlot.#ctor">
+            <summary>
+            角色的装备槽位
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Entity.EquipSlot.MagicCardPack">
+            <summary>
+            魔法卡包
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Entity.EquipSlot.Weapon">
+            <summary>
+            武器
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Entity.EquipSlot.Armor">
+            <summary>
+            防具
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Entity.EquipSlot.Shoes">
+            <summary>
+            鞋子
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Entity.EquipSlot.Accessory1">
+            <summary>
+            饰品1
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Entity.EquipSlot.Accessory2">
+            <summary>
+            饰品2
+            </summary>
+        </member>
+        <member name="T:Milimoe.FunGame.Core.Entity.MagicResistance">
+            <summary>
+            角色的魔法抗性，对不同的魔法类型有不同抗性
+            </summary>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Entity.MagicResistance.#ctor">
+            <summary>
+            角色的魔法抗性，对不同的魔法类型有不同抗性
+            </summary>
+        </member>
+        <member name="T:Milimoe.FunGame.Core.Entity.Item">
+            <summary>
+            和 <see cref="T:Milimoe.FunGame.Core.Entity.Skill"/> 一样，需要继承构造
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Entity.Item.Description">
+            <summary>
+            物品的描述
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Entity.Item.ItemType">
+            <summary>
+            物品类型
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Entity.Item.EquipSlotType">
+            <summary>
+            物品槽位
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Entity.Item.Price">
+            <summary>
+            物品的价格
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Entity.Item.Key">
+            <summary>
+            快捷键
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Entity.Item.IsActive">
+            <summary>
+            是否是主动物品
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Entity.Item.Enable">
+            <summary>
+            是否可用（涉及冷却和禁用等）
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Entity.Item.Character">
+            <summary>
+            物品所属的角色
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Entity.Item.Skills">
+            <summary>
+            物品拥有的技能
+            </summary>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Entity.Item.OnItemGained">
+            <summary>
+            当获得物品时
+            </summary>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Entity.Item.UseItem(Milimoe.FunGame.Core.Api.Utility.ActionQueue,System.Collections.Generic.List{Milimoe.FunGame.Core.Entity.Character},System.Collections.Generic.List{Milimoe.FunGame.Core.Entity.Character})">
+            <summary>
+            局内使用物品触发
+            </summary>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Entity.Item.UseItem">
+            <summary>
+            局外（库存）使用物品触发
+            </summary>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Entity.Item.OnItemUsed">
+            <summary>
+            当物品被使用时
+            </summary>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Entity.Item.Equals(Milimoe.FunGame.Core.Interface.Entity.IBaseEntity)">
+            <summary>
+            判断两个物品是否相同 检查Id.Name
+            </summary>
+            <param name="other"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Milimoe.FunGame.Core.Entity.SkillGroup">
+            <summary>
+            物品只有一个主动技能，但是可以有很多个被动技能
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Entity.SkillGroup.Active">
+            <summary>
+            唯一的主动技能
+            </summary>
+        </member>
+        <member name="P:Milimoe.FunGame.Core.Entity.SkillGroup.Passive">
+            <summary>
+            被动技能组
+            </summary>
+        </member>
+        <member name="T:Milimoe.FunGame.Core.Entity.Effect">
             <summary>
             特殊效果类，需要继承
             </summary>
@@ -2977,11 +3162,6 @@
             技能描述
             </summary>
         </member>
-        <member name="P:Milimoe.FunGame.Core.Entity.Skill.Key">
-            <summary>
-            快捷键
-            </summary>
-        </member>
         <member name="P:Milimoe.FunGame.Core.Entity.Skill.Level">
             <summary>
             技能等级，等于 0 时可以称之为尚未学习
@@ -2989,7 +3169,7 @@
         </member>
         <member name="P:Milimoe.FunGame.Core.Entity.Skill.SkillType">
             <summary>
-            技能 [ 此项为最高优先级 ]
+            技能类型 [ 此项为最高优先级 ]
             </summary>
         </member>
         <member name="P:Milimoe.FunGame.Core.Entity.Skill.IsActive">
@@ -3072,6 +3252,18 @@
             游戏中的行动顺序表实例，在技能效果被触发时，此实例会获得赋值，使用时需要判断其是否存在
             </summary>
         </member>
+        <member name="M:Milimoe.FunGame.Core.Entity.Skill.#ctor(Milimoe.FunGame.Core.Library.Constant.SkillType,Milimoe.FunGame.Core.Entity.Character)">
+            <summary>
+            继承此类实现时，调用基类的构造函数
+            </summary>
+            <param name="type"></param>
+            <param name="character"></param>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Entity.Skill.#ctor">
+            <summary>
+            用于构造 JSON
+            </summary>
+        </member>
         <member name="M:Milimoe.FunGame.Core.Entity.Skill.OnLevelUp">
             <summary>
             触发技能升级
@@ -3103,6 +3295,13 @@
             <summary>
             返回技能的详细说明
             </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Milimoe.FunGame.Core.Entity.Skill.Equals(Milimoe.FunGame.Core.Interface.Entity.IBaseEntity)">
+            <summary>
+            判断两个技能是否相同 检查Id.Name
+            </summary>
+            <param name="other"></param>
             <returns></returns>
         </member>
         <member name="F:Milimoe.FunGame.Core.Entity.Skill._Level">

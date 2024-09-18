@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Text;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using Milimoe.OneBot.Framework;
 using Milimoe.OneBot.Framework.Interface;
@@ -21,6 +22,8 @@ namespace Milimoe.RainBOT.Settings
         public static List<Group> Groups { get; set; } = [];
 
         public static Dictionary<long, List<Member>> GroupMembers { get; set; } = [];
+
+        public static bool FunGameSimulation { get; set; } = false;
 
         public static bool IsAdmin(long group_id, long user_id)
         {
@@ -377,6 +380,29 @@ namespace Milimoe.RainBOT.Settings
             Console.ForegroundColor = ConsoleColor.Magenta;
             Console.WriteLine("已解禁所有参与12点大挑战的成员。");
             Console.ForegroundColor = ConsoleColor.Gray;
+        }
+
+        private static readonly HttpClient client = new();
+
+        public static async Task<T?> HttpGet<T>(string url)
+        {
+            HttpResponseMessage response = await client.GetAsync(url);
+            response.EnsureSuccessStatusCode();
+
+            string content = await response.Content.ReadAsStringAsync();
+            T? result = JsonSerializer.Deserialize<T>(content);
+            return result;
+        }
+
+        public static async Task<T?> HttpPost<T>(string url, string json)
+        {
+            HttpContent content = new StringContent(json, Encoding.UTF8, "application/json");
+            HttpResponseMessage response = await client.PostAsync(url, content);
+            response.EnsureSuccessStatusCode();
+
+            string read = await response.Content.ReadAsStringAsync();
+            T? result = JsonSerializer.Deserialize<T>(read);
+            return result;
         }
     }
 }
