@@ -24,6 +24,11 @@ namespace Milimoe.RainBOT.ListeningTask
                 Sender sender = e.sender;
                 if (e.user_id == 0 || e.sender.user_id == 0) return quick_reply;
 
+                if (GeneralSettings.DebugGroupID != 0 && e.group_id != GeneralSettings.DebugGroupID)
+                {
+                    Console.WriteLine($"{e.group_id} 不是沙盒群聊，已经过滤。");
+                    return quick_reply;
+                }
                 Console.WriteLine($"{DateTime.Now:yyyy/MM/dd HH:mm:ss} G/{e.group_id}{(e.detail.Trim() == "" ? "" : " -> " + e.detail)} by {sender.user_id}（{(sender.card != "" ? sender.card : sender.nickname)}）");
                 if (GeneralSettings.IsDebug)
                 {
@@ -73,6 +78,27 @@ namespace Milimoe.RainBOT.ListeningTask
                     }
                 }
 
+                // 精华消息
+                if ((e.user_id == GeneralSettings.Master || Bot.IsAdmin(e.group_id, e.user_id)) && e.detail.Contains("精华；") && e.message.Any(m => m.type == "reply"))
+                {
+                    ReplyMessage reply = (ReplyMessage)e.message.Where(m => m.type == "reply").First();
+                    if (int.TryParse(reply.data.id, out int id))
+                    {
+                        if (e.detail.Contains("取消精华；"))
+                        {
+                            await Bot.SendMessage(SupportedAPI.delete_essence_msg, e.group_id, "取消精华", new DeleteEssenceMsgContent(id), true);
+                            await Bot.SendMessage(SupportedAPI.delete_msg, e.group_id, "撤回", new DeleteMsgContent(e.real_id), true);
+                            return quick_reply;
+                        }
+                        else
+                        {
+                            await Bot.SendMessage(SupportedAPI.set_essence_msg, e.group_id, "设置精华", new EssenceMsgContent(id), true);
+                            await Bot.SendMessage(SupportedAPI.delete_msg, e.group_id, "撤回", new DeleteMsgContent(e.real_id), true);
+                            return quick_reply;
+                        }
+                    }
+                }
+
                 if (!GeneralSettings.IsRun)
                 {
                     return quick_reply;
@@ -114,37 +140,89 @@ namespace Milimoe.RainBOT.ListeningTask
                     return quick_reply;
                 }
 
+                if (e.detail.Length >= 9 && e.detail[..9].Equals("FunGame模拟", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    if (!await Bot.CheckBlackList(true, e.user_id, e.group_id)) return quick_reply;
+                    if (!Bot.FunGameSimulation)
+                    {
+                        Bot.FunGameSimulation = true;
+                        List<string> msgs = await Bot.HttpGet<List<string>>("https://api.milimoe.com/fungame/test?isweb=false") ?? [];
+                        foreach (string msg in msgs)
+                        {
+                            await Bot.SendGroupMessage(e.group_id, "FunGame模拟", msg.Trim());
+                            await Task.Delay(5500);
+                        }
+                        Bot.FunGameSimulation = false;
+                    }
+                    else
+                    {
+                        await Bot.SendGroupMessage(e.group_id, "FunGame模拟", "游戏正在模拟中，请勿重复请求！");
+                    }
+                    return quick_reply;
+                }
+                
+                if (e.detail.Length >= 3 && e.detail[..3].Equals("查数据", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    if (!await Bot.CheckBlackList(true, e.user_id, e.group_id)) return quick_reply;
+                    string detail = e.detail.Replace("查数据", "").Trim();
+                    if (int.TryParse(detail, out int id))
+                    {
+                        string msg = (await Bot.HttpGet<string>("https://api.milimoe.com/fungame/stats?id=" + id) ?? "").Trim();
+                        if (msg != "")
+                        {
+                            await Bot.SendGroupMessage(e.group_id, "查询FunGame数据", msg);
+                        }
+                    }
+                    return quick_reply;
+                }
+
                 // 发图API
                 if (e.detail == "来图")
                 {
                     if (!await Bot.CheckBlackList(true, e.user_id, e.group_id)) return quick_reply;
-                    GroupMessageContent content = new(e.group_id);
-                    content.message.Add(new ImageMessage("https://iw233.cn/api.php?sort=random"));
-                    await Bot.SendGroupMessage(e.group_id, "Image", content);
+                    Guid guid = await Bot.DownloadImageStream("https://iw233.cn/api.php?sort=random", "https://weibo.com/");
+                    if (guid != Guid.Empty)
+                    {
+                        GroupMessageContent content = new(e.group_id);
+                        content.message.Add(new ImageMessage("file:///" + AppDomain.CurrentDomain.BaseDirectory.ToString() + @"img\download\" + guid.ToString() + ".jpg"));
+                        await Bot.SendGroupMessage(e.group_id, "Image", content);
+                    }
                     return quick_reply;
                 }
                 if (e.detail.Contains("白毛"))
                 {
                     if (!await Bot.CheckBlackList(true, e.user_id, e.group_id)) return quick_reply;
-                    GroupMessageContent content = new(e.group_id);
-                    content.message.Add(new ImageMessage("https://iw233.cn/api.php?sort=yin"));
-                    await Bot.SendGroupMessage(e.group_id, "Image", content);
+                    Guid guid = await Bot.DownloadImageStream("https://iw233.cn/api.php?sort=yin", "https://weibo.com/");
+                    if (guid != Guid.Empty)
+                    {
+                        GroupMessageContent content = new(e.group_id);
+                        content.message.Add(new ImageMessage("file:///" + AppDomain.CurrentDomain.BaseDirectory.ToString() + @"img\download\" + guid.ToString() + ".jpg"));
+                        await Bot.SendGroupMessage(e.group_id, "Image", content);
+                    }
                     return quick_reply;
                 }
                 if (e.detail == "猫耳")
                 {
                     if (!await Bot.CheckBlackList(true, e.user_id, e.group_id)) return quick_reply;
-                    GroupMessageContent content = new(e.group_id);
-                    content.message.Add(new ImageMessage("https://iw233.cn/api.php?sort=cat"));
-                    await Bot.SendGroupMessage(e.group_id, "Image", content);
+                    Guid guid = await Bot.DownloadImageStream("https://iw233.cn/api.php?sort=cat", "https://weibo.com/");
+                    if (guid != Guid.Empty)
+                    {
+                        GroupMessageContent content = new(e.group_id);
+                        content.message.Add(new ImageMessage("file:///" + AppDomain.CurrentDomain.BaseDirectory.ToString() + @"img\download\" + guid.ToString() + ".jpg"));
+                        await Bot.SendGroupMessage(e.group_id, "Image", content);
+                    }
                     return quick_reply;
                 }
                 if (e.detail == "壁纸")
                 {
                     if (!await Bot.CheckBlackList(true, e.user_id, e.group_id)) return quick_reply;
-                    GroupMessageContent content = new(e.group_id);
-                    content.message.Add(new ImageMessage("https://iw233.cn/api.php?sort=pc"));
-                    await Bot.SendGroupMessage(e.group_id, "Image", content);
+                    Guid guid = await Bot.DownloadImageStream("https://iw233.cn/api.php?sort=pc", "https://weibo.com/");
+                    if (guid != Guid.Empty)
+                    {
+                        GroupMessageContent content = new(e.group_id);
+                        content.message.Add(new ImageMessage("file:///" + AppDomain.CurrentDomain.BaseDirectory.ToString() + @"img\download\" + guid.ToString() + ".jpg"));
+                        await Bot.SendGroupMessage(e.group_id, "Image", content);
+                    }
                     return quick_reply;
                 }
                 if (e.detail == "新闻")

@@ -22,7 +22,7 @@
 
   <ItemGroup>
     <Reference Include="OneBot-HTTPClient">
-      <HintPath>..\..\OneBot-HTTPClient\bin\Release\net8.0\win-x64\OneBot-HTTPClient.dll</HintPath>
+      <HintPath>..\dll\OneBot-HTTPClient.dll</HintPath>
     </Reference>
   </ItemGroup>
 

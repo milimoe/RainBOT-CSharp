@@ -38,6 +38,8 @@ namespace Milimoe.RainBOT.Settings
 
         public static bool IsDebug { get; set; } = false;
 
+        public static long DebugGroupID { get; set; } = 0;
+
         public static long BlackTimes { get; set; } = 5;
 
         public static int BlackFrozenTime { get; set; } = 150;
