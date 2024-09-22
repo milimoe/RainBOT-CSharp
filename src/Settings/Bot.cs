@@ -179,7 +179,7 @@ namespace Milimoe.RainBOT.Settings
             }
             await SendMessage(SupportedAPI.send_group_msg, group_id, function, content, true);
         }
-
+        
         public static async Task SendGroupMessage(long group_id, string function, IEnumerable<IContent> contents) => await SendMessage(SupportedAPI.send_group_msg, group_id, function, contents, true);
 
         public static async Task SendFriendMessage(long user_id, string function, string text)
@@ -193,10 +193,10 @@ namespace Milimoe.RainBOT.Settings
 
         public static async Task SendFriendMessage(long user_id, string function, IEnumerable<IContent> contents) => await SendMessage(SupportedAPI.send_private_msg, user_id, function, contents, false);
 
-        public static async Task SendMessage(string api, long target_id, string function, IContent content, bool send_group)
+        public static async Task SendMessage(string api, long target_id, string function, IContent content, bool send_group, string referrer = "")
         {
             string msg_type = send_group ? "G" : "P";
-            string result = (await HTTPPost.Post(api, content)).ReasonPhrase ?? "";
+            string result = (await HTTPPost.Post(api, content, referrer)).ReasonPhrase ?? "";
             Console.Write($"{DateTime.Now:yyyy/MM/dd HH:mm:ss} F/");
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.Write(function);
@@ -211,10 +211,10 @@ namespace Milimoe.RainBOT.Settings
             }
         }
 
-        public static async Task SendMessage(string api, long target_id, string function, IEnumerable<IContent> contents, bool send_group)
+        public static async Task SendMessage(string api, long target_id, string function, IEnumerable<IContent> contents, bool send_group, string referrer = "")
         {
             string msg_type = send_group ? "G" : "P";
-            await HTTPPost.Post(api, contents);
+            await HTTPPost.Post(api, contents, referrer);
             Console.Write($"{DateTime.Now:yyyy/MM/dd HH:mm:ss} F/");
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.Write(function);
@@ -393,7 +393,7 @@ namespace Milimoe.RainBOT.Settings
             T? result = JsonSerializer.Deserialize<T>(content);
             return result;
         }
-
+        
         public static async Task<T?> HttpPost<T>(string url, string json)
         {
             HttpContent content = new StringContent(json, Encoding.UTF8, "application/json");
@@ -403,6 +403,37 @@ namespace Milimoe.RainBOT.Settings
             string read = await response.Content.ReadAsStringAsync();
             T? result = JsonSerializer.Deserialize<T>(read);
             return result;
+        }
+
+        public static async Task<Guid> DownloadImageStream(string url, string referrer)
+        {
+            try
+            {
+                HttpClient client = new();
+                if (referrer.Trim() != "") client.DefaultRequestHeaders.Referrer = new Uri(referrer);
+                using HttpResponseMessage response = await client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
+                response.EnsureSuccessStatusCode();
+
+                // 使用流的方式处理图片数据
+                string directory = AppDomain.CurrentDomain.BaseDirectory.ToString() + @"img\download\";
+                if (!Directory.Exists(directory))
+                {
+                    Directory.CreateDirectory(directory);
+                }
+
+                Guid guid = Guid.NewGuid();
+                using Stream contentStream = await response.Content.ReadAsStreamAsync(), fileStream = new FileStream(directory + guid.ToString() + ".jpg", FileMode.Create, FileAccess.Write, FileShare.None, 16384, true);
+                await contentStream.CopyToAsync(fileStream);
+                client.Dispose();
+                return guid;
+            }
+            catch (Exception e)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(e);
+                Console.ForegroundColor = ConsoleColor.Gray;
+                return Guid.Empty;
+            }
         }
     }
 }

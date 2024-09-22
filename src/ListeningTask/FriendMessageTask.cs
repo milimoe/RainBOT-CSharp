@@ -55,6 +55,27 @@ namespace Milimoe.RainBOT.ListeningTask
                     return quick_reply;
                 }
 
+                if (e.detail.Length >= 9 && e.detail[..9].Equals("FunGame模拟", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    if (!await Bot.CheckBlackList(true, e.user_id, e.user_id)) return quick_reply;
+                    if (!Bot.FunGameSimulation)
+                    {
+                        Bot.FunGameSimulation = true;
+                        List<string> msgs = await Bot.HttpGet<List<string>>("https://api.milimoe.com/fungame/test?isweb=false") ?? [];
+                        foreach (string msg in msgs)
+                        {
+                            await Bot.SendFriendMessage(e.user_id, "FunGame模拟", msg.Trim());
+                            await Task.Delay(5500);
+                        }
+                        Bot.FunGameSimulation = false;
+                    }
+                    else
+                    {
+                        await Bot.SendFriendMessage(e.user_id, "FunGame模拟", "游戏正在模拟中，请勿重复请求！");
+                    }
+                    return quick_reply;
+                }
+
                 if (GeneralSettings.IsMute && e.detail == "忏悔")
                 {
                     if (!await Bot.CheckBlackList(false, e.user_id, e.user_id)) return quick_reply;

@@ -1,4 +1,5 @@
-﻿using Milimoe.OneBot.Framework;
+﻿using System.IO;
+using Milimoe.OneBot.Framework;
 using Milimoe.OneBot.Model.Content;
 using Milimoe.OneBot.Model.Message;
 using Milimoe.OneBot.Model.Other;
@@ -15,6 +16,19 @@ try
         Console.ForegroundColor = ConsoleColor.Cyan;
         Console.WriteLine("Debug模式");
         Console.ForegroundColor = ConsoleColor.Gray;
+    }
+
+    if (args.Any(a => a.StartsWith("-g")))
+    {
+        string debug_group = args.Where(a => a.StartsWith("-g")).FirstOrDefault() ?? "";
+        debug_group = debug_group.Replace("-g", "").Trim();
+        if (long.TryParse(debug_group, out long group_id))
+        {
+            GeneralSettings.DebugGroupID = group_id;
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine("已指定Debug调试沙盒群聊：" + GeneralSettings.DebugGroupID);
+            Console.ForegroundColor = ConsoleColor.Gray;
+        }
     }
 
     HTTPListener? listener = default;
@@ -169,6 +183,19 @@ try
                 foreach (long uid in BlackList.Times.Where(d => d.Value < 5).Select(d => d.Key))
                 {
                     BlackList.Times.Remove(uid);
+                }
+                // 清空所有已下载的图片，释放空间
+                string directory = AppDomain.CurrentDomain.BaseDirectory.ToString() + @"img\download\";
+                if (Directory.Exists(directory))
+                {
+                    foreach (string file in Directory.GetFiles(directory))
+                    {
+                        try
+                        {
+                            File.Delete(file);
+                        }
+                        catch { }
+                    }
                 }
             }
             catch (Exception e)
