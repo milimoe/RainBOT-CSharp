@@ -77,28 +77,25 @@ namespace Milimoe.RainBOT.ListeningTask
                         return quick_reply;
                     }
                 }
-                
+
                 // 精华消息
-                if ((e.user_id == GeneralSettings.Master || GeneralSettings.RecallAccessGroup.Contains(e.user_id)) && e.detail.Contains("精华；") && e.message.Any(m => m.type == "reply"))
+                if ((e.user_id == GeneralSettings.Master || Bot.IsAdmin(e.group_id, e.user_id)) && e.detail.Contains("精华；") && e.message.Any(m => m.type == "reply"))
                 {
                     ReplyMessage reply = (ReplyMessage)e.message.Where(m => m.type == "reply").First();
                     if (int.TryParse(reply.data.id, out int id))
                     {
-                        await Bot.SendMessage(SupportedAPI.set_essence_msg, e.group_id, "设置精华", new EssenceMsgContent(id), true);
-                        await Bot.SendMessage(SupportedAPI.delete_msg, e.group_id, "撤回", new DeleteMsgContent(e.real_id), true);
-                        return quick_reply;
-                    }
-                }
-                
-                // 取消精华消息
-                if ((e.user_id == GeneralSettings.Master || GeneralSettings.RecallAccessGroup.Contains(e.user_id)) && e.detail.Contains("取消精华；") && e.message.Any(m => m.type == "reply"))
-                {
-                    ReplyMessage reply = (ReplyMessage)e.message.Where(m => m.type == "reply").First();
-                    if (int.TryParse(reply.data.id, out int id))
-                    {
-                        await Bot.SendMessage(SupportedAPI.delete_essence_msg, e.group_id, "取消精华", new DeleteEssenceMsgContent(id), true);
-                        await Bot.SendMessage(SupportedAPI.delete_msg, e.group_id, "撤回", new DeleteMsgContent(e.real_id), true);
-                        return quick_reply;
+                        if (e.detail.Contains("取消精华；"))
+                        {
+                            await Bot.SendMessage(SupportedAPI.delete_essence_msg, e.group_id, "取消精华", new DeleteEssenceMsgContent(id), true);
+                            await Bot.SendMessage(SupportedAPI.delete_msg, e.group_id, "撤回", new DeleteMsgContent(e.real_id), true);
+                            return quick_reply;
+                        }
+                        else
+                        {
+                            await Bot.SendMessage(SupportedAPI.set_essence_msg, e.group_id, "设置精华", new EssenceMsgContent(id), true);
+                            await Bot.SendMessage(SupportedAPI.delete_msg, e.group_id, "撤回", new DeleteMsgContent(e.real_id), true);
+                            return quick_reply;
+                        }
                     }
                 }
 
