@@ -1,4 +1,5 @@
-﻿using Milimoe.OneBot.Framework;
+﻿using System.Text.RegularExpressions;
+using Milimoe.OneBot.Framework;
 using Milimoe.OneBot.Model.Content;
 using Milimoe.OneBot.Model.Event;
 using Milimoe.OneBot.Model.Other;
@@ -10,6 +11,14 @@ namespace Milimoe.RainBOT.ListeningTask
 {
     public class FriendMessageTask
     {
+        public static bool 正在悬赏令 { get; set; } = false;
+        public static bool 秘境 { get; set; } = false;
+        public static bool 闭关 { get; set; } = false;
+        public static bool 修炼 { get; set; } = true;
+        public static bool 炼金药材 { get; set; } = false;
+        public static string 世界BOSS { get; set; } = "";
+        public static int 修炼次数 { get; set; } = 6;
+
         private static long dice = 0;
 
         public static async Task<FriendMsgEventQuickReply?> ListeningTask_handler(FriendMessageEvent e)
@@ -19,6 +28,116 @@ namespace Milimoe.RainBOT.ListeningTask
             try
             {
                 Sender sender = e.sender;
+                
+                if (e.user_id == 3889029313)
+                {
+                    Console.WriteLine($"{DateTime.Now:yyyy/MM/dd HH:mm:ss} P/{e.user_id}{(e.detail.Trim() == "" ? "" : " -> " + Regex.Replace(e.detail, @"\r(?!\n)", "\r\n"))}");
+                    if (GeneralSettings.IsDebug)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Magenta;
+                        Console.WriteLine($"DEBUG：{e.original_msg}");
+                        Console.ForegroundColor = ConsoleColor.Gray;
+                        await Task.Delay(100);
+                    }
+
+                    if (炼金药材)
+                    {
+                        炼金药材 = false;
+
+                        // 正则表达式提取名字
+                        MatchCollection names = Regex.Matches(e.detail, @"名字：(.+?)(?=\r)", RegexOptions.Singleline);
+                        MatchCollection quantitys = Regex.Matches(e.detail, @"拥有数量：(\d+)");
+
+                        for (int i = 0; i < names.Count; i++)
+                        {
+                            string name = names[i].Groups[1].Value.Trim();
+                            int quantity = int.Parse(quantitys[i].Groups[1].Value);
+                            await Bot.SendFriendMessage(e.user_id, "炼金药材", "炼金 " + name + " " + quantity);
+                            await Task.Delay(2000);
+                        }
+
+                        if (e.detail.Contains('页'))
+                        {
+                            炼金药材 = true;
+                            await Task.Delay(5000);
+                            await Bot.SendFriendMessage(e.user_id, "炼金药材", "药材背包");
+                        }
+                    }
+
+                    if (世界BOSS != "")
+                    {
+                        // 使用正则表达式匹配编号和BOSS名字
+                        string pattern = $@"编号(\d+)、{世界BOSS}Boss:([\u4e00-\u9fa5A-Za-z]+)\s*\r";
+                        MatchCollection matches = Regex.Matches(e.raw_message, pattern);
+                        世界BOSS = "";
+
+                        // 创建字典存储匹配到的编号和名字
+                        Dictionary<int, string> bossDictionary = [];
+
+                        foreach (Match match in matches)
+                        {
+                            int number = int.Parse(match.Groups[1].Value);
+                            string bossName = match.Groups[2].Value.Trim();
+                            bossDictionary[number] = bossName;
+                        }
+
+                        if (bossDictionary.Count > 0)
+                        {
+                            int id = bossDictionary.Keys.Last();
+                            await Bot.SendFriendMessage(e.user_id, "BOSS", "讨伐世界boss " + id);
+                        }
+                        else Console.WriteLine("没有BOSS了");
+                    }
+
+                    if (正在悬赏令)
+                    {
+                        正在悬赏令 = false;
+                        if (e.detail.Contains("灵石不足以刷新"))
+                        {
+                            修炼 = true;
+                            return quick_reply;
+                        }
+                        悬赏令? x = 悬赏令.获取最好的悬赏令(e.detail);
+                        int time = x?.Duration ?? 40;
+                        await Bot.SendFriendMessage(e.user_id, "悬赏令", "悬赏令接取" + (x?.Id ?? 0));
+                        _ = Task.Run(async () =>
+                        {
+                            await Task.Delay((time + 4) * 60 * 1000);
+                            await Bot.SendFriendMessage(e.user_id, "悬赏令", "悬赏令结算");
+                            await Task.Delay(5 * 1000);
+                            正在悬赏令 = true;
+                            await Bot.SendFriendMessage(e.user_id, "悬赏令", "悬赏令刷新");
+                        });
+                    }
+
+                    if (秘境)
+                    {
+                        秘境 = false;
+                        if (e.detail.Contains("已耗尽"))
+                        {
+                            修炼 = true;
+                            return quick_reply;
+                        }
+                        // 正则表达式用于提取时间
+                        string pattern = @"(\d+)\s*分钟";
+                        Match match = Regex.Match(e.detail, pattern);
+                        if (match.Success)
+                        {
+                            string time = match.Groups[1].Value;
+                            if (!int.TryParse(time, out int realTime))
+                            {
+                                realTime = 200;
+                            }
+                            _ = Task.Run(async () =>
+                            {
+                                await Task.Delay((realTime + 4) * 60 * 1000);
+                                await Bot.SendFriendMessage(e.user_id, "秘境", "秘境结算");
+                                修炼 = true;
+                            });
+                        }
+                    }
+                }
+
                 if (e.user_id == 0 || e.sender.user_id == 0) return quick_reply;
 
                 Console.WriteLine($"{DateTime.Now:yyyy/MM/dd HH:mm:ss} P/{e.user_id}{(e.detail.Trim() == "" ? "" : " -> " + e.detail)}");

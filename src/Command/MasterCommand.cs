@@ -272,6 +272,22 @@ namespace Milimoe.RainBOT.Command
                     else Access_Denied(send_group, target_id);
                 });
             }
+            else if (command.Contains(".osm sendto"))
+            {
+                TaskUtility.NewTask(async () =>
+                {
+                    if (user_id == GeneralSettings.Master)
+                    {
+                        string str = command.Replace(".osm sendto", "").Trim();
+                        string[] strs = Regex.Split(str, @"\s+");
+                        if (long.TryParse(strs[0], out long friend_id) && strs.Length > 1)
+                        {
+                            await Bot.SendFriendMessage(friend_id, "OSM指令", string.Join(" ", strs[1..]));
+                        }
+                    }
+                    else Access_Denied(send_group, target_id);
+                });
+            }
             else if (command.Contains(".osm send"))
             {
                 TaskUtility.NewTask(async () =>
