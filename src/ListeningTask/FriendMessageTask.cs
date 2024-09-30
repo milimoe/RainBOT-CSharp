@@ -136,6 +136,8 @@ namespace Milimoe.RainBOT.ListeningTask
                             });
                         }
                     }
+
+                    return quick_reply;
                 }
 
                 if (e.user_id == 0 || e.sender.user_id == 0) return quick_reply;
