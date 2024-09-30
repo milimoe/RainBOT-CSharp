@@ -1,6 +1,4 @@
 ﻿using System.Text.RegularExpressions;
-using Milimoe.OneBot.Framework;
-using Milimoe.OneBot.Model.Content;
 using Milimoe.OneBot.Model.Event;
 using Milimoe.OneBot.Model.Other;
 using Milimoe.OneBot.Model.QuickReply;
@@ -167,52 +165,6 @@ namespace Milimoe.RainBOT.ListeningTask
                 if (e.detail.Length >= 4 && e.detail[..4] == ".osm")
                 {
                     MasterCommand.Execute(e.detail, e.user_id, false, e.user_id, false);
-                    return quick_reply;
-                }
-
-                if (e.detail == "挑战结束" && e.user_id == GeneralSettings.Master)
-                {
-                    await Bot.Unmute12ClockMembers();
-                    return quick_reply;
-                }
-
-                if (e.detail.Length >= 9 && e.detail[..9].Equals("FunGame模拟", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    if (!await Bot.CheckBlackList(true, e.user_id, e.user_id)) return quick_reply;
-                    if (!Bot.FunGameSimulation)
-                    {
-                        Bot.FunGameSimulation = true;
-                        List<string> msgs = await Bot.HttpGet<List<string>>("https://api.milimoe.com/fungame/test?isweb=false") ?? [];
-                        foreach (string msg in msgs)
-                        {
-                            await Bot.SendFriendMessage(e.user_id, "FunGame模拟", msg.Trim());
-                            await Task.Delay(5500);
-                        }
-                        Bot.FunGameSimulation = false;
-                    }
-                    else
-                    {
-                        await Bot.SendFriendMessage(e.user_id, "FunGame模拟", "游戏正在模拟中，请勿重复请求！");
-                    }
-                    return quick_reply;
-                }
-
-                if (GeneralSettings.IsMute && e.detail == "忏悔")
-                {
-                    if (!await Bot.CheckBlackList(false, e.user_id, e.user_id)) return quick_reply;
-                    string msg = "";
-                    foreach (long group_id in Bot.Groups.Select(g => g.group_id))
-                    {
-                        if (Bot.BotIsAdmin(group_id) && MuteRecall.Muted[group_id].TryGetValue(e.user_id, out long operator_id) && operator_id == Bot.BotQQ)
-                        {
-                            MuteRecall.Muted[group_id].Remove(e.user_id);
-                            await Bot.SendMessage(SupportedAPI.set_group_ban, group_id, "忏悔", new SetGroupBanContent(group_id, e.user_id, 0), true);
-                            if (msg != "") msg += "\r\n";
-                            msg += $"[{group_id}] 忏悔成功！！希望你保持纯真，保持野性的美。";
-                        }
-                    }
-                    if (msg == "") msg = "你无需忏悔。请注意：我不能帮你解除由管理员手动操作的禁言。";
-                    await Bot.SendFriendMessage(e.user_id, "忏悔", msg);
                     return quick_reply;
                 }
             }
