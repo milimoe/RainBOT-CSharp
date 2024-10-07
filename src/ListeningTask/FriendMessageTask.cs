@@ -1,5 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 using Milimoe.OneBot.Model.Event;
+using Milimoe.OneBot.Model.Message;
 using Milimoe.OneBot.Model.Other;
 using Milimoe.OneBot.Model.QuickReply;
 using Milimoe.RainBOT.Command;
@@ -9,14 +10,6 @@ namespace Milimoe.RainBOT.ListeningTask
 {
     public class FriendMessageTask
     {
-        public static bool 正在悬赏令 { get; set; } = false;
-        public static bool 秘境 { get; set; } = false;
-        public static bool 闭关 { get; set; } = false;
-        public static bool 修炼 { get; set; } = true;
-        public static bool 炼金药材 { get; set; } = false;
-        public static string 世界BOSS { get; set; } = "";
-        public static int 修炼次数 { get; set; } = 6;
-
         private static long dice = 0;
 
         public static async Task<FriendMsgEventQuickReply?> ListeningTask_handler(FriendMessageEvent e)
@@ -27,7 +20,7 @@ namespace Milimoe.RainBOT.ListeningTask
             {
                 Sender sender = e.sender;
                 
-                if (e.user_id == 3889029313)
+                if (e.user_id == 修仙.小北QQ)
                 {
                     Console.WriteLine($"{DateTime.Now:yyyy/MM/dd HH:mm:ss} P/{e.user_id}{(e.detail.Trim() == "" ? "" : " -> " + Regex.Replace(e.detail, @"\r(?!\n)", "\r\n"))}");
                     if (GeneralSettings.IsDebug)
@@ -38,134 +31,58 @@ namespace Milimoe.RainBOT.ListeningTask
                         await Task.Delay(100);
                     }
 
-                    if (炼金药材)
+                    if (修仙状态.炼金药材 && e.message.Where(m => m is MarkdownMessage).FirstOrDefault() is MarkdownMessage md)
                     {
-                        炼金药材 = false;
-
-                        // 正则表达式提取名字
-                        MatchCollection names = Regex.Matches(e.detail, @"名字：(.+?)(?=\r)", RegexOptions.Singleline);
-                        MatchCollection quantitys = Regex.Matches(e.detail, @"拥有数量：(\d+)");
-
-                        for (int i = 0; i < names.Count; i++)
-                        {
-                            string name = names[i].Groups[1].Value.Trim();
-                            int quantity = int.Parse(quantitys[i].Groups[1].Value);
-                            await Bot.SendFriendMessage(e.user_id, "炼金药材", "炼金 " + name + " " + quantity);
-                            await Task.Delay(2000);
-                        }
-
-                        if (e.detail.Contains('页'))
-                        {
-                            炼金药材 = true;
-                            await Task.Delay(5000);
-                            await Bot.SendFriendMessage(e.user_id, "炼金药材", "药材背包");
-                        }
+                        await 修仙控制器.自动炼金药材(md.data.data, false, e.user_id);
                     }
 
-                    if (世界BOSS != "")
+                    if (修仙状态.世界BOSS != "" && e.message.Where(m => m is MarkdownMessage).FirstOrDefault() is MarkdownMessage md1)
                     {
-                        // 使用正则表达式匹配编号和BOSS名字
-                        string pattern = $@"编号(\d+)、{世界BOSS}Boss:([\u4e00-\u9fa5A-Za-z]+)\s*\r";
-                        MatchCollection matches = Regex.Matches(e.raw_message, pattern);
-                        世界BOSS = "";
-
-                        // 创建字典存储匹配到的编号和名字
-                        Dictionary<int, string> bossDictionary = [];
-
-                        foreach (Match match in matches)
-                        {
-                            int number = int.Parse(match.Groups[1].Value);
-                            string bossName = match.Groups[2].Value.Trim();
-                            bossDictionary[number] = bossName;
-                        }
-
-                        if (bossDictionary.Count > 0)
-                        {
-                            int id = bossDictionary.Keys.Last();
-                            await Bot.SendFriendMessage(e.user_id, "BOSS", "讨伐世界boss " + id);
-                        }
-                        else Console.WriteLine("没有BOSS了");
+                        修仙控制器.打BOSS(md1.data.data, false, e.user_id);
                     }
 
-                    if (正在悬赏令)
+                    if (修仙状态.悬赏令 && e.message.Where(m => m is MarkdownMessage).FirstOrDefault() is MarkdownMessage md2)
                     {
-                        正在悬赏令 = false;
-                        if (e.detail.Contains("灵石不足以刷新"))
-                        {
-                            修炼 = true;
-                            return quick_reply;
-                        }
-                        悬赏令? x = 悬赏令.获取最好的悬赏令(e.detail);
-                        int time = x?.Duration ?? 40;
-                        await Bot.SendFriendMessage(e.user_id, "悬赏令", "悬赏令接取" + (x?.Id ?? 0));
-                        _ = Task.Run(async () =>
-                        {
-                            await Task.Delay((time + 4) * 60 * 1000);
-                            await Bot.SendFriendMessage(e.user_id, "悬赏令", "悬赏令结算");
-                            await Task.Delay(5 * 1000);
-                            正在悬赏令 = true;
-                            await Bot.SendFriendMessage(e.user_id, "悬赏令", "悬赏令刷新");
-                        });
+                        修仙控制器.自动悬赏令(md2.data.data, false, e.user_id);
                     }
 
-                    if (秘境)
+                    if (修仙状态.秘境 && e.message.Where(m => m is MarkdownMessage).FirstOrDefault() is MarkdownMessage md3)
                     {
-                        秘境 = false;
-                        if (e.detail.Contains("已耗尽"))
-                        {
-                            修炼 = true;
-                            return quick_reply;
-                        }
-                        // 正则表达式用于提取时间
-                        string pattern = @"(\d+)\s*分钟";
-                        Match match = Regex.Match(e.detail, pattern);
-                        if (match.Success)
-                        {
-                            string time = match.Groups[1].Value;
-                            if (!int.TryParse(time, out int realTime))
-                            {
-                                realTime = 200;
-                            }
-                            _ = Task.Run(async () =>
-                            {
-                                await Task.Delay((realTime + 4) * 60 * 1000);
-                                await Bot.SendFriendMessage(e.user_id, "秘境", "秘境结算");
-                                修炼 = true;
-                            });
-                        }
+                        修仙控制器.自动秘境(md3.data.data, false, e.user_id);
                     }
 
                     return quick_reply;
                 }
 
-                if (e.user_id == 0 || e.sender.user_id == 0) return quick_reply;
-
-                Console.WriteLine($"{DateTime.Now:yyyy/MM/dd HH:mm:ss} P/{e.user_id}{(e.detail.Trim() == "" ? "" : " -> " + e.detail)}");
-                if (GeneralSettings.IsDebug)
+                if (e.user_id == GeneralSettings.Master)
                 {
-                    Console.ForegroundColor = ConsoleColor.Magenta;
-                    Console.WriteLine($"DEBUG：{e.original_msg}");
-                    Console.ForegroundColor = ConsoleColor.Gray;
-                }
-
-                if (e.detail == "是")
-                {
-                    if (e.user_id != GeneralSettings.Master && e.CheckThrow(10, out dice))
+                    Console.WriteLine($"{DateTime.Now:yyyy/MM/dd HH:mm:ss} P/{e.user_id}{(e.detail.Trim() == "" ? "" : " -> " + e.detail)}");
+                    if (GeneralSettings.IsDebug)
                     {
-                        Bot.ColorfulCheckPass(sender, "反驳是", dice, 40);
-                        await Bot.SendFriendMessage(e.user_id, "随机反驳是", "是你的头");
+                        Console.ForegroundColor = ConsoleColor.Magenta;
+                        Console.WriteLine($"DEBUG：{e.original_msg}");
+                        Console.ForegroundColor = ConsoleColor.Gray;
                     }
-                    else if (e.user_id == GeneralSettings.Master)
-                    {
-                        await Bot.SendFriendMessage(e.user_id, "随机反驳是", "是你的头");
-                    }
-                }
 
-                // OSM指令
-                if (e.detail.Length >= 4 && e.detail[..4] == ".osm")
-                {
-                    MasterCommand.Execute(e.detail, e.user_id, false, e.user_id, false);
-                    return quick_reply;
+                    if (e.detail == "是")
+                    {
+                        if (e.user_id != GeneralSettings.Master && e.CheckThrow(10, out dice))
+                        {
+                            Bot.ColorfulCheckPass(sender, "反驳是", dice, 40);
+                            await Bot.SendFriendMessage(e.user_id, "随机反驳是", "是你的头");
+                        }
+                        else if (e.user_id == GeneralSettings.Master)
+                        {
+                            await Bot.SendFriendMessage(e.user_id, "随机反驳是", "是你的头");
+                        }
+                    }
+
+                    // OSM指令
+                    if (e.detail.Length >= 4 && e.detail[..4] == ".osm")
+                    {
+                        MasterCommand.Execute(e.detail, e.user_id, false, e.user_id, false);
+                        return quick_reply;
+                    }
                 }
             }
             catch (Exception ex)
