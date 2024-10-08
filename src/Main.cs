@@ -1,6 +1,9 @@
-﻿using Milimoe.OneBot.Framework;
+﻿using System.Text.RegularExpressions;
+using Milimoe.OneBot.Framework;
+using Milimoe.OneBot.Model.Message;
+using Milimoe.OneBot.Model.Other;
+using Milimoe.OneBot.Model.QuickReply;
 using Milimoe.RainBOT.Command;
-using Milimoe.RainBOT.ListeningTask;
 using Milimoe.RainBOT.Settings;
 
 try
@@ -110,10 +113,148 @@ try
     Console.WriteLine("开始监听 -> " + listener.address);
 
     // 绑定监听事件
-    listener.FriendMessageListening += FriendMessageTask.ListeningTask_handler;
+    listener.FriendMessageListening += new HTTPListener.FriendMessageListeningTask(async (e) =>
+    {
+        FriendMsgEventQuickReply? quick_reply = null;
+
+        try
+        {
+            Sender sender = e.sender;
+
+            if (e.user_id == 修仙.小北QQ)
+            {
+                Console.WriteLine($"{DateTime.Now:yyyy/MM/dd HH:mm:ss} P/{e.user_id}{(e.detail.Trim() == "" ? "" : " -> " + Regex.Replace(e.detail, @"\r(?!\n)", "\r\n"))}");
+                if (GeneralSettings.IsDebug)
+                {
+                    Console.ForegroundColor = ConsoleColor.Magenta;
+                    Console.WriteLine($"DEBUG：{e.original_msg}");
+                    Console.ForegroundColor = ConsoleColor.Gray;
+                    await Task.Delay(100);
+                }
+
+                if (修仙.小北.修仙状态.炼金药材 && e.message.Where(m => m is MarkdownMessage).FirstOrDefault() is MarkdownMessage md)
+                {
+                    await 修仙.小北.自动炼金药材(md.data.data);
+                }
+
+                if (修仙.小北.修仙状态.世界BOSS != "" && e.message.Where(m => m is MarkdownMessage).FirstOrDefault() is MarkdownMessage md1)
+                {
+                    修仙.小北.打BOSS(md1.data.data);
+                }
+
+                if (修仙.小北.修仙状态.悬赏令 && e.message.Where(m => m is MarkdownMessage).FirstOrDefault() is MarkdownMessage md2)
+                {
+                    修仙.小北.自动悬赏令(md2.data.data);
+                }
+
+                if (修仙.小北.修仙状态.秘境 && e.message.Where(m => m is MarkdownMessage).FirstOrDefault() is MarkdownMessage md3)
+                {
+                    修仙.小北.自动秘境(md3.data.data);
+                }
+
+                if (e.detail.Contains("秘境") && e.message.Where(m => m is MarkdownMessage).FirstOrDefault() is MarkdownMessage md4)
+                {
+                    _ = Bot.SendFriendMessage(GeneralSettings.Master, "秘境", "【小北】" + md4.data.data);
+                }
+
+                return quick_reply;
+            }
+
+            if (e.user_id == GeneralSettings.Master)
+            {
+                Console.WriteLine($"{DateTime.Now:yyyy/MM/dd HH:mm:ss} M/来自主人{(e.detail.Trim() == "" ? "" : " -> " + e.detail)}");
+                if (GeneralSettings.IsDebug)
+                {
+                    Console.ForegroundColor = ConsoleColor.Magenta;
+                    Console.WriteLine($"DEBUG：{e.original_msg}");
+                    Console.ForegroundColor = ConsoleColor.Gray;
+                }
+
+                if (e.detail == "是")
+                {
+                    await Bot.SendFriendMessage(e.user_id, "随机反驳是", "是你的头");
+                }
+
+                // OSM指令
+                if (e.detail.Length >= 4 && e.detail[..4] == ".osm")
+                {
+                    MasterCommand.Execute(e.detail, e.user_id, false, e.user_id, false);
+                    return quick_reply;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine(ex);
+            Console.ForegroundColor = ConsoleColor.Gray;
+        }
+
+        return quick_reply;
+    });
+
+    listener.GroupMessageListening += new HTTPListener.GroupMessageListeningTask(async (e) =>
+    {
+        GroupMsgEventQuickReply quick_reply = new();
+
+        try
+        {
+            if (e.user_id == 修仙.小北QQ || e.user_id == 修仙.小小QQ)
+            {
+                修仙控制器 修仙控制器 = e.user_id == 修仙.小北QQ ? 修仙.小北 : 修仙.小小;
+                修仙状态 修仙状态 = 修仙控制器.修仙状态;
+
+                Console.WriteLine($"{DateTime.Now:yyyy/MM/dd HH:mm:ss} G/{e.group_id} U/{e.user_id}{(e.detail.Trim() == "" ? "" : " -> " + Regex.Replace(e.detail, @"\r(?!\n)", "\r\n"))}");
+                if (GeneralSettings.IsDebug)
+                {
+                    Console.ForegroundColor = ConsoleColor.Magenta;
+                    Console.WriteLine($"DEBUG：{e.original_msg}");
+                    Console.ForegroundColor = ConsoleColor.Gray;
+                    await Task.Delay(100);
+                }
+
+                if (修仙状态.炼金药材 && e.message.Where(m => m is MarkdownMessage).FirstOrDefault() is MarkdownMessage md)
+                {
+                    await 修仙控制器.自动炼金药材(md.data.data);
+                }
+
+                if (e.user_id == 修仙.小北QQ && 修仙状态.世界BOSS != "" && e.message.Where(m => m is MarkdownMessage).FirstOrDefault() is MarkdownMessage md1)
+                {
+                    修仙控制器.打BOSS(md1.data.data);
+                }
+
+                if (修仙状态.悬赏令 && e.message.Where(m => m is MarkdownMessage).FirstOrDefault() is MarkdownMessage md2)
+                {
+                    修仙控制器.自动悬赏令(md2.data.data);
+                }
+
+                if (修仙状态.秘境 && e.message.Where(m => m is MarkdownMessage).FirstOrDefault() is MarkdownMessage md3)
+                {
+                    修仙控制器.自动秘境(md3.data.data);
+                }
+
+                if (e.detail.Contains("秘境") && e.message.Where(m => m is MarkdownMessage).FirstOrDefault() is MarkdownMessage md4)
+                {
+                    _ = Bot.SendFriendMessage(GeneralSettings.Master, "秘境", (e.user_id == 修仙.小北QQ ? "【小北】" : "【小小】") + md4.data.data);
+                }
+
+                return quick_reply;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine(ex);
+            Console.ForegroundColor = ConsoleColor.Gray;
+        }
+
+        return quick_reply;
+    });
 
     _ = Task.Factory.StartNew(async () =>
     {
+        bool 悬赏令控制 = false;
+        bool 秘境控制 = false;
         while (true)
         {
             try
@@ -127,10 +268,16 @@ try
                     Console.WriteLine("修炼关闭，准备做悬赏！");
                     Console.ForegroundColor = ConsoleColor.Gray;
                 }
-                if (now.Hour == 9 && now.Minute == 3)
+                if (now.Hour == 9 && now.Minute == 3 && !悬赏令控制)
                 {
-                    修仙状态.悬赏令 = true;
+                    悬赏令控制 = true;
+                    修仙.小北.修仙状态.悬赏令 = true;
+                    if (修仙.开启小小修炼) 修仙.小小.修仙状态.悬赏令 = true;
                     await 修仙.发消息("悬赏令刷新", $"悬赏令刷新");
+                }
+                if (now.Hour == 9 && now.Minute > 3 && 悬赏令控制)
+                {
+                    悬赏令控制 = false;
                 }
                 if (now.Hour == 12 && now.Minute == 9 && 修仙.开启自动灵田收取宗门丹药领取)
                 {
@@ -150,10 +297,16 @@ try
                     Console.WriteLine("修炼关闭，准备做秘境！");
                     Console.ForegroundColor = ConsoleColor.Gray;
                 }
-                if (now.Hour == 15 && now.Minute == 3)
+                if (now.Hour == 15 && now.Minute == 3 && !秘境控制)
                 {
-                    修仙状态.秘境 = true;
+                    秘境控制 = true;
+                    修仙.小北.修仙状态.秘境 = true;
+                    if (修仙.开启小小修炼) 修仙.小小.修仙状态.秘境 = true;
                     await 修仙.发消息("秘境", $"探索秘境");
+                }
+                if (now.Hour == 15 && now.Minute > 3 && 秘境控制)
+                {
+                    秘境控制 = false;
                 }
                 await Task.Delay(1000);
             }
@@ -172,14 +325,38 @@ try
         {
             try
             {
-                if (修仙.开启自动突破 && 修仙状态.修炼次数 != -1 && 修仙状态.修炼次数++ == 修仙.每修炼几次破一次)
+                if (修仙.开启自动突破 && 修仙.小北.修仙状态.修炼次数 != -1 && 修仙.小北.修仙状态.修炼次数++ == 修仙.每修炼几次破一次)
                 {
-                    await 修仙.发消息("自动突破", "渡厄突破");
-                    修仙状态.修炼次数 = 0;
+                    await 修仙.发消息("自动突破", "渡厄突破", 修仙.小北QQ);
+                    修仙.小北.修仙状态.修炼次数 = 0;
                     await Task.Delay(1000);
                 }
-                if (!修仙状态.闭关 && 修仙.开启自动修炼) await 修仙.发消息("修炼", "修炼");
+                if (!修仙.小北.修仙状态.闭关 && 修仙.开启自动修炼) await 修仙.发消息("修炼", "修炼", 修仙.小北QQ);
                 await Task.Delay(1000 * 60 * 2 + 1000 * 8);
+            }
+            catch (Exception e)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(e);
+                Console.ForegroundColor = ConsoleColor.Gray;
+            }
+        }
+    });
+    
+    _ = Task.Factory.StartNew(async () =>
+    {
+        while (true)
+        {
+            try
+            {
+                if (修仙.开启自动突破 && 修仙.开启小小修炼 && 修仙.小小.修仙状态.修炼次数 != -1 && 修仙.小小.修仙状态.修炼次数++ == 修仙.每修炼几次破一次)
+                {
+                    await 修仙.发消息("自动突破", "渡厄突破", 修仙.小小QQ);
+                    修仙.小小.修仙状态.修炼次数 = 0;
+                    await Task.Delay(1000);
+                }
+                if (!修仙.小小.修仙状态.闭关 && 修仙.开启自动修炼 && 修仙.开启小小修炼) await 修仙.发消息("修炼", "修炼", 修仙.小小QQ);
+                await Task.Delay(1000 * 60 + 1000 * 6);
             }
             catch (Exception e)
             {
@@ -224,14 +401,15 @@ try
         if (read.Length >= 4 && read[..4].Equals("boss", StringComparison.CurrentCultureIgnoreCase))
         {
             string str = read.ToLower().Replace("boss", "").Trim();
-            修仙状态.世界BOSS = str;
-            await 修仙.发消息("BOSS", "查询世界boss");
+            修仙.小北.修仙状态.世界BOSS = str;
+            await 修仙.发消息("BOSS", "查询世界boss", 修仙.小北QQ);
             continue;
         }
         switch (read.ToLower().Trim() ?? "")
         {
             case "炼金药材":
-                修仙状态.炼金药材 = true;
+                修仙.小北.修仙状态.炼金药材 = true;
+                if (修仙.开启小小修炼) 修仙.小小.修仙状态.炼金药材 = true;
                 await 修仙.发消息("炼金药材", "药材背包");
                 break;
             case "暂停":
@@ -248,13 +426,15 @@ try
                 break;
             case "闭关":
                 Console.ForegroundColor = ConsoleColor.Yellow;
-                修仙状态.闭关 = true;
+                修仙.小北.修仙状态.闭关 = true;
+                if (修仙.开启小小修炼) 修仙.小小.修仙状态.闭关 = true;
                 await 修仙.发消息("闭关", "闭关");
                 Console.ForegroundColor = ConsoleColor.Gray;
                 break;
             case "出关":
                 Console.ForegroundColor = ConsoleColor.Yellow;
-                修仙状态.闭关 = false;
+                修仙.小北.修仙状态.闭关 = false;
+                if (修仙.开启小小修炼) 修仙.小小.修仙状态.闭关 = false;
                 await 修仙.发消息("出关", "出关");
                 Console.ForegroundColor = ConsoleColor.Gray;
                 break;

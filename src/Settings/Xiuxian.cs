@@ -1,4 +1,5 @@
 ﻿using System.Text.RegularExpressions;
+using System.Xml.Linq;
 using Milimoe.OneBot.Framework.Utility;
 using Milimoe.OneBot.Model.Content;
 using Milimoe.OneBot.Model.Message;
@@ -68,23 +69,39 @@ namespace Milimoe.RainBOT.Settings
                 每修炼几次破一次 = l;
             }
             else Configs.Add("每修炼几次破一次", 每修炼几次破一次);
+            小北 = new(小北QQ);
+            小小 = new(小小QQ);
             Configs.Save();
         }
 
-        public static async Task 发消息(string function, string text)
+        public static async Task 发消息(string function, string text, long qq = 0)
         {
             if (私聊模式)
             {
-                await Bot.SendFriendMessage(小北QQ, function, text);
-                // if (开启小小修炼) await Bot.SendFriendMessage(小小QQ, function, text);
+                if (qq != 0)
+                {
+                    await Bot.SendFriendMessage(qq, function, text);
+                }
+                else
+                {
+                    await Bot.SendFriendMessage(小北QQ, function, text);
+                    // if (开启小小修炼) await Bot.SendFriendMessage(小小QQ, function, text);
+                }
             }
             else
             {
                 GroupMessageContent content = new(指定群聊);
-                content.message.Add(new AtMessage(小北QQ));
+                if (qq != 0)
+                {
+                    content.message.Add(new AtMessage(qq));
+                }
+                else
+                {
+                    content.message.Add(new AtMessage(小北QQ));
+                }
                 content.message.Add(new TextMessage(text));
                 await Bot.SendGroupMessage(指定群聊, function, content);
-                if (开启小小修炼)
+                if (开启小小修炼 && qq == 0)
                 {
                     GroupMessageContent content2 = new(指定群聊);
                     content2.message.Add(new AtMessage(小小QQ));
@@ -93,25 +110,31 @@ namespace Milimoe.RainBOT.Settings
                 }
             }
         }
+
+        public static 修仙控制器 小北 { get; set; } = new(小北QQ);
+        public static 修仙控制器 小小 { get; set; } = new(小小QQ);
     }
 
     public class 修仙状态
     {
-        public static bool 闭关 { get; set; } = false;
-        public static bool 悬赏令 { get; set; } = false;
-        public static bool 秘境 { get; set; } = false;
-        public static bool 炼金药材 { get; set; } = false;
-        public static string 世界BOSS { get; set; } = "";
-        public static long 修炼次数 { get; set; } = 修仙.每修炼几次破一次 - 1 < 0 ? 0 : 修仙.每修炼几次破一次 - 1;
+        public bool 闭关 { get; set; } = false;
+        public bool 悬赏令 { get; set; } = false;
+        public bool 秘境 { get; set; } = false;
+        public bool 炼金药材 { get; set; } = false;
+        public string 世界BOSS { get; set; } = "";
+        public long 修炼次数 { get; set; } = 修仙.每修炼几次破一次 - 1 < 0 ? 0 : 修仙.每修炼几次破一次 - 1;
     }
 
-    public class 修仙控制器
+    public class 修仙控制器(long qq)
     {
-        public static async Task 自动炼金药材(string detail, bool is_group, long target_id)
+        public 修仙状态 修仙状态 = new();
+
+        public async Task 自动炼金药材(string detail)
         {
             if (修仙状态.炼金药材)
             {
                 修仙状态.炼金药材 = false;
+                detail = detail.Replace(": ", "：").Replace(":", "：");
 
                 // 正则表达式提取名字
                 MatchCollection names = Regex.Matches(detail, @"名字：(.+?)(?=\r)", RegexOptions.Singleline);
@@ -130,21 +153,20 @@ namespace Milimoe.RainBOT.Settings
                 
                 foreach (string name in dict.Keys)
                 {
-                    Task t = is_group ? Bot.SendGroupMessage(target_id, "炼金药材", "炼金 " + name + " " + dict[name]) : Bot.SendFriendMessage(target_id, "炼金药材", "炼金 " + name + " " + dict[name]);
-                    await t;
+                    await 修仙.发消息("炼金药材", "炼金 " + name + " " + dict[name], qq);
                     await Task.Delay(2000);
                 }
 
                 if (detail.Contains('页'))
                 {
                     修仙状态.炼金药材 = true;
-                    await Task.Delay(5000);
-                    _ = is_group ? Bot.SendGroupMessage(target_id, "炼金药材", "药材背包") : Bot.SendFriendMessage(target_id, "炼金药材", "药材背包");
+                    await Task.Delay(3000);
+                    await 修仙.发消息("炼金药材", "药材背包", qq);
                 }
             }
         }
 
-        public static void 打BOSS(string detail, bool is_group, long target_id)
+        public void 打BOSS(string detail)
         {
             if (修仙状态.世界BOSS != "")
             {
@@ -166,18 +188,18 @@ namespace Milimoe.RainBOT.Settings
                 if (bossDictionary.Count > 0)
                 {
                     int id = bossDictionary.Keys.Last();
-                    _ = is_group ? Bot.SendGroupMessage(target_id, "BOSS", "讨伐世界boss " + id) : Bot.SendFriendMessage(target_id, "BOSS", "讨伐世界boss " + id);
+                    _ = 修仙.发消息("讨伐世界boss", "讨伐世界boss " + id, qq);
                 }
                 else Console.WriteLine("没有BOSS了");
             }
         }
 
-        public static async void 自动悬赏令(string detail, bool is_group, long target_id)
+        public async void 自动悬赏令(string detail)
         {
             if (修仙状态.悬赏令)
             {
                 修仙状态.悬赏令 = false;
-                悬赏令? x = 悬赏令.获取最好的悬赏令(detail);
+                悬赏令? x = 悬赏令.获取最好的悬赏令(qq, detail);
                 if (detail.Contains("灵石不足以刷新") || detail.Contains("已耗尽") || detail.Contains("已用尽") || x is null)
                 {
                     Console.WriteLine("做完了悬赏令");
@@ -186,22 +208,19 @@ namespace Milimoe.RainBOT.Settings
                     return;
                 }
                 int time = x.Duration;
-                Task t = is_group ? Bot.SendGroupMessage(target_id, "悬赏令", "悬赏令接取" + (x.Id)) : Bot.SendFriendMessage(target_id, "悬赏令", "悬赏令接取" + (x.Id));
-                await t;
+                await 修仙.发消息("悬赏令", "悬赏令接取" + x.Id, qq);
                 _ = Task.Run(async () =>
                 {
                     await Task.Delay((time + 4) * 60 * 1000);
-                    Task t1 = is_group ? Bot.SendFriendMessage(target_id, "悬赏令", "悬赏令结算") : Bot.SendFriendMessage(target_id, "悬赏令", "悬赏令结算");
-                    await t1;
+                    await 修仙.发消息("悬赏令", "悬赏令结算", qq);
                     await Task.Delay(5 * 1000);
                     修仙状态.悬赏令 = true;
-                    Task t2 = is_group ? Bot.SendGroupMessage(target_id, "悬赏令", "悬赏令刷新") : Bot.SendFriendMessage(target_id, "悬赏令", "悬赏令刷新");
-                    await t2;
+                    await 修仙.发消息("悬赏令", "悬赏令刷新", qq);
                 });
             }
         }
 
-        public static void 自动秘境(string detail, bool is_group, long target_id)
+        public void 自动秘境(string detail)
         {
             if (修仙状态.秘境)
             {
@@ -227,8 +246,7 @@ namespace Milimoe.RainBOT.Settings
                     _ = Task.Run(async () =>
                     {
                         await Task.Delay((realTime + 4) * 60 * 1000);
-                        Task t = is_group ? Bot.SendGroupMessage(target_id, "秘境", "秘境结算") : Bot.SendFriendMessage(target_id, "秘境", "秘境结算");
-                        await t;
+                        await 修仙.发消息("秘境", "秘境结算", qq);
                         修仙.开启自动修炼 = true;
                         修仙.开启自动秘境 = true;
                     });
@@ -237,35 +255,18 @@ namespace Milimoe.RainBOT.Settings
         }
     }
 
-    public class 悬赏令(int id, string name, int completionRate, int baseReward, int duration, string possibleReward)
+    public class 悬赏令(int id, string name, int completionRate, long baseReward, int duration, string possibleReward)
     {
         public int Id { get; set; } = id;
         public string Name { get; set; } = name;
         public int CompletionRate { get; set; } = completionRate;
-        public int BaseReward { get; set; } = baseReward;
+        public long BaseReward { get; set; } = baseReward;
         public int Duration { get; set; } = duration;
         public string PossibleReward { get; set; } = possibleReward;
-        public string RewardRank { get; set; } = GetRank(possibleReward);
+        public double AverageScore { get; set; } = 0;
+        public string Description { get; set; } = "";
 
-        // 提取品阶等级，并赋予优先级数值
-        private static string GetRank(string reward)
-        {
-            if (reward.Contains("仙阶")) return "仙阶";
-            if (reward.Contains("天阶")) return "天阶";
-            if (reward.Contains("九品")) return "九品";
-            if (reward.Contains("八品")) return "八品";
-            if (reward.Contains("地阶")) return "地阶";
-            if (reward.Contains("七品")) return "七品";
-            if (reward.Contains("六品")) return "六品";
-            if (reward.Contains("玄阶")) return "玄阶";
-            if (reward.Contains("五品")) return "五品";
-            if (reward.Contains("四品")) return "四品";
-            if (reward.Contains("黄阶")) return "黄阶";
-            return "无";
-        }
-
-
-        public static 悬赏令? 获取最好的悬赏令(string description)
+        public static 悬赏令? 获取最好的悬赏令(long qq, string description)
         {
             string pattern = @"(\d+)、(.+?),完成机率(\d+),基础报酬(\d+)修为,预计需(\d+)分钟，可能额外获得：(.*)!";
             MatchCollection matches = Regex.Matches(description, pattern);
@@ -277,45 +278,91 @@ namespace Milimoe.RainBOT.Settings
                 int id = int.Parse(match.Groups[1].Value);
                 string name = match.Groups[2].Value.Trim();
                 int completionRate = int.Parse(match.Groups[3].Value);
-                int baseReward = int.Parse(match.Groups[4].Value);
+                long baseReward = long.Parse(match.Groups[4].Value);
                 int duration = int.Parse(match.Groups[5].Value);
                 string possibleReward = match.Groups[6].Value.Trim();
 
-                tasks.Add(new 悬赏令(id, name, completionRate, baseReward, duration, possibleReward));
+                悬赏令 xsl = new(id, name, completionRate, baseReward, duration, possibleReward);
+                xsl.CalculateWeightedScore();
+                tasks.Add(xsl);
             }
 
-            // 按优先级排序：完成几率优先，品阶最高次之，基础报酬最后
-            悬赏令? bestTask = tasks.OrderByDescending(t => t.CompletionRate)
-                                .ThenBy(t => GetPriority(t.RewardRank))
-                                .ThenByDescending(t => t.BaseReward)
-                                .FirstOrDefault();
+            悬赏令? bestTask = tasks.OrderByDescending(x => x.AverageScore).FirstOrDefault();
 
             if (bestTask != null)
             {
-                Console.WriteLine($"最符合条件的任务是: {bestTask.Id + "、" + bestTask.Name}");
+                _ = Bot.SendFriendMessage(GeneralSettings.Master, "悬赏令", (qq == 修仙.小北QQ ? "【小北】" : "【小小】") + " 接取了任务：" + bestTask.Description);
                 return bestTask;
             }
             return null;
         }
-
-        // 根据奖励等级返回优先级数值，数值越低优先级越高
-        public static int GetPriority(string rank)
+        
+        // 定义物品品阶及其权重
+        public static Dictionary<string, int> RankWeights { get; } = new()
         {
-            return rank switch
+            { "仙阶极品", 100 },
+            { "仙阶上品", 90 },
+            { "仙阶下品", 80 },
+            { "天阶上品", 70 },
+            { "天阶下品", 60 },
+            { "地阶上品", 50 },
+            { "地阶下品", 40 },
+            { "玄阶上品", 30 },
+            { "玄阶下品", 25 },
+            { "黄阶上品", 20 },
+            { "黄阶下品", 15 },
+            { "人阶上品", 10 },
+            { "人阶下品", 5 },
+            { "九品药材", 85 },
+            { "八品药材", 65 },
+            { "七品药材", 50 },
+            { "六品药材", 40 },
+            { "五品药材", 30 },
+            { "四品药材", 20 },
+            { "三品药材", 15 },
+            { "二品药材", 10 },
+            { "一品药材", 5 }
+        };
+
+        // 计算加权得分并生成任务描述
+        public void CalculateWeightedScore()
+        {
+            // 设置权重系数
+            double completionWeight;
+            // 根据完成几率的区间设定权重
+            if (CompletionRate > 0.7)
             {
-                "仙阶" => 1,
-                "天阶" => 2,
-                "九品" => 2,
-                "八品" => 3,
-                "地阶" => 4,
-                "七品" => 5,
-                "六品" => 6,
-                "玄阶" => 7,
-                "五品" => 8,
-                "四品" => 9,
-                "黄阶" => 10,
-                _ => 11,
-            };
+                completionWeight = 100; // 完成几率大于 70%
+            }
+            else if (CompletionRate > 0.5)
+            {
+                completionWeight = 40; // 完成几率介于 50% 和 70% 之间
+            }
+            else if (CompletionRate > 0.2)
+            {
+                completionWeight = 20; // 完成几率介于 20% 和 50% 之间
+            }
+            else
+            {
+                completionWeight = 0; // 完成几率小于 20%
+            }
+
+            // 使用品阶权重字典计算额外奖励的权重，并引入优先系数
+            int extraRewardWeight = RankWeights.Where(kv => PossibleReward.Contains(kv.Key)).Select(kv => kv.Value).FirstOrDefault();
+
+            // 引入优先系数：对于权重大于50的奖励，额外奖励权重增加 1.5 倍
+            double extraRewardPriorityWeight = extraRewardWeight > 50 ? extraRewardWeight * 1.5 : extraRewardWeight;
+
+            // 基础报酬权重：避免影响优先级判断
+            double rewardWeight = BaseReward * 0.0000000000005;
+
+            // 计算加权平均分，只考虑完成几率和额外奖励权重
+            AverageScore = (completionWeight + extraRewardPriorityWeight + rewardWeight) / 3;
+            //AverageScore = (completionWeight + extraRewardPriorityWeight) / 2;
+
+            // 生成任务消息
+            Description = $"{Id}、完成几率: {CompletionRate}%, 基础报酬: {BaseReward} 修为, " +
+                      $"预计时间: {Duration} 分钟, 可能额外获得: {PossibleReward} (权重: {extraRewardWeight})";
         }
     }
 }
