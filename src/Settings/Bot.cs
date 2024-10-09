@@ -331,57 +331,6 @@ namespace Milimoe.RainBOT.Settings
             else await SendGroupMessage(group_id, "OSM指令", "你没有权限使用此指令。");
         }
 
-        public static async Task Send12ClockPresents()
-        {
-            foreach (long group_id in GroupMembers.Keys)
-            {
-                List<IContent> list = [];
-                foreach (Member m in GroupMembers[group_id])
-                {
-                    if (GeneralSettings.Challenge12ClockGroup.Contains(m.user_id))
-                    {
-                        SetGroupBanContent content = new(group_id, m.user_id, 28800);
-                        list.Add(content);
-                        await Task.Delay(3000);
-                        if (MuteRecall.Muted[group_id].ContainsKey(m.user_id)) MuteRecall.Muted[group_id][m.user_id] = GeneralSettings.BotQQ;
-                        else MuteRecall.Muted[group_id].Add(m.user_id, GeneralSettings.BotQQ);
-                    }
-                }
-                if (list.Count > 0)
-                {
-                    await SendMessage(SupportedAPI.set_group_ban, group_id, "12点大挑战", list, true);
-                    await SendGroupMessage(group_id, "12点大挑战", "12点大挑战的奖励现已发放！\r\n添加Bot为好友即可享受私聊【忏悔】解除禁言的特权。\r\n发送【退出12点】即可退出挑战！");
-                }
-            }
-            Console.ForegroundColor = ConsoleColor.Magenta;
-            Console.WriteLine("已向12点大挑战的成员发放奖励。");
-            Console.ForegroundColor = ConsoleColor.Gray;
-        }
-
-        public static async Task Unmute12ClockMembers()
-        {
-            foreach (long group_id in GroupMembers.Keys)
-            {
-                List<IContent> list = [];
-                foreach (Member m in GroupMembers[group_id])
-                {
-                    if (GeneralSettings.Challenge12ClockGroup.Contains(m.user_id))
-                    {
-                        MuteRecall.Muted.Remove(m.user_id);
-                        SetGroupBanContent content = new(group_id, m.user_id, 0);
-                        list.Add(content);
-                    }
-                }
-                if (list.Count > 0)
-                {
-                    await SendMessage(SupportedAPI.set_group_ban, group_id, "12点大挑战", list, true);
-                }
-            }
-            Console.ForegroundColor = ConsoleColor.Magenta;
-            Console.WriteLine("已解禁所有参与12点大挑战的成员。");
-            Console.ForegroundColor = ConsoleColor.Gray;
-        }
-
         private static readonly HttpClient client = new();
 
         public static async Task<T?> HttpGet<T>(string url)
