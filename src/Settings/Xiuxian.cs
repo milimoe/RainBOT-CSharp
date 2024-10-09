@@ -268,7 +268,7 @@ namespace Milimoe.RainBOT.Settings
 
         public static 悬赏令? 获取最好的悬赏令(long qq, string description)
         {
-            string pattern = @"(\d+)、(.+?),完成机率(\d+),基础报酬(\d+)修为,预计需(\d+)分钟，可能额外获得：(.*)!";
+            string pattern = @"(\d+)、([^,]+?),完成机率(\d+),基础报酬(\d+)修为,预计需(\d+)分钟，可能额外获得：(.*)!";
             MatchCollection matches = Regex.Matches(description, pattern);
 
             List<悬赏令> tasks = [];
