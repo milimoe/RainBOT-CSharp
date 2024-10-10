@@ -199,6 +199,8 @@ try
 
         try
         {
+            if (修仙.私聊模式 || e.group_id != 修仙.指定群聊) return quick_reply;
+
             if (e.user_id == 修仙.小北QQ || e.user_id == 修仙.小小QQ)
             {
                 修仙控制器 修仙控制器 = e.user_id == 修仙.小北QQ ? 修仙.小北 : 修仙.小小;
