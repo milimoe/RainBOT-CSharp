@@ -268,7 +268,7 @@ try
                     Console.WriteLine("修炼关闭，准备做悬赏！");
                     Console.ForegroundColor = ConsoleColor.Gray;
                 }
-                if (now.Hour == 21 && now.Minute == 54 && !悬赏令控制)
+                if (now.Hour == 9 && now.Minute == 3 && !悬赏令控制)
                 {
                     悬赏令控制 = true;
                     修仙.小北.修仙状态.悬赏令 = true;
