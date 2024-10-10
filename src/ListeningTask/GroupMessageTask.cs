@@ -258,11 +258,6 @@ namespace Milimoe.RainBOT.ListeningTask
                         }
                         else
                         {
-                            GroupMessageContent content = new(e.group_id);
-                            content.message.Add(new AtMessage(e.user_id));
-                            content.message.Add(new TextMessage(daily.daily));
-                            await Bot.SendGroupMessage(e.group_id, "我的运势", content);
-
                             string img = "file:///" + AppDomain.CurrentDomain.BaseDirectory.ToString() + @"img\zi\";
                             img += daily.type switch
                             {
@@ -270,10 +265,15 @@ namespace Milimoe.RainBOT.ListeningTask
                                 2 => "zj" + (new Random().Next(2) + 1) + ".png",
                                 3 => "j" + (new Random().Next(4) + 1) + ".png",
                                 4 => "mj" + (new Random().Next(2) + 1) + ".png",
-                                5 => "dx" + (new Random().Next(2) + 1) + ".png",
-                                6 => "x" + (new Random().Next(2) + 1) + ".png",
+                                5 => "x" + (new Random().Next(2) + 1) + ".png",
+                                6 => "dx" + (new Random().Next(2) + 1) + ".png",
                                 _ => ""
                             };
+
+                            GroupMessageContent content = new(e.group_id);
+                            content.message.Add(new AtMessage(e.user_id));
+                            content.message.Add(new TextMessage(daily.daily));
+                            await Bot.SendGroupMessage(e.group_id, "我的运势", content);
 
                             content = new(e.group_id);
                             content.message.Add(new ImageMessage(img));
@@ -283,7 +283,7 @@ namespace Milimoe.RainBOT.ListeningTask
 
                     return quick_reply;
                 }
-                if (e.detail == "重置运势" && Daily.UserDailys.ContainsKey(e.user_id))
+                if (e.detail == "重置运势")
                 {
                     if (!await Bot.CheckBlackList(true, e.user_id, e.group_id)) return quick_reply;
 
@@ -306,21 +306,17 @@ namespace Milimoe.RainBOT.ListeningTask
                     {
                         if (long.TryParse(str_qq.Trim().Replace("@", ""), out long qq))
                         {
-                            if (qq == GeneralSettings.BotQQ && !Daily.UserDailys.ContainsKey(qq))
+                            if (qq == GeneralSettings.BotQQ)
                             {
-                                string text = Daily.DailyContent[new Random().Next(Daily.DailyContent.Count)];
-                                Daily.UserDailys.Add(GeneralSettings.BotQQ, text);
-                                Daily.SaveDaily();
+                                await Bot.HttpGet<UserDaily>("https://api.milimoe.com/userdaily/" + qq);
                             }
-                            if (Daily.UserDailys.TryGetValue(qq, out string? daily) && daily != null)
+                            UserDaily daily = await Bot.HttpGet<UserDaily>("https://api.milimoe.com/userdaily/v/" + qq) ?? new(0, 0, "");
+                            if (daily.daily != "")
                             {
                                 GroupMessageContent content = new(e.group_id);
-                                content.message.Add(new TextMessage(Bot.GetMemberNickName(e.group_id, qq) + "（" + qq + "）的今日运势是：\r\n" + daily));
+                                content.message.Add(new AtMessage(e.user_id));
+                                content.message.Add(new TextMessage(daily.daily));
                                 await Bot.SendGroupMessage(e.group_id, "查看运势", content);
-                            }
-                            else
-                            {
-                                await Bot.SendGroupMessage(e.group_id, "查看运势", "TA今天还没有抽取运势哦，快去提醒TA！");
                             }
                         }
                     }
@@ -334,9 +330,11 @@ namespace Milimoe.RainBOT.ListeningTask
                     {
                         if (long.TryParse(str_qq.Trim().Replace("@", ""), out long qq))
                         {
-                            Daily.UserDailys.Remove(GeneralSettings.BotQQ);
-                            await Bot.SendGroupMessage(e.group_id, "重置运势", "已重置" + Bot.GetMemberNickName(e.group_id, qq) + "（" + qq + "）的今日运势。");
-                            Daily.SaveDaily();
+                            string msg = await Bot.HttpGet<string>("https://api.milimoe.com/userdaily/r/" + e.user_id) ?? "";
+                            if (msg != "")
+                            {
+                                await Bot.SendGroupMessage(e.group_id, "重置运势", "已重置" + Bot.GetMemberNickName(e.group_id, qq) + "（" + qq + "）的今日运势。");
+                            }
                         }
                     }
                     return quick_reply;
