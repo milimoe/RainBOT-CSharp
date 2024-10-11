@@ -170,9 +170,36 @@ try
                     Console.ForegroundColor = ConsoleColor.Gray;
                 }
 
-                if (e.detail == "是")
+                switch (e.detail)
                 {
-                    await Bot.SendFriendMessage(e.user_id, "随机反驳是", "是你的头");
+                    case "是":
+                        await Bot.SendFriendMessage(e.user_id, "随机反驳是", "是你的头");
+                        break;
+                    case "炼金药材":
+                        修仙.小北.修仙状态.炼金药材 = true;
+                        if (修仙.开启小小修炼) 修仙.小小.修仙状态.炼金药材 = true;
+                        await 修仙.发消息("炼金药材", "药材背包");
+                        break;
+                    case "暂停":
+                        修仙.开启自动修炼 = false;
+                        await Bot.SendFriendMessage(e.user_id, "暂停修炼", "暂停修炼");
+                        break;
+                    case "继续":
+                        修仙.开启自动修炼 = true;
+                        await Bot.SendFriendMessage(e.user_id, "继续修炼", "继续修炼");
+                        break;
+                    case "闭关":
+                        修仙.小北.修仙状态.闭关 = true;
+                        if (修仙.开启小小修炼) 修仙.小小.修仙状态.闭关 = true;
+                        await 修仙.发消息("闭关", "闭关");
+                        await Bot.SendFriendMessage(e.user_id, "闭关", "闭关");
+                        break;
+                    case "出关":
+                        修仙.小北.修仙状态.闭关 = false;
+                        if (修仙.开启小小修炼) 修仙.小小.修仙状态.闭关 = false;
+                        await 修仙.发消息("出关", "出关");
+                        await Bot.SendFriendMessage(e.user_id, "出关", "出关");
+                        break;
                 }
 
                 // OSM指令
@@ -427,18 +454,14 @@ try
                 Console.ForegroundColor = ConsoleColor.Gray;
                 break;
             case "闭关":
-                Console.ForegroundColor = ConsoleColor.Yellow;
                 修仙.小北.修仙状态.闭关 = true;
                 if (修仙.开启小小修炼) 修仙.小小.修仙状态.闭关 = true;
                 await 修仙.发消息("闭关", "闭关");
-                Console.ForegroundColor = ConsoleColor.Gray;
                 break;
             case "出关":
-                Console.ForegroundColor = ConsoleColor.Yellow;
                 修仙.小北.修仙状态.闭关 = false;
                 if (修仙.开启小小修炼) 修仙.小小.修仙状态.闭关 = false;
                 await 修仙.发消息("出关", "出关");
-                Console.ForegroundColor = ConsoleColor.Gray;
                 break;
             case "debug on":
                 GeneralSettings.IsDebug = true;
