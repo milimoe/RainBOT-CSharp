@@ -120,6 +120,8 @@ namespace Milimoe.RainBOT.Settings
         public bool 闭关 { get; set; } = false;
         public bool 悬赏令 { get; set; } = false;
         public bool 秘境 { get; set; } = false;
+        public bool 在做悬赏令 { get; set; } = false;
+        public bool 在秘境中 { get; set; } = false;
         public bool 炼金药材 { get; set; } = false;
         public string 世界BOSS { get; set; } = "";
         public long 修炼次数 { get; set; } = 修仙.每修炼几次破一次 - 1 < 0 ? 0 : 修仙.每修炼几次破一次 - 1;
@@ -199,12 +201,14 @@ namespace Milimoe.RainBOT.Settings
             if (修仙状态.悬赏令)
             {
                 修仙状态.悬赏令 = false;
+                修仙状态.在做悬赏令 = true;
                 悬赏令? x = 悬赏令.获取最好的悬赏令(qq, detail);
                 if (detail.Contains("灵石不足以刷新") || detail.Contains("已耗尽") || detail.Contains("已用尽") || x is null)
                 {
                     Console.WriteLine("做完了悬赏令");
                     修仙.开启自动修炼 = true;
                     修仙.开启自动悬赏令 = true;
+                    修仙状态.在做悬赏令 = false;
                     return;
                 }
                 int time = x.Duration;
@@ -226,6 +230,7 @@ namespace Milimoe.RainBOT.Settings
             if (修仙状态.秘境)
             {
                 修仙状态.秘境 = false;
+                修仙状态.在秘境中 = true;
                 if (detail.Contains("参加过本次"))
                 {
                     修仙.开启自动修炼 = true;
@@ -250,6 +255,7 @@ namespace Milimoe.RainBOT.Settings
                         await 修仙.发消息("秘境", "秘境结算", qq);
                         修仙.开启自动修炼 = true;
                         修仙.开启自动秘境 = true;
+                        修仙状态.在秘境中 = false;
                     });
                 }
             }
