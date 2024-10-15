@@ -182,11 +182,38 @@ try
                         break;
                     case "暂停":
                         修仙.开启自动修炼 = false;
+                        修仙.小北.开启修炼 = false;
+                        修仙.小小.开启修炼 = false;
                         await Bot.SendFriendMessage(e.user_id, "暂停修炼", "暂停修炼");
                         break;
                     case "继续":
                         修仙.开启自动修炼 = true;
+                        修仙.小北.开启修炼 = true;
+                        修仙.小小.开启修炼 = true;
                         await Bot.SendFriendMessage(e.user_id, "继续修炼", "继续修炼");
+                        break;
+                    case "暂停小北":
+                        修仙.小北.开启修炼 = false;
+                        await Bot.SendFriendMessage(e.user_id, "暂停小北修炼", "暂停小北修炼");
+                        break;
+                    case "继续小北":
+                        修仙.小北.开启修炼 = true;
+                        await Bot.SendFriendMessage(e.user_id, "继续小北修炼", "继续小北修炼");
+                        break;
+                    case "暂停小小":
+                        修仙.小小.开启修炼 = false;
+                        await Bot.SendFriendMessage(e.user_id, "暂停小小修炼", "暂停小小修炼");
+                        break;
+                    case "继续小小":
+                        修仙.小小.开启修炼 = true;
+                        await Bot.SendFriendMessage(e.user_id, "继续小小修炼", "继续小小修炼");
+                        break;
+                    case "破5次":
+                        _ = Task.Run(async () =>
+                        {
+                            await Bot.SendFriendMessage(e.user_id, "破5次", "渡厄突破");
+                            await Task.Delay(1500);
+                        });
                         break;
                     case "闭关":
                         修仙.小北.修仙状态.闭关 = true;
@@ -289,24 +316,21 @@ try
             try
             {
                 DateTime now = DateTime.Now;
-                if (now.Hour == 9 && now.Minute == 0 && 修仙.开启自动悬赏令)
+                if (now.Hour == 9 && now.Minute == 0 && 修仙.开启自动悬赏令 && !悬赏令控制)
                 {
+                    悬赏令控制 = true;
                     修仙.开启自动修炼 = false;
                     修仙.开启自动悬赏令 = false;
                     Console.ForegroundColor = ConsoleColor.Magenta;
                     Console.WriteLine("修炼关闭，准备做悬赏！");
                     Console.ForegroundColor = ConsoleColor.Gray;
                 }
-                if (now.Hour == 9 && now.Minute == 3 && !悬赏令控制)
+                if (now.Hour == 9 && now.Minute == 3 && 悬赏令控制)
                 {
-                    悬赏令控制 = true;
+                    悬赏令控制 = false;
                     修仙.小北.修仙状态.悬赏令 = true;
                     if (修仙.开启小小修炼) 修仙.小小.修仙状态.悬赏令 = true;
                     await 修仙.发消息("悬赏令刷新", $"悬赏令刷新");
-                }
-                if (now.Hour == 9 && now.Minute > 3 && 悬赏令控制)
-                {
-                    悬赏令控制 = false;
                 }
                 if (now.Hour == 12 && now.Minute == 9 && 修仙.开启自动灵田收取宗门丹药领取)
                 {
@@ -318,24 +342,21 @@ try
                 {
                     修仙.开启自动灵田收取宗门丹药领取 = true;
                 }
-                if (now.Hour == 15 && now.Minute == 0 && 修仙.开启自动秘境)
+                if (now.Hour == 15 && now.Minute == 0 && 修仙.开启自动秘境 && !秘境控制)
                 {
+                    秘境控制 = true;
                     修仙.开启自动修炼 = false;
                     修仙.开启自动秘境 = false;
                     Console.ForegroundColor = ConsoleColor.Magenta;
                     Console.WriteLine("修炼关闭，准备做秘境！");
                     Console.ForegroundColor = ConsoleColor.Gray;
                 }
-                if (now.Hour == 15 && now.Minute == 3 && !秘境控制)
+                if (now.Hour == 15 && now.Minute == 3 && 秘境控制)
                 {
-                    秘境控制 = true;
+                    秘境控制 = false;
                     修仙.小北.修仙状态.秘境 = true;
                     if (修仙.开启小小修炼) 修仙.小小.修仙状态.秘境 = true;
                     await 修仙.发消息("秘境", $"探索秘境");
-                }
-                if (now.Hour == 15 && now.Minute > 3 && 秘境控制)
-                {
-                    秘境控制 = false;
                 }
                 await Task.Delay(1000);
             }
@@ -350,17 +371,21 @@ try
 
     _ = Task.Factory.StartNew(async () =>
     {
+        if (修仙.开启自动修炼)
+        {
+            修仙.小北.开启修炼 = true;
+        }
         while (true)
         {
             try
             {
-                if (修仙.开启自动修炼 && 修仙.开启自动突破 && 修仙.小北.修仙状态.修炼次数 != -1 && 修仙.小北.修仙状态.修炼次数++ == 修仙.每修炼几次破一次)
+                if (修仙.开启自动修炼 && 修仙.小北.开启修炼 && 修仙.开启自动突破 && 修仙.小北.修仙状态.修炼次数 != -1 && 修仙.小北.修仙状态.修炼次数++ == 修仙.每修炼几次破一次)
                 {
                     await 修仙.发消息("自动突破", "渡厄突破", 修仙.小北QQ);
                     修仙.小北.修仙状态.修炼次数 = 0;
                     await Task.Delay(1000);
                 }
-                if (!修仙.小北.修仙状态.闭关 && !修仙.小北.修仙状态.在做悬赏令 && !修仙.小北.修仙状态.在秘境中 && 修仙.开启自动修炼) await 修仙.发消息("修炼", "修炼", 修仙.小北QQ);
+                if (!修仙.小北.修仙状态.闭关 && !修仙.小北.修仙状态.在做悬赏令 && !修仙.小北.修仙状态.在秘境中 && 修仙.开启自动修炼 && 修仙.小北.开启修炼) await 修仙.发消息("修炼", "修炼", 修仙.小北QQ);
                 await Task.Delay(1000 * 60 * 2 + 1000 * 8);
             }
             catch (Exception e)
@@ -374,17 +399,21 @@ try
     
     _ = Task.Factory.StartNew(async () =>
     {
+        if (修仙.开启小小修炼)
+        {
+            修仙.小小.开启修炼 = true;
+        }
         while (true)
         {
             try
             {
-                if (修仙.开启自动修炼 && 修仙.开启自动突破 && 修仙.开启小小修炼 && 修仙.小小.修仙状态.修炼次数 != -1 && 修仙.小小.修仙状态.修炼次数++ == 修仙.每修炼几次破一次)
+                if (修仙.开启自动修炼 && 修仙.开启自动突破 && 修仙.开启小小修炼 && 修仙.小小.开启修炼 && 修仙.小小.修仙状态.修炼次数 != -1 && 修仙.小小.修仙状态.修炼次数++ == 修仙.每修炼几次破一次)
                 {
                     await 修仙.发消息("自动突破", "渡厄突破", 修仙.小小QQ);
                     修仙.小小.修仙状态.修炼次数 = 0;
                     await Task.Delay(1000);
                 }
-                if (!修仙.小小.修仙状态.闭关 && !修仙.小小.修仙状态.在做悬赏令 && !修仙.小小.修仙状态.在秘境中 && 修仙.开启自动修炼 && 修仙.开启小小修炼) await 修仙.发消息("修炼", "修炼", 修仙.小小QQ);
+                if (!修仙.小小.修仙状态.闭关 && !修仙.小小.修仙状态.在做悬赏令 && !修仙.小小.修仙状态.在秘境中 && 修仙.开启自动修炼 && 修仙.开启小小修炼 && 修仙.小小.开启修炼) await 修仙.发消息("修炼", "修炼", 修仙.小小QQ);
                 await Task.Delay(1000 * 60 + 1000 * 6);
             }
             catch (Exception e)
@@ -444,14 +473,49 @@ try
             case "暂停":
                 Console.ForegroundColor = ConsoleColor.Yellow;
                 修仙.开启自动修炼 = false;
+                修仙.小北.开启修炼 = false;
+                修仙.小小.开启修炼 = false;
                 Console.WriteLine("暂停修炼");
                 Console.ForegroundColor = ConsoleColor.Gray;
                 break;
             case "继续":
                 Console.ForegroundColor = ConsoleColor.Yellow;
                 修仙.开启自动修炼 = true;
+                修仙.小北.开启修炼 = true;
+                修仙.小小.开启修炼 = true;
                 Console.WriteLine("继续修炼");
                 Console.ForegroundColor = ConsoleColor.Gray;
+                break;
+            case "暂停小北":
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                修仙.小北.开启修炼 = false;
+                Console.WriteLine("暂停小北修炼");
+                Console.ForegroundColor = ConsoleColor.Gray;
+                break;
+            case "继续小北":
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                修仙.小北.开启修炼 = true;
+                Console.WriteLine("继续小北修炼");
+                Console.ForegroundColor = ConsoleColor.Gray;
+                break;
+            case "暂停小小":
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                修仙.小小.开启修炼 = false;
+                Console.WriteLine("暂停小小修炼");
+                Console.ForegroundColor = ConsoleColor.Gray;
+                break;
+            case "继续小小":
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                修仙.小小.开启修炼 = true;
+                Console.WriteLine("继续小小修炼");
+                Console.ForegroundColor = ConsoleColor.Gray;
+                break;
+            case "破5次":
+                _ = Task.Run(async () =>
+                {
+                    await 修仙.发消息("破5次", "渡厄突破");
+                    await Task.Delay(1500);
+                });
                 break;
             case "闭关":
                 修仙.小北.修仙状态.闭关 = true;

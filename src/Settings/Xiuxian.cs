@@ -130,6 +130,7 @@ namespace Milimoe.RainBOT.Settings
     public class 修仙控制器(long qq)
     {
         public 修仙状态 修仙状态 = new();
+        public bool 开启修炼 = false;
 
         public async Task 自动炼金药材(string detail)
         {
