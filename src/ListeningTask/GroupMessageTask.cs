@@ -5,6 +5,7 @@ using Milimoe.OneBot.Model.Message;
 using Milimoe.OneBot.Model.Other;
 using Milimoe.OneBot.Model.QuickReply;
 using Milimoe.RainBOT.Command;
+using Milimoe.RainBOT.Model;
 using Milimoe.RainBOT.Settings;
 
 namespace Milimoe.RainBOT.ListeningTask
@@ -101,42 +102,6 @@ namespace Milimoe.RainBOT.ListeningTask
 
                 if (!GeneralSettings.IsRun)
                 {
-                    return quick_reply;
-                }
-
-                // 12点大挑战
-                if (e.detail == "加入12点" || e.detail == "加入12点大挑战")
-                {
-                    if (!await Bot.CheckBlackList(true, e.user_id, e.group_id)) return quick_reply;
-                    if (GeneralSettings.Challenge12ClockGroup.Contains(e.user_id))
-                    {
-                        await Bot.SendGroupMessage(e.group_id, "12点大挑战", "请勿重复加入。");
-                    }
-                    else
-                    {
-                        GeneralSettings.Challenge12ClockGroup.Add(e.user_id);
-                        await Bot.SendGroupMessage(e.group_id, "12点大挑战", "你已成功加入~\r\n发送【退出12点】退出挑战。");
-                        GeneralSettings.SaveConfig();
-                    }
-                    return quick_reply;
-                }
-                else if ((e.detail == "退出12点" || e.detail == "退出12点大挑战") && GeneralSettings.Challenge12ClockGroup.Contains(e.user_id))
-                {
-                    if (!await Bot.CheckBlackList(true, e.user_id, e.group_id)) return quick_reply;
-                    GeneralSettings.Challenge12ClockGroup.Remove(e.user_id);
-                    await Bot.SendGroupMessage(e.group_id, "12点大挑战", "你已成功退出~\r\n发送【加入12点】即可再次参加。");
-                    GeneralSettings.SaveConfig();
-                    return quick_reply;
-                }
-                else if (e.detail == "12点大挑战")
-                {
-                    if (!await Bot.CheckBlackList(true, e.user_id, e.group_id)) return quick_reply;
-                    await Bot.SendGroupMessage(e.group_id, "12点大挑战", "欢迎加入12点大挑战。参加本挑战后，你将在每晚的12点获得8小时禁言和优质的睡眠，确保第二天的精神饱满！\r\n发送【加入12点】即可参加。");
-                    return quick_reply;
-                }
-                else if (e.detail == "挑战结束" && e.user_id == GeneralSettings.Master)
-                {
-                    await Bot.Unmute12ClockMembers();
                     return quick_reply;
                 }
 
@@ -280,63 +245,57 @@ namespace Milimoe.RainBOT.ListeningTask
                 if (e.detail == "我的运势")
                 {
                     if (!await Bot.CheckBlackList(true, e.user_id, e.group_id)) return quick_reply;
-                    GroupMessageContent content = new(e.group_id);
-                    content.message.Add(new AtMessage(e.user_id));
-                    if (Daily.UserDailys.TryGetValue(e.user_id, out string? value) && value != null && value.Trim() != "")
+
+                    UserDaily daily = await Bot.HttpPost<UserDaily>("https://api.milimoe.com/userdaily/get/" + e.user_id, "") ?? new(0, 0, "");
+                    if (daily.daily != "")
                     {
-                        content.message.Add(new TextMessage("你已看过你的今日运势：\r\n"));
-                        content.message.Add(new TextMessage(value));
-                        await Bot.SendGroupMessage(e.group_id, "我的运势", content);
+                        if (daily.type == 0)
+                        {
+                            GroupMessageContent content = new(e.group_id);
+                            content.message.Add(new AtMessage(e.user_id));
+                            content.message.Add(new TextMessage(daily.daily));
+                            await Bot.SendGroupMessage(e.group_id, "我的运势", content);
+                        }
+                        else
+                        {
+                            string img = "file:///" + AppDomain.CurrentDomain.BaseDirectory.ToString() + @"img\zi\";
+                            img += daily.type switch
+                            {
+                                1 => "dj" + (new Random().Next(3) + 1) + ".png",
+                                2 => "zj" + (new Random().Next(2) + 1) + ".png",
+                                3 => "j" + (new Random().Next(4) + 1) + ".png",
+                                4 => "mj" + (new Random().Next(2) + 1) + ".png",
+                                5 => "x" + (new Random().Next(2) + 1) + ".png",
+                                6 => "dx" + (new Random().Next(2) + 1) + ".png",
+                                _ => ""
+                            };
+
+                            GroupMessageContent content = new(e.group_id);
+                            content.message.Add(new AtMessage(e.user_id));
+                            content.message.Add(new TextMessage(daily.daily));
+                            await Bot.SendGroupMessage(e.group_id, "我的运势", content);
+
+                            content = new(e.group_id);
+                            content.message.Add(new ImageMessage(img));
+                            await Bot.SendGroupMessage(e.group_id, "我的运势配图", content);
+                        }
                     }
-                    else
-                    {
-                        int seq = new Random().Next(Daily.DailyContent.Count);
-                        string text = Daily.DailyContent[seq];
-                        Daily.UserDailys.Add(e.user_id, text);
-                        content.message.Add(new TextMessage("你的今日运势是：\r\n" + text));
-                        await Bot.SendGroupMessage(e.group_id, "我的运势", content);
-                        // 配图
-                        content = new(e.group_id);
-                        string img = "file:///" + AppDomain.CurrentDomain.BaseDirectory.ToString() + @"img\zi\";
-                        if (seq >= 0 && seq <= 5)
-                        {
-                            img += "dj" + (new Random().Next(3) + 1) + ".png";
-                        }
-                        else if (seq >= 6 && seq <= 10)
-                        {
-                            img += "zj" + (new Random().Next(2) + 1) + ".png";
-                        }
-                        else if (seq >= 11 && seq <= 15)
-                        {
-                            img += "j" + (new Random().Next(4) + 1) + ".png";
-                        }
-                        else if (seq >= 16 && seq <= 22)
-                        {
-                            img += "mj" + (new Random().Next(2) + 1) + ".png";
-                        }
-                        else if (seq >= 23 && seq <= 25)
-                        {
-                            img += "dx" + (new Random().Next(2) + 1) + ".png";
-                        }
-                        else if (seq >= 26 && seq <= 29)
-                        {
-                            img += "x" + (new Random().Next(2) + 1) + ".png";
-                        }
-                        content.message.Add(new ImageMessage(img));
-                        await Bot.SendGroupMessage(e.group_id, "我的运势配图", content);
-                        Daily.SaveDaily();
-                    }
+
                     return quick_reply;
                 }
-                if (e.detail == "重置运势" && Daily.UserDailys.ContainsKey(e.user_id))
+                if (e.detail == "重置运势")
                 {
                     if (!await Bot.CheckBlackList(true, e.user_id, e.group_id)) return quick_reply;
-                    Daily.UserDailys.Remove(e.user_id);
-                    GroupMessageContent content = new(e.group_id);
-                    content.message.Add(new AtMessage(e.user_id));
-                    content.message.Add(new TextMessage("你的今日运势已重置。"));
-                    await Bot.SendGroupMessage(e.group_id, "重置运势", content);
-                    Daily.SaveDaily();
+
+                    string msg = await Bot.HttpPost<string>("https://api.milimoe.com/userdaily/remove/" + e.user_id, "") ?? "";
+                    if (msg != "")
+                    {
+                        GroupMessageContent content = new(e.group_id);
+                        content.message.Add(new AtMessage(e.user_id));
+                        content.message.Add(new TextMessage(msg));
+                        await Bot.SendGroupMessage(e.group_id, "重置运势", content);
+                    }
+
                     return quick_reply;
                 }
                 if (e.detail.Length > 4 && e.detail[..2] == "查看" && (e.detail[^2..] == "运势"))
@@ -347,21 +306,17 @@ namespace Milimoe.RainBOT.ListeningTask
                     {
                         if (long.TryParse(str_qq.Trim().Replace("@", ""), out long qq))
                         {
-                            if (qq == GeneralSettings.BotQQ && !Daily.UserDailys.ContainsKey(qq))
+                            if (qq == GeneralSettings.BotQQ)
                             {
-                                string text = Daily.DailyContent[new Random().Next(Daily.DailyContent.Count)];
-                                Daily.UserDailys.Add(GeneralSettings.BotQQ, text);
-                                Daily.SaveDaily();
+                                await Bot.HttpPost<UserDaily>("https://api.milimoe.com/userdaily/get/" + qq, "");
                             }
-                            if (Daily.UserDailys.TryGetValue(qq, out string? daily) && daily != null)
+                            UserDaily daily = await Bot.HttpGet<UserDaily>("https://api.milimoe.com/userdaily/view/" + qq) ?? new(0, 0, "");
+                            if (daily.daily != "")
                             {
                                 GroupMessageContent content = new(e.group_id);
-                                content.message.Add(new TextMessage(Bot.GetMemberNickName(e.group_id, qq) + "（" + qq + "）的今日运势是：\r\n" + daily));
+                                content.message.Add(new AtMessage(e.user_id));
+                                content.message.Add(new TextMessage(daily.daily));
                                 await Bot.SendGroupMessage(e.group_id, "查看运势", content);
-                            }
-                            else
-                            {
-                                await Bot.SendGroupMessage(e.group_id, "查看运势", "TA今天还没有抽取运势哦，快去提醒TA！");
                             }
                         }
                     }
@@ -375,9 +330,11 @@ namespace Milimoe.RainBOT.ListeningTask
                     {
                         if (long.TryParse(str_qq.Trim().Replace("@", ""), out long qq))
                         {
-                            Daily.UserDailys.Remove(GeneralSettings.BotQQ);
-                            await Bot.SendGroupMessage(e.group_id, "重置运势", "已重置" + Bot.GetMemberNickName(e.group_id, qq) + "（" + qq + "）的今日运势。");
-                            Daily.SaveDaily();
+                            string msg = await Bot.HttpPost<string>("https://api.milimoe.com/userdaily/remove/" + e.user_id, "") ?? "";
+                            if (msg != "")
+                            {
+                                await Bot.SendGroupMessage(e.group_id, "重置运势", "已重置" + Bot.GetMemberNickName(e.group_id, qq) + "（" + qq + "）的今日运势。");
+                            }
                         }
                     }
                     return quick_reply;

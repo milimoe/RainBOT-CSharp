@@ -156,7 +156,7 @@ try
                     Console.WriteLine("已重置所有人的今日运势。");
                     Console.ForegroundColor = ConsoleColor.Gray;
                     // 发放12点大挑战的奖励
-                    await Bot.Send12ClockPresents();
+                    //await Bot.Send12ClockPresents();
                 }
                 if (now.Hour == 0 && now.Minute == 1)
                 {

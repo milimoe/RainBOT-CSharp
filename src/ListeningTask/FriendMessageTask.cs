@@ -49,12 +49,6 @@ namespace Milimoe.RainBOT.ListeningTask
                     return quick_reply;
                 }
 
-                if (e.detail == "挑战结束" && e.user_id == GeneralSettings.Master)
-                {
-                    await Bot.Unmute12ClockMembers();
-                    return quick_reply;
-                }
-
                 if (e.detail.Length >= 9 && e.detail[..9].Equals("FunGame模拟", StringComparison.CurrentCultureIgnoreCase))
                 {
                     if (!await Bot.CheckBlackList(true, e.user_id, e.user_id)) return quick_reply;
