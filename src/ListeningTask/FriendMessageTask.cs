@@ -69,25 +69,6 @@ namespace Milimoe.RainBOT.ListeningTask
                     }
                     return quick_reply;
                 }
-
-                if (GeneralSettings.IsMute && e.detail == "忏悔")
-                {
-                    if (!await Bot.CheckBlackList(false, e.user_id, e.user_id)) return quick_reply;
-                    string msg = "";
-                    foreach (long group_id in Bot.Groups.Select(g => g.group_id))
-                    {
-                        if (Bot.BotIsAdmin(group_id) && MuteRecall.Muted[group_id].TryGetValue(e.user_id, out long operator_id) && operator_id == Bot.BotQQ)
-                        {
-                            MuteRecall.Muted[group_id].Remove(e.user_id);
-                            await Bot.SendMessage(SupportedAPI.set_group_ban, group_id, "忏悔", new SetGroupBanContent(group_id, e.user_id, 0), true);
-                            if (msg != "") msg += "\r\n";
-                            msg += $"[{group_id}] 忏悔成功！！希望你保持纯真，保持野性的美。";
-                        }
-                    }
-                    if (msg == "") msg = "你无需忏悔。请注意：我不能帮你解除由管理员手动操作的禁言。";
-                    await Bot.SendFriendMessage(e.user_id, "忏悔", msg);
-                    return quick_reply;
-                }
             }
             catch (Exception ex)
             {
