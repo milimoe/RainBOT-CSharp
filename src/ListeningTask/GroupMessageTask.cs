@@ -112,7 +112,30 @@ namespace Milimoe.RainBOT.ListeningTask
                     {
                         Bot.FunGameSimulation = true;
                         List<string> msgs = await Bot.HttpGet<List<string>>("https://api.milimoe.com/fungame/test?isweb=false") ?? [];
-                        foreach (string msg in msgs)
+                        List<string> real = [];
+                        int remain = 7;
+                        string merge = "";
+                        for (int i = 0; i < msgs.Count - 2; i++)
+                        {
+                            remain--;
+                            merge += msgs[i] + "\r\n";
+                            if (remain == 0)
+                            {
+                                real.Add(merge);
+                                merge = "";
+                                if ((msgs.Count - i - 3) < 7)
+                                {
+                                    remain = msgs.Count - i - 3;
+                                }
+                                else remain = 7;
+                            }
+                        }
+                        if (msgs.Count > 2)
+                        {
+                            real.Add(msgs[^2]);
+                            real.Add(msgs[^1]);
+                        }
+                        foreach (string msg in real)
                         {
                             await Bot.SendGroupMessage(e.group_id, "FunGame模拟", msg.Trim());
                             await Task.Delay(5500);
@@ -122,6 +145,54 @@ namespace Milimoe.RainBOT.ListeningTask
                     else
                     {
                         await Bot.SendGroupMessage(e.group_id, "FunGame模拟", "游戏正在模拟中，请勿重复请求！");
+                    }
+                    return quick_reply;
+                }
+                
+                if (e.detail.Length >= 11 && e.detail[..11].Equals("FunGame团队模拟", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    if (!await Bot.CheckBlackList(true, e.user_id, e.group_id)) return quick_reply;
+                    if (!Bot.FunGameSimulation)
+                    {
+                        Bot.FunGameSimulation = true;
+                        List<string> msgs = await Bot.HttpGet<List<string>>("https://api.milimoe.com/fungame/test?isweb=false&isteam=true") ?? [];
+                        List<string> real = [];
+                        if (msgs.Count > 0)
+                        {
+                            real.Add(msgs[0]);
+                        }
+                        int remain = 7;
+                        string merge = "";
+                        for (int i = 1; i < msgs.Count - 2; i++)
+                        {
+                            remain--;
+                            merge += msgs[i] + "\r\n";
+                            if (remain == 0)
+                            {
+                                real.Add(merge);
+                                merge = "";
+                                if ((msgs.Count - i - 3) < 7)
+                                {
+                                    remain = msgs.Count - i - 3;
+                                }
+                                else remain = 7;
+                            }
+                        }
+                        if (msgs.Count > 2)
+                        {
+                            real.Add(msgs[^2]);
+                            real.Add(msgs[^1]);
+                        }
+                        foreach (string msg in real)
+                        {
+                            await Bot.SendGroupMessage(e.group_id, "FunGame团队模拟", msg.Trim());
+                            await Task.Delay(5500);
+                        }
+                        Bot.FunGameSimulation = false;
+                    }
+                    else
+                    {
+                        await Bot.SendGroupMessage(e.group_id, "FunGame团队模拟", "游戏正在模拟中，请勿重复请求！");
                     }
                     return quick_reply;
                 }
@@ -137,6 +208,43 @@ namespace Milimoe.RainBOT.ListeningTask
                         {
                             await Bot.SendGroupMessage(e.group_id, "查询FunGame数据", msg);
                         }
+                    }
+                    return quick_reply;
+                }
+                
+                if (e.detail.Length >= 5 && e.detail[..5].Equals("查团队数据", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    if (!await Bot.CheckBlackList(true, e.user_id, e.group_id)) return quick_reply;
+                    string detail = e.detail.Replace("查团队数据", "").Trim();
+                    if (int.TryParse(detail, out int id))
+                    {
+                        string msg = (await Bot.HttpGet<string>("https://api.milimoe.com/fungame/teamstats?id=" + id) ?? "").Trim();
+                        if (msg != "")
+                        {
+                            await Bot.SendGroupMessage(e.group_id, "查询FunGame数据", msg);
+                        }
+                    }
+                    return quick_reply;
+                }
+                
+                if (e.detail.Length >= 5 && e.detail[..5].Equals("查个人胜率", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    if (!await Bot.CheckBlackList(true, e.user_id, e.group_id)) return quick_reply;
+                    string[] msg = await Bot.HttpGet<string[]>("https://api.milimoe.com/fungame/winraterank?isteam=false") ?? [];
+                    if (msg.Length > 0)
+                    {
+                        await Bot.SendGroupMessage(e.group_id, "查询FunGame数据", string.Join("\r\n\r\n", msg));
+                    }
+                    return quick_reply;
+                }
+                
+                if (e.detail.Length >= 5 && e.detail[..5].Equals("查团队胜率", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    if (!await Bot.CheckBlackList(true, e.user_id, e.group_id)) return quick_reply;
+                    string[] msg = await Bot.HttpGet<string[]>("https://api.milimoe.com/fungame/winraterank?isteam=true") ?? [];
+                    if (msg.Length > 0)
+                    {
+                        await Bot.SendGroupMessage(e.group_id, "查询FunGame数据", string.Join("\r\n\r\n", msg));
                     }
                     return quick_reply;
                 }
