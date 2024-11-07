@@ -249,13 +249,43 @@ namespace Milimoe.RainBOT.ListeningTask
                     return quick_reply;
                 }
                 
+                if (e.detail.Length >= 3 && e.detail[..3].Equals("查角色", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    if (!await Bot.CheckBlackList(true, e.user_id, e.group_id)) return quick_reply;
+                    string detail = e.detail.Replace("查角色", "").Trim();
+                    if (int.TryParse(detail, out int id))
+                    {
+                        string msg = (await Bot.HttpGet<string>("https://api.milimoe.com/fungame/cjs?id=" + id) ?? "").Trim();
+                        if (msg != "")
+                        {
+                            await Bot.SendGroupMessage(e.group_id, "查询FunGame角色技能", msg);
+                        }
+                    }
+                    return quick_reply;
+                }
+                
                 if (e.detail.Length >= 3 && e.detail[..3].Equals("查技能", StringComparison.CurrentCultureIgnoreCase))
                 {
                     if (!await Bot.CheckBlackList(true, e.user_id, e.group_id)) return quick_reply;
                     string detail = e.detail.Replace("查技能", "").Trim();
                     if (int.TryParse(detail, out int id))
                     {
-                        string msg = (await Bot.HttpGet<string>("https://api.milimoe.com/fungame/cjs?id=" + id) ?? "").Trim();
+                        string msg = (await Bot.HttpGet<string>("https://api.milimoe.com/fungame/cjn?id=" + id) ?? "").Trim();
+                        if (msg != "")
+                        {
+                            await Bot.SendGroupMessage(e.group_id, "查询FunGame角色技能", msg);
+                        }
+                    }
+                    return quick_reply;
+                }
+                
+                if (e.detail.Length >= 3 && e.detail[..3].Equals("查物品", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    if (!await Bot.CheckBlackList(true, e.user_id, e.group_id)) return quick_reply;
+                    string detail = e.detail.Replace("查物品", "").Trim();
+                    if (int.TryParse(detail, out int id))
+                    {
+                        string msg = (await Bot.HttpGet<string>("https://api.milimoe.com/fungame/cwp?id=" + id) ?? "").Trim();
                         if (msg != "")
                         {
                             await Bot.SendGroupMessage(e.group_id, "查询FunGame角色技能", msg);
