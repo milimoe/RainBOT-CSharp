@@ -170,6 +170,21 @@ try
                     Console.ForegroundColor = ConsoleColor.Gray;
                 }
 
+                if (e.detail.StartsWith("计算"))
+                {
+                    string msg = e.detail.ReplaceLineEndings().Replace("计算", "");
+                    decimal total = 0;
+                    foreach (string s in msg.Split("\r\n"))
+                    {
+                        string[] str = s.Split(" ");
+                        decimal dec = Convert.ToDecimal(str[2]) * Convert.ToDecimal(str[3]);
+                        total += dec;
+                        await Bot.SendGroupMessage(729688059, "批发", $"{str[1]}{str[3]}个，{str[2]}*{str[3]}={dec}");
+                        await Task.Delay(3000);
+                    }
+                    await Bot.SendGroupMessage(729688059, "批发", $"总共{total}");
+                }
+
                 switch (e.detail)
                 {
                     case "是":
