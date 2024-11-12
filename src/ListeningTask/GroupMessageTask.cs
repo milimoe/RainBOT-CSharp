@@ -105,6 +105,17 @@ namespace Milimoe.RainBOT.ListeningTask
                     return quick_reply;
                 }
 
+                if (e.detail == "查询服务器启动时间")
+                {
+                    if (!await Bot.CheckBlackList(true, e.user_id, e.group_id)) return quick_reply;
+                    string msg = (await Bot.HttpGet<string>("https://api.milimoe.com/test/getlastlogintime") ?? "").Trim();
+                    if (msg != "")
+                    {
+                        await Bot.SendGroupMessage(e.group_id, "查询服务器启动时间", msg);
+                    }
+                    return quick_reply;
+                }
+
                 if (e.detail.Length >= 9 && e.detail[..9].Equals("FunGame模拟", StringComparison.CurrentCultureIgnoreCase))
                 {
                     if (!await Bot.CheckBlackList(true, e.user_id, e.group_id)) return quick_reply;
@@ -290,6 +301,38 @@ namespace Milimoe.RainBOT.ListeningTask
                         {
                             await Bot.SendGroupMessage(e.group_id, "查询FunGame角色技能", msg);
                         }
+                    }
+                    return quick_reply;
+                }
+                
+                if (e.detail.Length >= 6 && e.detail[..6] == "生成魔法卡包")
+                {
+                    if (!await Bot.CheckBlackList(true, e.user_id, e.group_id)) return quick_reply;
+                    string msg = (await Bot.HttpGet<string>("https://api.milimoe.com/fungame/mfkb") ?? "").Trim();
+                    if (msg != "")
+                    {
+                        await Bot.SendGroupMessage(e.group_id, "生成魔法卡包", msg);
+                    }
+                    return quick_reply;
+                }
+                else if (e.detail.Length >= 5 && e.detail[..5] == "生成魔法卡")
+                {
+                    if (!await Bot.CheckBlackList(true, e.user_id, e.group_id)) return quick_reply;
+                    string msg = (await Bot.HttpGet<string>("https://api.milimoe.com/fungame/mfk") ?? "").Trim();
+                    if (msg != "")
+                    {
+                        await Bot.SendGroupMessage(e.group_id, "生成魔法卡", msg);
+                    }
+                    return quick_reply;
+                }
+                
+                if (e.user_id == GeneralSettings.Master && e.detail.Length >= 9 && e.detail[..9].Equals("重载FunGame", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    if (!await Bot.CheckBlackList(true, e.user_id, e.group_id)) return quick_reply;
+                    string msg = (await Bot.HttpGet<string>("https://api.milimoe.com/fungame/reload?master=" + GeneralSettings.Master) ?? "").Trim();
+                    if (msg != "")
+                    {
+                        await Bot.SendGroupMessage(e.group_id, "重载FunGame", msg);
                     }
                     return quick_reply;
                 }
