@@ -343,7 +343,7 @@ namespace Milimoe.RainBOT.Settings
             return result;
         }
         
-        public static async Task<T?> HttpPost<T>(string url, string json)
+        public static async Task<T?> HttpPost<T>(string url, string json = "")
         {
             HttpContent content = new StringContent(json, Encoding.UTF8, "application/json");
             HttpResponseMessage response = await client.PostAsync(url, content);

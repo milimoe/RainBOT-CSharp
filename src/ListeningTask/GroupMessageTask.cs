@@ -325,7 +325,40 @@ namespace Milimoe.RainBOT.ListeningTask
                     }
                     return quick_reply;
                 }
+
+                if (e.detail == "创建存档")
+                {
+                    if (!await Bot.CheckBlackList(true, e.user_id, e.group_id)) return quick_reply;
+                    string msg = (await Bot.HttpPost<string>($"https://api.milimoe.com/fungame/cjcd?qq={e.user_id}&name={e.sender.nickname}", "") ?? "").Trim();
+                    if (msg != "")
+                    {
+                        await Bot.SendGroupMessage(e.group_id, "创建存档", msg);
+                    }
+                    return quick_reply;
+                }
                 
+                if (e.detail == "抽卡")
+                {
+                    if (!await Bot.CheckBlackList(true, e.user_id, e.group_id)) return quick_reply;
+                    string msg = (await Bot.HttpPost<string>($"https://api.milimoe.com/fungame/ck?qq={e.user_id}", "") ?? "").Trim();
+                    if (msg != "")
+                    {
+                        await Bot.SendGroupMessage(e.group_id, "抽卡", msg);
+                    }
+                    return quick_reply;
+                }
+                
+                if (e.detail == "查看库存")
+                {
+                    if (!await Bot.CheckBlackList(true, e.user_id, e.group_id)) return quick_reply;
+                    string msg = (await Bot.HttpPost<string>($"https://api.milimoe.com/fungame/ckkc?qq={e.user_id}", "") ?? "").Trim();
+                    if (msg != "")
+                    {
+                        await Bot.SendGroupMessage(e.group_id, "查看库存", msg);
+                    }
+                    return quick_reply;
+                }
+
                 if (e.user_id == GeneralSettings.Master && e.detail.Length >= 9 && e.detail[..9].Equals("重载FunGame", StringComparison.CurrentCultureIgnoreCase))
                 {
                     if (!await Bot.CheckBlackList(true, e.user_id, e.group_id)) return quick_reply;
