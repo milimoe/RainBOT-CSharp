@@ -167,6 +167,19 @@ namespace Milimoe.RainBOT.Settings
             }
             await SendMessage(SupportedAPI.send_group_msg, group_id, function, content, true);
         }
+        
+        public static async Task SendGroupMessageAt(long at_id, long group_id, string function, string text, int delay = 0)
+        {
+            GroupMessageContent content = new(group_id);
+            content.message.Add(new AtMessage(at_id));
+            content.message.Add(new TextMessage(text));
+            if (delay > 0)
+            {
+                await Task.Delay(delay);
+                if (!GeneralSettings.IsRun) return;
+            }
+            await SendMessage(SupportedAPI.send_group_msg, group_id, function, content, true);
+        }
 
         public static async Task SendGroupMessage(long group_id, string function, IContent content) => await SendMessage(SupportedAPI.send_group_msg, group_id, function, content, true);
 

@@ -328,33 +328,39 @@ namespace Milimoe.RainBOT.ListeningTask
 
                 if (e.detail == "创建存档")
                 {
-                    if (!await Bot.CheckBlackList(true, e.user_id, e.group_id)) return quick_reply;
                     string msg = (await Bot.HttpPost<string>($"https://api.milimoe.com/fungame/cjcd?qq={e.user_id}&name={e.sender.nickname}", "") ?? "").Trim();
                     if (msg != "")
                     {
-                        await Bot.SendGroupMessage(e.group_id, "创建存档", msg);
+                        await Bot.SendGroupMessageAt(e.user_id, e.group_id, "创建存档", msg);
                     }
                     return quick_reply;
                 }
                 
                 if (e.detail == "抽卡")
                 {
-                    if (!await Bot.CheckBlackList(true, e.user_id, e.group_id)) return quick_reply;
                     string msg = (await Bot.HttpPost<string>($"https://api.milimoe.com/fungame/ck?qq={e.user_id}", "") ?? "").Trim();
                     if (msg != "")
                     {
-                        await Bot.SendGroupMessage(e.group_id, "抽卡", msg);
+                        await Bot.SendGroupMessageAt(e.user_id, e.group_id, "抽卡", msg);
                     }
                     return quick_reply;
                 }
                 
-                if (e.detail == "查看库存")
+                if (e.detail.Length >= 4 && e.detail[..4].Equals("查看库存", StringComparison.CurrentCultureIgnoreCase))
                 {
-                    if (!await Bot.CheckBlackList(true, e.user_id, e.group_id)) return quick_reply;
-                    string msg = (await Bot.HttpPost<string>($"https://api.milimoe.com/fungame/ckkc?qq={e.user_id}", "") ?? "").Trim();
-                    if (msg != "")
+                    string detail = e.detail.Replace("查看库存", "").Trim();
+                    List<string> msgs = [];
+                    if (int.TryParse(detail, out int page))
                     {
-                        await Bot.SendGroupMessage(e.group_id, "查看库存", msg);
+                        msgs = await Bot.HttpPost<List<string>>($"https://api.milimoe.com/fungame/ckkc2?qq={e.user_id}&page={page}", "") ?? [];
+                    }
+                    else
+                    {
+                        msgs = await Bot.HttpPost<List<string>>($"https://api.milimoe.com/fungame/ckkc2?qq={e.user_id}&page=1", "") ?? [];
+                    }
+                    if (msgs.Count > 0)
+                    {
+                        await Bot.SendGroupMessageAt(e.user_id, e.group_id, "查看库存", string.Join("\r\n", msgs));
                     }
                     return quick_reply;
                 }
