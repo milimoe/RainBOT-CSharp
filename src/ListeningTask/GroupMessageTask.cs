@@ -299,7 +299,7 @@ namespace Milimoe.RainBOT.ListeningTask
                         string msg = (await Bot.HttpGet<string>("https://api.milimoe.com/fungame/cwp?id=" + id) ?? "").Trim();
                         if (msg != "")
                         {
-                            await Bot.SendGroupMessage(e.group_id, "查询FunGame角色技能", msg);
+                            await Bot.SendGroupMessage(e.group_id, "查询FunGame物品信息", msg);
                         }
                     }
                     return quick_reply;
@@ -331,7 +331,7 @@ namespace Milimoe.RainBOT.ListeningTask
                     string msg = (await Bot.HttpPost<string>($"https://api.milimoe.com/fungame/cjcd?qq={e.user_id}&name={e.sender.nickname}", "") ?? "").Trim();
                     if (msg != "")
                     {
-                        await Bot.SendGroupMessageAt(e.user_id, e.group_id, "创建存档", msg);
+                        await Bot.SendGroupMessageAt(e.user_id, e.group_id, "创建存档", "\r\n" + msg);
                     }
                     return quick_reply;
                 }
@@ -341,7 +341,37 @@ namespace Milimoe.RainBOT.ListeningTask
                     string msg = (await Bot.HttpPost<string>($"https://api.milimoe.com/fungame/ck?qq={e.user_id}", "") ?? "").Trim();
                     if (msg != "")
                     {
-                        await Bot.SendGroupMessageAt(e.user_id, e.group_id, "抽卡", msg);
+                        await Bot.SendGroupMessageAt(e.user_id, e.group_id, "抽卡", "\r\n" + msg);
+                    }
+                    return quick_reply;
+                }
+                
+                if (e.detail == "十连抽卡")
+                {
+                    List<string> msgs = (await Bot.HttpPost<List<string>>($"https://api.milimoe.com/fungame/ck10?qq={e.user_id}", "") ?? []);
+                    if (msgs.Count > 0)
+                    {
+                        await Bot.SendGroupMessageAt(e.user_id, e.group_id, "十连抽卡", "\r\n" + string.Join("\r\n", msgs));
+                    }
+                    return quick_reply;
+                }
+                
+                if (e.detail == "材料抽卡")
+                {
+                    string msg = (await Bot.HttpPost<string>($"https://api.milimoe.com/fungame/clck?qq={e.user_id}", "") ?? "").Trim();
+                    if (msg != "")
+                    {
+                        await Bot.SendGroupMessageAt(e.user_id, e.group_id, "材料抽卡", "\r\n" + msg);
+                    }
+                    return quick_reply;
+                }
+                
+                if (e.detail == "材料十连抽卡")
+                {
+                    List<string> msgs = await Bot.HttpPost<List<string>>($"https://api.milimoe.com/fungame/clck10?qq={e.user_id}", "") ?? [];
+                    if (msgs.Count > 0)
+                    {
+                        await Bot.SendGroupMessageAt(e.user_id, e.group_id, "材料十连抽卡", "\r\n" + string.Join("\r\n", msgs));
                     }
                     return quick_reply;
                 }
@@ -360,7 +390,68 @@ namespace Milimoe.RainBOT.ListeningTask
                     }
                     if (msgs.Count > 0)
                     {
-                        await Bot.SendGroupMessageAt(e.user_id, e.group_id, "查看库存", string.Join("\r\n", msgs));
+                        await Bot.SendGroupMessageAt(e.user_id, e.group_id, "查看库存", "\r\n" + string.Join("\r\n", msgs));
+                    }
+                    return quick_reply;
+                }
+                
+                if (e.detail.Length >= 6 && e.detail[..6].Equals("查看分类库存", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    string detail = e.detail.Replace("查看分类库存", "").Trim();
+                    List<string> msgs = [];
+                    if (int.TryParse(detail, out int page))
+                    {
+                        msgs = await Bot.HttpPost<List<string>>($"https://api.milimoe.com/fungame/ckkc3?qq={e.user_id}&page={page}&order=2&orderqty=2", "") ?? [];
+                    }
+                    else
+                    {
+                        msgs = await Bot.HttpPost<List<string>>($"https://api.milimoe.com/fungame/ckkc3?qq={e.user_id}&page=1&order=2&orderqty=2", "") ?? [];
+                    }
+                    if (msgs.Count > 0)
+                    {
+                        await Bot.SendGroupMessageAt(e.user_id, e.group_id, "查看分类库存", "\r\n" + string.Join("\r\n", msgs));
+                    }
+                    return quick_reply;
+                }
+
+                if (e.detail.Length >= 5 && e.detail[..5].Equals("查库存角色", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    string detail = e.detail.Replace("查库存角色", "").Trim();
+                    if (int.TryParse(detail, out int seq))
+                    {
+                        string msg = (await Bot.HttpPost<string>($"https://api.milimoe.com/fungame/cckjs?qq={e.user_id}&seq={seq}") ?? "").Trim();
+                        if (msg != "")
+                        {
+                            await Bot.SendGroupMessage(e.group_id, "查库存角色", msg);
+                        }
+                    }
+                    return quick_reply;
+                }
+
+                if (e.detail.Length >= 5 && e.detail[..5].Equals("查库存物品", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    string detail = e.detail.Replace("查库存物品", "").Trim();
+                    if (int.TryParse(detail, out int index))
+                    {
+                        string msg = (await Bot.HttpPost<string>($"https://api.milimoe.com/fungame/cckwp?qq={e.user_id}&seq={index}") ?? "").Trim();
+                        if (msg != "")
+                        {
+                            await Bot.SendGroupMessage(e.group_id, "查库存物品", msg);
+                        }
+                    }
+                    return quick_reply;
+                }
+                
+                if (e.detail.Length >= 4 && e.detail[..4].Equals("兑换金币", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    string detail = e.detail.Replace("兑换金币", "").Trim();
+                    if (int.TryParse(detail, out int materials))
+                    {
+                        string msg = (await Bot.HttpPost<string>($"https://api.milimoe.com/fungame/dhjb?qq={e.user_id}&materials={materials}") ?? "").Trim();
+                        if (msg != "")
+                        {
+                            await Bot.SendGroupMessage(e.group_id, "兑换金币", msg);
+                        }
                     }
                     return quick_reply;
                 }
