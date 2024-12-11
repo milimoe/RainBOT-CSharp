@@ -5,6 +5,7 @@ using Milimoe.OneBot.Model.Other;
 using Milimoe.OneBot.Model.QuickReply;
 using Milimoe.RainBOT.Command;
 using Milimoe.RainBOT.Settings;
+using static Milimoe.FunGame.Core.Library.Constant.FunGameInfo;
 
 try
 {
@@ -145,6 +146,12 @@ try
                 if (修仙.小北.修仙状态.悬赏令 && e.message.Where(m => m is MarkdownMessage).FirstOrDefault() is MarkdownMessage md2)
                 {
                     修仙.小北.自动悬赏令(md2.data.data);
+                    string strtm1 = "";
+                    if (e.message.Where(m => m is TextMessage).FirstOrDefault() is TextMessage tm1)
+                    {
+                        strtm1 = tm1.data.text;
+                    }
+                    Milimoe.FunGame.Core.Api.Utility.TXTHelper.OverwriteTXT(e.detail + "\r\n==MD==\r\n" + md2.data.data + "\r\n==TEXT==\r\n" + strtm1, "xsl.txt");
                 }
 
                 if (修仙.小北.修仙状态.秘境 && e.message.Where(m => m is MarkdownMessage).FirstOrDefault() is MarkdownMessage md3)
