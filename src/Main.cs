@@ -226,8 +226,11 @@ try
                     case "破5次":
                         _ = Task.Run(async () =>
                         {
-                            await Bot.SendFriendMessage(e.user_id, "破5次", "渡厄突破");
-                            await Task.Delay(1500);
+                            for (int i = 0; i < 5; i++)
+                            {
+                                await Bot.SendFriendMessage(修仙.小北QQ, "破5次", "渡厄突破");
+                                await Task.Delay(1000);
+                            }
                         });
                         break;
                     case "闭关":
@@ -322,6 +325,24 @@ try
         return quick_reply;
     });
 
+    Milimoe.FunGame.Core.Api.Utility.TaskScheduler.Shared.AddTask("自动灵田收取宗门丹药领取-早上", new TimeSpan(10, 0, 0), async () =>
+    {
+        if (修仙.开启自动灵田收取宗门丹药领取)
+        {
+            await 修仙.发消息("灵田收取", $"灵田收取");
+            await 修仙.发消息("宗门丹药领取", $"宗门丹药领取");
+        }
+    });
+    
+    Milimoe.FunGame.Core.Api.Utility.TaskScheduler.Shared.AddTask("自动灵田收取宗门丹药领取-晚上", new TimeSpan(20, 0, 0), async () =>
+    {
+        if (修仙.开启自动灵田收取宗门丹药领取)
+        {
+            await 修仙.发消息("灵田收取", $"灵田收取");
+            await 修仙.发消息("宗门丹药领取", $"宗门丹药领取");
+        }
+    });
+
     _ = Task.Factory.StartNew(async () =>
     {
         bool 悬赏令控制 = false;
@@ -347,16 +368,16 @@ try
                     if (修仙.开启小小修炼) 修仙.小小.修仙状态.悬赏令 = true;
                     await 修仙.发消息("悬赏令刷新", $"悬赏令刷新");
                 }
-                if (now.Hour == 12 && now.Minute == 9 && 修仙.开启自动灵田收取宗门丹药领取)
-                {
-                    修仙.开启自动灵田收取宗门丹药领取 = false;
-                    await 修仙.发消息("灵田收取", $"灵田收取");
-                    await 修仙.发消息("宗门丹药领取", $"宗门丹药领取");
-                }
-                if (now.Hour == 12 && now.Minute > 9 && !修仙.开启自动灵田收取宗门丹药领取)
-                {
-                    修仙.开启自动灵田收取宗门丹药领取 = true;
-                }
+                //if (now.Hour == 12 && now.Minute == 9 && 修仙.开启自动灵田收取宗门丹药领取)
+                //{
+                //    修仙.开启自动灵田收取宗门丹药领取 = false;
+                //    await 修仙.发消息("灵田收取", $"灵田收取");
+                //    await 修仙.发消息("宗门丹药领取", $"宗门丹药领取");
+                //}
+                //if (now.Hour == 12 && now.Minute > 9 && !修仙.开启自动灵田收取宗门丹药领取)
+                //{
+                //    修仙.开启自动灵田收取宗门丹药领取 = true;
+                //}
                 if (now.Hour == 15 && now.Minute == 0 && 修仙.开启自动秘境 && !秘境控制)
                 {
                     秘境控制 = true;

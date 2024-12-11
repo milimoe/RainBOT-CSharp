@@ -1,5 +1,4 @@
 ﻿using System.Text.RegularExpressions;
-using System.Xml.Linq;
 using Milimoe.OneBot.Framework.Utility;
 using Milimoe.OneBot.Model.Content;
 using Milimoe.OneBot.Model.Message;
