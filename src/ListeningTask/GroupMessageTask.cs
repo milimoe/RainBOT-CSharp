@@ -329,7 +329,7 @@ namespace Milimoe.RainBOT.ListeningTask
 
                 if (e.detail == "创建存档")
                 {
-                    string msg = (await Bot.HttpPost<string>($"https://api.milimoe.com/fungame/createsaved?qq={e.user_id}&name={e.sender.nickname}", "") ?? "").Trim();
+                    string msg = (await Bot.HttpPost<string>($"https://api.milimoe.com/fungame/createsaved?qq={e.user_id}", "") ?? "").Trim();
                     if (msg != "")
                     {
                         await Bot.SendGroupMessageAt(e.user_id, e.group_id, "创建存档", "\r\n" + msg);
@@ -343,6 +343,56 @@ namespace Milimoe.RainBOT.ListeningTask
                     if (msg != "")
                     {
                         await Bot.SendGroupMessageAt(e.user_id, e.group_id, "还原存档", "\r\n" + msg);
+                    }
+                    return quick_reply;
+                }
+                
+                if (e.detail == "生成自建角色")
+                {
+                    string msg = (await Bot.HttpPost<string>($"https://api.milimoe.com/fungame/newcustomcharacter?qq={e.user_id}", "") ?? "").Trim();
+                    if (msg != "")
+                    {
+                        await Bot.SendGroupMessageAt(e.user_id, e.group_id, "抽卡", "\r\n" + msg);
+                    }
+                    return quick_reply;
+                }
+                
+                if (e.detail == "角色改名")
+                {
+                    string msg = (await Bot.HttpPost<string>($"https://api.milimoe.com/fungame/rename?qq={e.user_id}", "") ?? "").Trim();
+                    if (msg != "")
+                    {
+                        await Bot.SendGroupMessageAt(e.user_id, e.group_id, "改名", "\r\n" + msg);
+                    }
+                    return quick_reply;
+                }
+                
+                if (e.detail == "角色重随")
+                {
+                    string msg = (await Bot.HttpPost<string>($"https://api.milimoe.com/fungame/randomcustom?qq={e.user_id}&confirm=false", "") ?? "").Trim();
+                    if (msg != "")
+                    {
+                        await Bot.SendGroupMessageAt(e.user_id, e.group_id, "角色重随", "\r\n" + msg);
+                    }
+                    return quick_reply;
+                }
+                
+                if (e.detail == "确认角色重随")
+                {
+                    string msg = (await Bot.HttpPost<string>($"https://api.milimoe.com/fungame/randomcustom?qq={e.user_id}&confirm=true", "") ?? "").Trim();
+                    if (msg != "")
+                    {
+                        await Bot.SendGroupMessageAt(e.user_id, e.group_id, "角色重随", "\r\n" + msg);
+                    }
+                    return quick_reply;
+                }
+                
+                if (e.detail == "取消角色重随")
+                {
+                    string msg = (await Bot.HttpPost<string>($"https://api.milimoe.com/fungame/cancelrandomcustom?qq={e.user_id}", "") ?? "").Trim();
+                    if (msg != "")
+                    {
+                        await Bot.SendGroupMessageAt(e.user_id, e.group_id, "角色重随", "\r\n" + msg);
                     }
                     return quick_reply;
                 }
@@ -468,16 +518,40 @@ namespace Milimoe.RainBOT.ListeningTask
                     return quick_reply;
                 }
 
+                if (e.detail.Length >= 3 && e.detail[..3].Equals("我角色", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    string detail = e.detail.Replace("我角色", "").Trim();
+                    string msg = "";
+                    if (int.TryParse(detail, out int seq))
+                    {
+                        msg = (await Bot.HttpPost<string>($"https://api.milimoe.com/fungame/showcharacterinfo?qq={e.user_id}&seq={seq}&simple=true") ?? "").Trim();
+                    }
+                    else
+                    {
+                        msg = (await Bot.HttpPost<string>($"https://api.milimoe.com/fungame/showcharacterinfo?qq={e.user_id}&seq=1&simple=true") ?? "").Trim();
+                    }
+                    if (msg != "")
+                    {
+                        await Bot.SendGroupMessage(e.group_id, "查库存角色", msg);
+                    }
+                    return quick_reply;
+                }
+                
                 if (e.detail.Length >= 4 && e.detail[..4].Equals("我的角色", StringComparison.CurrentCultureIgnoreCase))
                 {
                     string detail = e.detail.Replace("我的角色", "").Trim();
+                    string msg = "";
                     if (int.TryParse(detail, out int seq))
                     {
-                        string msg = (await Bot.HttpPost<string>($"https://api.milimoe.com/fungame/showcharacterinfo?qq={e.user_id}&seq={seq}") ?? "").Trim();
-                        if (msg != "")
-                        {
-                            await Bot.SendGroupMessage(e.group_id, "查库存角色", msg);
-                        }
+                        msg = (await Bot.HttpPost<string>($"https://api.milimoe.com/fungame/showcharacterinfo?qq={e.user_id}&seq={seq}&simple=false") ?? "").Trim();
+                    }
+                    else
+                    {
+                        msg = (await Bot.HttpPost<string>($"https://api.milimoe.com/fungame/showcharacterinfo?qq={e.user_id}&seq=1&simple=false") ?? "").Trim();
+                    }
+                    if (msg != "")
+                    {
+                        await Bot.SendGroupMessage(e.group_id, "查库存角色", msg);
                     }
                     return quick_reply;
                 }
@@ -543,6 +617,30 @@ namespace Milimoe.RainBOT.ListeningTask
                             {
                                 await Bot.SendGroupMessage(e.group_id, "装备", msg);
                             }
+                        }
+                    }
+                    return quick_reply;
+                }
+                
+                if (e.detail.Length >= 2 && e.detail[..2].Equals("决斗", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    string detail = e.detail.Replace("决斗", "").Replace("@", "").Trim();
+                    if (long.TryParse(detail.Trim(), out long eqq))
+                    {
+                        List<string> strings = await Bot.HttpPost<List<string>>($"https://api.milimoe.com/fungame/fightcustom?qq={e.user_id}&eqq={eqq}") ?? [];
+                        foreach (string msg in strings)
+                        {
+                            await Bot.SendGroupMessage(e.group_id, "决斗", msg.Trim());
+                            await Task.Delay(800);
+                        }
+                    }
+                    else
+                    {
+                        List<string> strings = await Bot.HttpPost<List<string>>($"https://api.milimoe.com/fungame/fightcustom2?qq={e.user_id}&name={detail.Trim()}") ?? [];
+                        foreach (string msg in strings)
+                        {
+                            await Bot.SendGroupMessage(e.group_id, "决斗", msg.Trim());
+                            await Task.Delay(800);
                         }
                     }
                     return quick_reply;
