@@ -15,7 +15,7 @@ namespace Milimoe.RainBOT.ListeningTask
         private static long dice = 0;
         private readonly static string[] EEWords = ["ee", "鹅鹅", "呃呃", "谔谔", "饿饿"];
         private readonly static string[] MuteCommands = ["禁言", "解禁"];
-        private readonly static string[] FunGameItemType = ["魔法卡包", "武器", "防具", "鞋子", "饰品", "消耗品", "魔法卡", "收藏品", "特殊物品", "任务物品", "礼包", "其他"];
+        private readonly static List<string> FunGameItemType = ["卡包", "武器", "防具", "鞋子", "饰品", "消耗品", "魔法卡", "收藏品", "特殊物品", "任务物品", "礼包", "其他"];
 
         public static async Task<GroupMsgEventQuickReply?> ListeningTask_handler(GroupMessageEvent e)
         {
@@ -437,13 +437,26 @@ namespace Milimoe.RainBOT.ListeningTask
                     return quick_reply;
                 }
                 
-                if (e.detail.Length >= 4 && (e.detail.StartsWith("查看库存") || e.detail.StartsWith("我的库存")))
+                if (e.detail.Length >= 4 && (e.detail.StartsWith("查看库存") || e.detail.StartsWith("我的库存") || e.detail.StartsWith("我的背包")))
                 {
                     string detail = e.detail.Replace("查看库存", "").Replace("我的库存", "").Trim();
                     List<string> msgs = [];
                     if (int.TryParse(detail, out int page))
                     {
                         msgs = await Bot.HttpPost<List<string>>($"https://api.milimoe.com/fungame/inventoryinfo2?qq={e.user_id}&page={page}", "") ?? [];
+                    }
+                    else if (FunGameItemType.FirstOrDefault(detail.Contains) is string matchedType)
+                    {
+                        int typeIndex = FunGameItemType.IndexOf(matchedType);
+                        string remain = detail.Replace(matchedType, "").Trim();
+                        if (int.TryParse(remain, out page))
+                        {
+                            msgs = await Bot.HttpPost<List<string>>($"https://api.milimoe.com/fungame/inventoryinfo4?qq={e.user_id}&page={page}&type={typeIndex}", "") ?? [];
+                        }
+                        else
+                        {
+                            msgs = await Bot.HttpPost<List<string>>($"https://api.milimoe.com/fungame/inventoryinfo4?qq={e.user_id}&page=1&type={typeIndex}", "") ?? [];
+                        }
                     }
                     else
                     {
@@ -517,7 +530,7 @@ namespace Milimoe.RainBOT.ListeningTask
                     }
                     return quick_reply;
                 }
-
+                
                 if (e.detail.Length >= 3 && e.detail[..3].Equals("我角色", StringComparison.CurrentCultureIgnoreCase))
                 {
                     string detail = e.detail.Replace("我角色", "").Trim();
