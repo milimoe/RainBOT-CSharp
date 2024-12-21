@@ -1,4 +1,5 @@
-﻿using Milimoe.OneBot.Framework;
+﻿using System.Text.RegularExpressions;
+using Milimoe.OneBot.Framework;
 using Milimoe.OneBot.Model.Content;
 using Milimoe.OneBot.Model.Event;
 using Milimoe.OneBot.Model.Message;
@@ -113,6 +114,18 @@ namespace Milimoe.RainBOT.ListeningTask
                     if (msg != "")
                     {
                         await Bot.SendGroupMessage(e.group_id, "查询服务器启动时间", msg);
+                    }
+                    return quick_reply;
+                }
+                
+                if (e.detail.StartsWith("查询任务计划"))
+                {
+                    if (!await Bot.CheckBlackList(true, e.user_id, e.group_id)) return quick_reply;
+                    string detail = e.detail.Replace("查询任务计划", "").Trim();
+                    string msg = await Bot.HttpGet<string>($"https://api.milimoe.com/test/gettask?name={detail}") ?? "";
+                    if (msg != "")
+                    {
+                        await Bot.SendGroupMessage(e.group_id, "查询任务计划", msg);
                     }
                     return quick_reply;
                 }
@@ -634,27 +647,319 @@ namespace Milimoe.RainBOT.ListeningTask
                     }
                     return quick_reply;
                 }
-                
-                if (e.detail.Length >= 2 && e.detail[..2].Equals("决斗", StringComparison.CurrentCultureIgnoreCase))
+
+                if (e.detail.Length >= 4 && e.detail[..4].Equals("角色升级", StringComparison.CurrentCultureIgnoreCase))
                 {
-                    string detail = e.detail.Replace("决斗", "").Replace("@", "").Trim();
-                    if (long.TryParse(detail.Trim(), out long eqq))
+                    string detail = e.detail.Replace("角色升级", "").Trim();
+                    string msg = "";
+                    if (int.TryParse(detail, out int cid))
                     {
-                        List<string> strings = await Bot.HttpPost<List<string>>($"https://api.milimoe.com/fungame/fightcustom?qq={e.user_id}&eqq={eqq}") ?? [];
-                        foreach (string msg in strings)
+                        msg = (await Bot.HttpPost<string>($"https://api.milimoe.com/fungame/characterlevelup?qq={e.user_id}&c={cid}") ?? "").Trim();
+                    }
+                    else
+                    {
+                        msg = (await Bot.HttpPost<string>($"https://api.milimoe.com/fungame/characterlevelup?qq={e.user_id}&c=1") ?? "").Trim();
+                    }
+                    if (msg != "")
+                    {
+                        await Bot.SendGroupMessage(e.group_id, "角色升级", msg);
+                    }
+                    return quick_reply;
+                }
+                
+                if (e.detail.Length >= 4 && e.detail[..4].Equals("角色突破", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    string detail = e.detail.Replace("角色突破", "").Trim();
+                    string msg = "";
+                    if (int.TryParse(detail, out int cid))
+                    {
+                        msg = (await Bot.HttpPost<string>($"https://api.milimoe.com/fungame/characterlevelbreak?qq={e.user_id}&c={cid}") ?? "").Trim();
+                    }
+                    else
+                    {
+                        msg = (await Bot.HttpPost<string>($"https://api.milimoe.com/fungame/characterlevelbreak?qq={e.user_id}&c=1") ?? "").Trim();
+                    }
+                    if (msg != "")
+                    {
+                        await Bot.SendGroupMessage(e.group_id, "角色突破", msg);
+                    }
+                    return quick_reply;
+                }
+                
+                if (e.detail.Length >= 4 && e.detail[..4].Equals("突破信息", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    string detail = e.detail.Replace("突破信息", "").Trim();
+                    string msg = "";
+                    if (int.TryParse(detail, out int cid))
+                    {
+                        msg = (await Bot.HttpPost<string>($"https://api.milimoe.com/fungame/getlevelbreakneedy?qq={e.user_id}&id={cid}") ?? "").Trim();
+                    }
+                    else
+                    {
+                        msg = (await Bot.HttpPost<string>($"https://api.milimoe.com/fungame/getlevelbreakneedy?qq={e.user_id}&id=1") ?? "").Trim();
+                    }
+                    if (msg != "")
+                    {
+                        await Bot.SendGroupMessage(e.group_id, "突破信息", msg);
+                    }
+                    return quick_reply;
+                }
+
+                if (e.detail.Length >= 2 && e.detail[..2].Equals("使用", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    string detail = e.detail.Replace("使用", "").Trim();
+                    char[] chars = [',', ' '];
+                    string pattern = @"\s*(?<itemName>[^\d]+)\s*(?<count>\d+)\s*(?:角色\s*(?<characterIds>[\d\s]*))?";
+                    Match match = Regex.Match(detail, pattern);
+                    if (match.Success)
+                    {
+                        string itemName = match.Groups["itemName"].Value.Trim();
+                        if (int.TryParse(match.Groups["count"].Value, out int count))
                         {
-                            await Bot.SendGroupMessage(e.group_id, "决斗", msg.Trim());
-                            await Task.Delay(800);
+                            string characterIdsString = match.Groups["characterIds"].Value;
+                            int[] characterIds = characterIdsString != "" ? [.. characterIdsString.Split(chars, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse)] : [1];
+                            string msg = (await Bot.HttpPost<string>($"https://api.milimoe.com/fungame/useitem2?qq={e.user_id}&name={itemName}&count={count}", System.Text.Json.JsonSerializer.Serialize(characterIds)) ?? "").Trim();
+                            if (msg != "")
+                            {
+                                await Bot.SendGroupMessage(e.group_id, "使用", msg);
+                            }
                         }
                     }
                     else
                     {
-                        List<string> strings = await Bot.HttpPost<List<string>>($"https://api.milimoe.com/fungame/fightcustom2?qq={e.user_id}&name={detail.Trim()}") ?? [];
-                        foreach (string msg in strings)
+                        pattern = @"\s*(?<itemId>\d+)\s*(?:角色\s*(?<characterIds>[\d\s]*))?";
+                        match = Regex.Match(detail, pattern);
+                        if (match.Success)
                         {
-                            await Bot.SendGroupMessage(e.group_id, "决斗", msg.Trim());
-                            await Task.Delay(800);
+                            if (int.TryParse(match.Groups["itemId"].Value, out int itemId))
+                            {
+                                string characterIdsString = match.Groups["characterIds"].Value;
+                                int[] characterIds = characterIdsString != "" ? [.. characterIdsString.Split(chars, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse)] : [1];
+                                string msg = (await Bot.HttpPost<string>($"https://api.milimoe.com/fungame/useitem?qq={e.user_id}&id={itemId}", System.Text.Json.JsonSerializer.Serialize(characterIds)) ?? "").Trim();
+                                if (msg != "")
+                                {
+                                    await Bot.SendGroupMessage(e.group_id, "使用", msg);
+                                }
+                            }
                         }
+                        else
+                        {
+                            pattern = @"\s*(?<itemName>[^\d]+)\s*(?<count>\d+)\s*";
+                            match = Regex.Match(detail, pattern);
+                            if (match.Success)
+                            {
+                                string itemName = match.Groups["itemName"].Value.Trim();
+                                if (int.TryParse(match.Groups["count"].Value, out int count))
+                                {
+                                    string msg = (await Bot.HttpPost<string>($"https://api.milimoe.com/fungame/useitem2?qq={e.user_id}&name={itemName}&count={count}") ?? "").Trim();
+                                    if (msg != "")
+                                    {
+                                        await Bot.SendGroupMessage(e.group_id, "使用", msg);
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                pattern = @"\s*(?<itemId>\d+)\s*";
+                                match = Regex.Match(detail, pattern);
+                                if (match.Success)
+                                {
+                                    if (int.TryParse(match.Groups["itemId"].Value, out int itemId))
+                                    {
+                                        string msg = (await Bot.HttpPost<string>($"https://api.milimoe.com/fungame/useitem?qq={e.user_id}&id={itemId}") ?? "").Trim();
+                                        if (msg != "")
+                                        {
+                                            await Bot.SendGroupMessage(e.group_id, "使用", msg);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    return quick_reply;
+                }
+                
+                if (e.detail.Length >= 4 && e.detail[..4].Equals("分解物品", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    string detail = e.detail.Replace("分解物品", "").Trim();
+                    List<int> ids = [];
+                    foreach (string str in detail.Split(' '))
+                    {
+                        if (int.TryParse(str, out int id))
+                        {
+                            ids.Add(id);
+                        }
+                    }
+                    string msg = (await Bot.HttpPost<string>($"https://api.milimoe.com/fungame/decomposeitem?qq={e.user_id}", System.Text.Json.JsonSerializer.Serialize(ids)) ?? "").Trim();
+                    if (msg != "")
+                    {
+                        await Bot.SendGroupMessage(e.group_id, "分解物品", msg);
+                    }
+
+                    return quick_reply;
+                }
+                
+                if (e.detail.Length >= 2 && e.detail[..2].Equals("分解", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    string detail = e.detail.Replace("分解", "").Trim();
+                    string pattern = @"\s*(?<itemName>[^\d]+)\s*(?<count>\d+)\s*";
+                    Match match = Regex.Match(detail, pattern);
+                    if (match.Success)
+                    {
+                        string itemName = match.Groups["itemName"].Value.Trim();
+                        if (int.TryParse(match.Groups["count"].Value, out int count))
+                        {
+                            string msg = (await Bot.HttpPost<string>($"https://api.milimoe.com/fungame/decomposeitem2?qq={e.user_id}&name={itemName}&count={count}") ?? "").Trim();
+                            if (msg != "")
+                            {
+                                await Bot.SendGroupMessage(e.group_id, "分解", msg);
+                            }
+                        }
+                    }
+
+                    return quick_reply;
+                }
+                
+                if (e.detail.Length >= 4 && e.detail[..4].Equals("品质分解", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    string detail = e.detail.Replace("品质分解", "").Trim();
+                    if (int.TryParse(detail, out int q))
+                    {
+                        string msg = (await Bot.HttpPost<string>($"https://api.milimoe.com/fungame/decomposeitem3?qq={e.user_id}&q={q}") ?? "").Trim();
+                        if (msg != "")
+                        {
+                            await Bot.SendGroupMessage(e.group_id, "品质分解", msg);
+                        }
+                    }
+
+                    return quick_reply;
+                }
+
+                if (e.detail.Length >= 4 && e.detail[..4].Equals("熟圣之力", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    string detail = e.detail.Replace("熟圣之力", "").Trim();
+                    string[] strings = detail.Split(" ");
+                    int count = -1;
+                    if (strings.Length > 1 && int.TryParse(strings[1].Trim(), out count))
+                    {
+                        string name = strings[0].Trim();
+                        if (count > 0)
+                        {
+                            long userid = e.user_id;
+                            if (strings.Length > 2 && long.TryParse(strings[2].Replace("@", "").Trim(), out long temp))
+                            {
+                                userid = temp;
+                            }
+                            string msg = (await Bot.HttpPost<string>($"https://api.milimoe.com/fungame/createitem?qq={e.user_id}&name={name}&count={count}&target={userid}") ?? "").Trim();
+                            if (msg != "")
+                            {
+                                await Bot.SendGroupMessage(e.group_id, "熟圣之力", msg);
+                            }
+                        }
+                        else
+                        {
+                            await Bot.SendGroupMessage(e.group_id, "熟圣之力", "数量不能为0，请重新输入。");
+                        }
+                    }
+                    return quick_reply;
+                }
+
+                if (e.detail.Length >= 4 && e.detail[..4].Equals("完整决斗", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    string detail = e.detail.Replace("完整决斗", "").Replace("@", "").Trim();
+                    List<string> msgs = [];
+                    if (long.TryParse(detail.Trim(), out long eqq))
+                    {
+                        msgs = await Bot.HttpPost<List<string>>($"https://api.milimoe.com/fungame/fightcustom?qq={e.user_id}&eqq={eqq}&all=true") ?? [];
+                    }
+                    else
+                    {
+                        msgs = await Bot.HttpPost<List<string>>($"https://api.milimoe.com/fungame/fightcustom2?qq={e.user_id}&name={detail.Trim()}&all=true") ?? [];
+                    }
+                    List<string> real = [];
+                    if (msgs.Count > 2)
+                    {
+                        if (msgs.Count < 20)
+                        {
+                            int remain = 7;
+                            string merge = "";
+                            for (int i = 0; i < msgs.Count - 1; i++)
+                            {
+                                remain--;
+                                merge += msgs[i] + "\r\n";
+                                if (remain == 0)
+                                {
+                                    real.Add(merge);
+                                    merge = "";
+                                    if ((msgs.Count - i - 2) < 7)
+                                    {
+                                        remain = msgs.Count - i - 2;
+                                    }
+                                    else remain = 7;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            real.Add(msgs[^2]);
+                        }
+                        real.Add(msgs[^1]);
+                    }
+                    else
+                    {
+                        real = msgs;
+                    }
+                    foreach (string msg in real)
+                    {
+                        await Bot.SendGroupMessage(e.group_id, "完整决斗", msg.Trim());
+                        await Task.Delay(1500);
+                    }
+                    return quick_reply;
+                }
+                
+                if (e.detail.Length >= 2 && e.detail[..2].Equals("决斗", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    string detail = e.detail.Replace("决斗", "").Replace("@", "").Trim();
+                    List<string> msgs = [];
+                    if (long.TryParse(detail.Trim(), out long eqq))
+                    {
+                        msgs = await Bot.HttpPost<List<string>>($"https://api.milimoe.com/fungame/fightcustom?qq={e.user_id}&eqq={eqq}&all=false") ?? [];
+                    }
+                    else
+                    {
+                        msgs = await Bot.HttpPost<List<string>>($"https://api.milimoe.com/fungame/fightcustom2?qq={e.user_id}&name={detail.Trim()}&all=false") ?? [];
+                    }
+                    List<string> real = [];
+                    if (msgs.Count > 2)
+                    {
+                        int remain = 7;
+                        string merge = "";
+                        for (int i = 0; i < msgs.Count - 1; i++)
+                        {
+                            remain--;
+                            merge += msgs[i] + "\r\n";
+                            if (remain == 0)
+                            {
+                                real.Add(merge);
+                                merge = "";
+                                if ((msgs.Count - i - 3) < 7)
+                                {
+                                    remain = msgs.Count - i - 3;
+                                }
+                                else remain = 7;
+                            }
+                        }
+                        real.Add(msgs[^1]);
+                    }
+                    else
+                    {
+                        real = msgs;
+                    }
+                    foreach (string msg in real)
+                    {
+                        await Bot.SendGroupMessage(e.group_id, "决斗", msg.Trim());
+                        await Task.Delay(1500);
                     }
                     return quick_reply;
                 }
