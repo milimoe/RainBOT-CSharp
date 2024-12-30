@@ -1,5 +1,4 @@
-﻿using System.IO;
-using Milimoe.OneBot.Framework;
+﻿using Milimoe.OneBot.Framework;
 using Milimoe.OneBot.Model.Content;
 using Milimoe.OneBot.Model.Message;
 using Milimoe.OneBot.Model.Other;

@@ -53,6 +53,10 @@ namespace Milimoe.RainBOT.Settings
         public static List<long> SayNoAccessGroup { get; set; } = [];
 
         public static List<long> OSMCoreGroup { get; set; } = [];
+        
+        public static List<long> FunGameGroup { get; set; } = [];
+
+        public static string FunGameToken { get; set; } = "";
 
         public static PluginConfig Configs { get; set; } = new("rainbot", "config");
 
@@ -152,6 +156,14 @@ namespace Milimoe.RainBOT.Settings
             {
                 OSMCoreGroup = (List<long>)value;
             }
+            if (configs.TryGetValue("FunGameGroup", out value) && value != null)
+            {
+                FunGameGroup = (List<long>)value;
+            }
+            if (configs.TryGetValue("FunGameToken", out value) && value != null)
+            {
+                FunGameToken = (string)value;
+            }
         }
 
         public static void SaveConfig()
@@ -178,6 +190,8 @@ namespace Milimoe.RainBOT.Settings
             Configs.Add("RecallAccessGroup", RecallAccessGroup);
             Configs.Add("SayNoAccessGroup", SayNoAccessGroup);
             Configs.Add("OSMCoreGroup", OSMCoreGroup);
+            Configs.Add("FunGameGroup", FunGameGroup);
+            Configs.Add("FunGameToken", FunGameToken);
             Configs.Save();
         }
 
@@ -200,6 +214,9 @@ namespace Milimoe.RainBOT.Settings
                     break;
                 case "osmcoregroup":
                     list = OSMCoreGroup;
+                    break;
+                case "fungamegroup":
+                    list = FunGameGroup;
                     break;
             }
             string msg = list.Count > 0 ? "权限组" + group + "拥有以下成员：" + "\r\n" + string.Join("\r\n", list) : "此权限组不存在或没有任何成员。";

@@ -16,6 +16,8 @@ namespace Milimoe.RainBOT.Settings
         public static List<long> RepeatQQIgnore { get; set; } = [];
 
         public static List<long> ReverseAtIgnore { get; set; } = [];
+        
+        public static HashSet<string> CustomIgnore { get; set; } = [];
 
         public static PluginConfig Configs { get; set; } = new("rainbot", "ignore");
 
@@ -52,6 +54,7 @@ namespace Milimoe.RainBOT.Settings
             Configs.Add("QQGroupIgnore", QQGroupIgnore);
             Configs.Add("RepeatQQIgnore", RepeatQQIgnore);
             Configs.Add("ReverseAtIgnore", ReverseAtIgnore);
+            Configs.Add("CustomIgnore", CustomIgnore);
             Configs.Save();
         }
 
@@ -94,6 +97,10 @@ namespace Milimoe.RainBOT.Settings
                             else ReverseAtIgnore.Remove(lv);
                         }
                         break;
+                    case "customignore":
+                        if (isadd) CustomIgnore.Add(strv);
+                        else CustomIgnore.Remove(strv);
+                        break;
                     default:
                         return false;
                 }
@@ -124,6 +131,9 @@ namespace Milimoe.RainBOT.Settings
                     break;
                 case "reverseatignore":
                     list = ReverseAtIgnore.Select(x => x.ToString()).ToList();
+                    break;
+                case "customignore":
+                    list = CustomIgnore.Select(x => x.ToString()).ToList();
                     break;
             }
             string msg = list.Count > 0 ? "列表" + group + "拥有以下成员：" + "\r\n" + string.Join("\r\n", list) : "此列表不存在或没有任何成员。";

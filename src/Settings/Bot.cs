@@ -23,8 +23,6 @@ namespace Milimoe.RainBOT.Settings
 
         public static Dictionary<long, List<Member>> GroupMembers { get; set; } = [];
 
-        public static bool FunGameSimulation { get; set; } = false;
-
         public static bool IsAdmin(long group_id, long user_id)
         {
             if (GroupMembers.TryGetValue(group_id, out List<Member>? members) && members != null && members.Any(m => m.user_id == user_id && (m.role == "owner" || m.role == "admin")))
@@ -346,8 +344,9 @@ namespace Milimoe.RainBOT.Settings
 
         private static readonly HttpClient client = new();
 
-        public static async Task<T?> HttpGet<T>(string url)
+        public static async Task<T?> HttpGet<T>(string url, bool fungame = false)
         {
+            if (fungame) client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", GeneralSettings.FunGameToken);
             HttpResponseMessage response = await client.GetAsync(url);
             response.EnsureSuccessStatusCode();
 
@@ -356,9 +355,10 @@ namespace Milimoe.RainBOT.Settings
             return result;
         }
         
-        public static async Task<T?> HttpPost<T>(string url, string json = "")
+        public static async Task<T?> HttpPost<T>(string url, string json = "", bool fungame = false)
         {
             HttpContent content = new StringContent(json, Encoding.UTF8, "application/json");
+            if (fungame) client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", GeneralSettings.FunGameToken);
             HttpResponseMessage response = await client.PostAsync(url, content);
             response.EnsureSuccessStatusCode();
 
