@@ -5,7 +5,6 @@ using Milimoe.OneBot.Model.Other;
 using Milimoe.OneBot.Model.QuickReply;
 using Milimoe.RainBOT.Command;
 using Milimoe.RainBOT.Settings;
-using static Milimoe.FunGame.Core.Library.Constant.FunGameInfo;
 
 try
 {
@@ -348,6 +347,25 @@ try
             await 修仙.发消息("灵田收取", $"灵田收取");
             await 修仙.发消息("宗门丹药领取", $"宗门丹药领取");
         }
+    });
+    
+    Milimoe.FunGame.Core.Api.Utility.TaskScheduler.Shared.AddTask("自动灵田收取宗门丹药领取-晚上", new TimeSpan(20, 0, 0), async () =>
+    {
+        if (修仙.开启自动灵田收取宗门丹药领取)
+        {
+            await 修仙.发消息("灵田收取", $"灵田收取");
+            await 修仙.发消息("宗门丹药领取", $"宗门丹药领取");
+        }
+    });
+    
+    Milimoe.FunGame.Core.Api.Utility.TaskScheduler.Shared.AddTask("活动签到", new TimeSpan(9, 30, 0), async () =>
+    {
+        await 修仙.发消息("活动签到", $"活动签到");
+    });
+    
+    Milimoe.FunGame.Core.Api.Utility.TaskScheduler.Shared.AddTask("祈愿", new TimeSpan(9, 31, 0), async () =>
+    {
+        await 修仙.发消息("祈愿", $"祈愿");
     });
 
     _ = Task.Factory.StartNew(async () =>
