@@ -664,7 +664,51 @@ namespace Milimoe.RainBOT.Settings
                 }
                 return result;
             }
-
+            
+            if (e.detail == "任务列表")
+            {
+                string msg = (await Bot.HttpPost<string>($"https://api.milimoe.com/fungame/checkquestlist?qq={e.user_id}", "", fungame: true) ?? "").Trim();
+                if (msg != "")
+                {
+                    await Bot.SendGroupMessageAt(e.user_id, e.group_id, "任务列表", "\r\n" + msg);
+                }
+                return result;
+            }
+            
+            if (e.detail == "任务信息")
+            {
+                string msg = (await Bot.HttpPost<string>($"https://api.milimoe.com/fungame/checkworkingquest?qq={e.user_id}", "", fungame: true) ?? "").Trim();
+                if (msg != "")
+                {
+                    await Bot.SendGroupMessageAt(e.user_id, e.group_id, "任务信息", "\r\n" + msg);
+                }
+                return result;
+            }
+            
+            if (e.detail == "签到")
+            {
+                string msg = (await Bot.HttpPost<string>($"https://api.milimoe.com/fungame/signin?qq={e.user_id}", "", fungame: true) ?? "").Trim();
+                if (msg != "")
+                {
+                    await Bot.SendGroupMessageAt(e.user_id, e.group_id, "签到", "\r\n" + msg);
+                }
+                return result;
+            }
+            
+            if (e.detail.Length >= 4 && e.detail[..4].Equals("开始任务", StringComparison.CurrentCultureIgnoreCase))
+            {
+                string detail = e.detail.Replace("开始任务", "").Trim();
+                if (int.TryParse(detail, out int index))
+                {
+                    string msg = (await Bot.HttpPost<string>($"https://api.milimoe.com/fungame/acceptquest?qq={e.user_id}&id={index}", fungame: true) ?? "").Trim();
+                    if (msg != "")
+                    {
+                        await Bot.SendGroupMessage(e.group_id, "开始任务", msg);
+                    }
+                }
+                return result;
+            }
+            
             if (e.detail.Length >= 4 && e.detail[..4].Equals("我的物品", StringComparison.CurrentCultureIgnoreCase))
             {
                 string detail = e.detail.Replace("我的物品", "").Trim();
