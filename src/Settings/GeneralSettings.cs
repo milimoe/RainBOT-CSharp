@@ -37,6 +37,8 @@ namespace Milimoe.RainBOT.Settings
         public static long PCallBrother { get; set; } = 4;
 
         public static bool IsDebug { get; set; } = false;
+        
+        public static bool IsQQBot { get; set; } = false;
 
         public static long DebugGroupID { get; set; } = 0;
 
@@ -55,6 +57,10 @@ namespace Milimoe.RainBOT.Settings
         public static List<long> OSMCoreGroup { get; set; } = [];
         
         public static List<long> FunGameGroup { get; set; } = [];
+        
+        public static List<long> FunGameWebSocketGroup { get; set; } = [];
+
+        public static string FunGameServer { get; set; } = "";
 
         public static string FunGameToken { get; set; } = "";
 
@@ -160,6 +166,14 @@ namespace Milimoe.RainBOT.Settings
             {
                 FunGameGroup = (List<long>)value;
             }
+            if (configs.TryGetValue("FunGameWebSocketGroup", out value) && value != null)
+            {
+                FunGameWebSocketGroup = (List<long>)value;
+            }
+            if (configs.TryGetValue("FunGameServer", out value) && value != null)
+            {
+                FunGameServer = (string)value;
+            }
             if (configs.TryGetValue("FunGameToken", out value) && value != null)
             {
                 FunGameToken = (string)value;
@@ -191,6 +205,8 @@ namespace Milimoe.RainBOT.Settings
             Configs.Add("SayNoAccessGroup", SayNoAccessGroup);
             Configs.Add("OSMCoreGroup", OSMCoreGroup);
             Configs.Add("FunGameGroup", FunGameGroup);
+            Configs.Add("FunGameWebSocketGroup", FunGameWebSocketGroup);
+            Configs.Add("FunGameServer", FunGameServer);
             Configs.Add("FunGameToken", FunGameToken);
             Configs.Save();
         }
@@ -217,6 +233,9 @@ namespace Milimoe.RainBOT.Settings
                     break;
                 case "fungamegroup":
                     list = FunGameGroup;
+                    break;
+                case "fungamewebsocketgroup":
+                    list = FunGameWebSocketGroup;
                     break;
             }
             string msg = list.Count > 0 ? "权限组" + group + "拥有以下成员：" + "\r\n" + string.Join("\r\n", list) : "此权限组不存在或没有任何成员。";

@@ -242,8 +242,49 @@ namespace Milimoe.RainBOT.Command
                     Daily.InitDaily();
                     SayNo.InitSayNo();
                     Ignore.InitIgnore();
-                    FunGame.FunGameSimulation = false;
+                    RainBOTFunGame.FunGameSimulation = false;
                     SendMessage(send_group, target_id, "参数设定以及权限组重新加载完成。");
+                }
+                else Access_Denied(send_group, target_id);
+            }
+            else if (command.Contains(".osm checkws"))
+            {
+                if (user_id == GeneralSettings.Master)
+                {
+                    SendMessage(send_group, target_id, OshimaController.Instance.HTTPClient?.Connected ?? false ? $"已连接上服务器{OshimaController.Instance.HTTPClient.ServerAddress}" : "连接已断开。");
+                }
+                else Access_Denied(send_group, target_id);
+            }
+            else if (command.Contains(".osm retryserver"))
+            {
+                if (user_id == GeneralSettings.Master)
+                {
+                    TaskUtility.NewTask(async () =>
+                    {
+                        OshimaController.Config.FunGame_isAutoRetry = true;
+                        OshimaController.CurrentRetryTimes = -1;
+                        try
+                        {
+                            await OshimaController.Instance.DisconnectFromAnonymousServer();
+                        }
+                        catch { }
+                        try
+                        {
+                            await OshimaController.Instance.DisconnectAsync();
+                        }
+                        catch { }
+                        try
+                        {
+                            await OshimaController.Instance.Retry(true);
+                        }
+                        catch { }
+                        try
+                        {
+                            await OshimaController.Instance.ConnectToAnonymousServer();
+                        }
+                        catch { }
+                        SendMessage(send_group, target_id, "已经重新启动 FunGame WebSocket 服务。");
+                    });
                 }
                 else Access_Denied(send_group, target_id);
             }

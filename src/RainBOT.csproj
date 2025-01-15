@@ -21,9 +21,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Reference Include="OneBot-HTTPClient">
-      <HintPath>..\..\OneBot-HTTPClient\bin\Debug\net9.0\OneBot-HTTPClient.dll</HintPath>
-    </Reference>
+    <EditorConfigFiles Remove="C:\milimoe\RainBOT-CSharp\src\.editorconfig" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\FunGame.Core\FunGame.Core.csproj" />
+    <ProjectReference Include="..\..\OneBot-HTTPClient\src\OneBot-HTTPClient.csproj" />
   </ItemGroup>
 
 </Project>

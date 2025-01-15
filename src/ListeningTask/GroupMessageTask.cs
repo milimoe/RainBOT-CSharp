@@ -137,7 +137,7 @@ namespace Milimoe.RainBOT.ListeningTask
                     return quick_reply;
                 }
 
-                if (await FunGame.Handler(e))
+                if (await RainBOTFunGame.Handler(e))
                 {
                     return quick_reply;
                 }

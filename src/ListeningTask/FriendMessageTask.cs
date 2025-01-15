@@ -52,16 +52,16 @@ namespace Milimoe.RainBOT.ListeningTask
                 if (e.detail.Length >= 9 && e.detail[..9].Equals("FunGame模拟", StringComparison.CurrentCultureIgnoreCase))
                 {
                     if (!await Bot.CheckBlackList(true, e.user_id, e.user_id)) return quick_reply;
-                    if (!FunGame.FunGameSimulation)
+                    if (!RainBOTFunGame.FunGameSimulation)
                     {
-                        FunGame.FunGameSimulation = true;
+                        RainBOTFunGame.FunGameSimulation = true;
                         List<string> msgs = await Bot.HttpGet<List<string>>("https://api.milimoe.com/fungame/test?isweb=false") ?? [];
                         foreach (string msg in msgs)
                         {
                             await Bot.SendFriendMessage(e.user_id, "FunGame模拟", msg.Trim());
                             await Task.Delay(5500);
                         }
-                        FunGame.FunGameSimulation = false;
+                        RainBOTFunGame.FunGameSimulation = false;
                     }
                     else
                     {
