@@ -11,11 +11,10 @@ namespace Milimoe.RainBOT.Settings
     public class OshimaController : RunTimeController
     {
         public static OshimaController Instance { get; set; } = new();
-
         public static FunGameConfig Config { get; set; } = new();
-
         public static int CurrentRetryTimes { get; set; } = -1;
-        public static int MaxRetryTimes => 10;
+        public static int MaxRetryTimes => 30;
+        public const string ServerName = "oshima.fungame.anonymous";
 
         public override bool BeforeConnect(ref string addr, ref int port, ArrayList args)
         {
@@ -70,7 +69,7 @@ namespace Milimoe.RainBOT.Settings
                 {
                     result = await ConnectAsync(TransmittalType.WebSocket, GeneralSettings.FunGameServer, ssl: true, subUrl: "ws");
                     Config.FunGame_isRetrying = false;
-                    await Task.Delay(2000);
+                    await Task.Delay(5000);
                 }
                 catch (Exception e)
                 {
@@ -98,7 +97,7 @@ namespace Milimoe.RainBOT.Settings
                         Console.WriteLine("重连失败！");
                         if (!Config.FunGame_isRetrying && Config.FunGame_isAutoRetry)
                         {
-                            await Task.Delay(2000);
+                            await Task.Delay(5000);
                             if (!Config.FunGame_isRetrying && Config.FunGame_isAutoRetry)
                             {
                                 await Retry();
@@ -114,7 +113,7 @@ namespace Milimoe.RainBOT.Settings
         {
             if (HTTPClient != null)
             {
-                await HTTPClient.Send(SocketMessageType.AnonymousGameServer, "oshima.fungame.anonymous");
+                await HTTPClient.Send(SocketMessageType.AnonymousGameServer, ServerName);
             }
         }
         
@@ -143,7 +142,7 @@ namespace Milimoe.RainBOT.Settings
             {
                 CurrentRetryTimes = -1;
                 Config.FunGame_isAutoRetry = true;
-                await Task.Delay(2000);
+                await Task.Delay(5000);
                 if (!Config.FunGame_isRetrying && Config.FunGame_isAutoRetry)
                 {
                     await Retry();
@@ -168,18 +167,53 @@ namespace Milimoe.RainBOT.Settings
             {
                 long qq = NetworkUtility.JsonDeserializeFromDictionary<long>(data, "qq");
                 string msg = NetworkUtility.JsonDeserializeFromDictionary<string>(data, "msg") ?? "";
-                if (qq > 0 && msg != "")
+                if (msg != "")
                 {
-                    foreach (Group g in Bot.Groups.Where(g => GeneralSettings.FunGameWebSocketGroup.Contains(g.group_id)))
+                    if (qq > 0)
                     {
-                        Member m = Bot.GetMember(g.group_id, qq);
-                        if (m.user_id == qq)
+                        foreach (Group g in Bot.Groups.Where(g => GeneralSettings.FunGameWebSocketGroup.Contains(g.group_id)))
                         {
-                            await Bot.SendGroupMessageAt(qq, g.group_id, "FunGame推送", msg);
-                            break;
+                            Member m = Bot.GetMember(g.group_id, qq);
+                            if (m.user_id == qq)
+                            {
+                                await Bot.SendGroupMessageAt(qq, g.group_id, "FunGame推送", msg);
+                                break;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        long groupid = NetworkUtility.JsonDeserializeFromDictionary<long>(data, "groupid");
+                        if (groupid > 0 && Bot.Groups.Any(g => g.group_id == groupid))
+                        {
+                            await Bot.SendGroupMessage(groupid, "匿名服务器消息", msg);
                         }
                     }
                 }
+            }
+        }
+
+        public async Task SCAdd(long qq, long groupid, double sc = 1)
+        {
+            if (HTTPClient != null)
+            {
+                Dictionary<string, object> data = [];
+                data.Add("command", "scadd");
+                data.Add("qq", qq);
+                data.Add("groupid", groupid);
+                data.Add("sc", sc);
+                await HTTPClient.Send(SocketMessageType.AnonymousGameServer, ServerName, data);
+            }
+        }
+
+        public async Task SCList(long groupid)
+        {
+            if (HTTPClient != null)
+            {
+                Dictionary<string, object> data = [];
+                data.Add("command", "sclist");
+                data.Add("groupid", groupid);
+                await HTTPClient.Send(SocketMessageType.AnonymousGameServer, ServerName, data);
             }
         }
     }
