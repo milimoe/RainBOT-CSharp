@@ -109,11 +109,10 @@ namespace Milimoe.RainBOT.ListeningTask
                     return quick_reply;
                 }
 
-                if (e.detail == "圣人榜")
+                if (e.detail.Contains("圣人榜"))
                 {
                     if (!await Bot.CheckBlackList(true, e.user_id, e.group_id)) return quick_reply;
                     _ = OshimaController.Instance.SCList(e.group_id);
-                    return quick_reply;
                 }
                 
                 if (e.detail == "查询服务器启动时间")
@@ -632,6 +631,7 @@ namespace Milimoe.RainBOT.ListeningTask
                     {
                         GroupMessageContent content = new(e.group_id);
                         content.message.Add(new AtMessage(e.user_id));
+                        int sc = 1;
                         switch (Random.Shared.Next(4))
                         {
                             case 0:
@@ -642,14 +642,16 @@ namespace Milimoe.RainBOT.ListeningTask
                                 break;
                             case 2:
                                 content.message.Add(new TextMessage(string.Concat(name.AsSpan(pos, name.Length > 0 ? 1 : name.Length), "圣")));
+                                sc = 3;
                                 break;
                             case 3:
                             default:
                                 content.message.Add(new TextMessage(string.Concat(name.AsSpan(pos, name.Length > 0 ? 1 : name.Length), "出")));
+                                sc = -1;
                                 break;
                         }
                         await Bot.SendGroupMessage(e.group_id, "随机叫哥", content, delay * 1000);
-                        _ = OshimaController.Instance.SCAdd(e.user_id, e.group_id);
+                        _ = OshimaController.Instance.SCAdd(e.user_id, e.group_id, sc);
                         return quick_reply;
                     }
                 }

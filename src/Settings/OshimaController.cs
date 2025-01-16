@@ -113,7 +113,9 @@ namespace Milimoe.RainBOT.Settings
         {
             if (HTTPClient != null)
             {
-                await HTTPClient.Send(SocketMessageType.AnonymousGameServer, ServerName);
+                Dictionary<string, object> data = [];
+                data.Add("access_token", GeneralSettings.FunGameToken);
+                await HTTPClient.Send(SocketMessageType.AnonymousGameServer, ServerName, data);
             }
         }
         
@@ -166,25 +168,29 @@ namespace Milimoe.RainBOT.Settings
             if (data.Count > 0)
             {
                 long qq = NetworkUtility.JsonDeserializeFromDictionary<long>(data, "qq");
+                long groupid = NetworkUtility.JsonDeserializeFromDictionary<long>(data, "groupid");
                 string msg = NetworkUtility.JsonDeserializeFromDictionary<string>(data, "msg") ?? "";
                 if (msg != "")
                 {
-                    if (qq > 0)
+                    if (qq > 0 && groupid > 0)
                     {
-                        foreach (Group g in Bot.Groups.Where(g => GeneralSettings.FunGameWebSocketGroup.Contains(g.group_id)))
-                        {
-                            Member m = Bot.GetMember(g.group_id, qq);
-                            if (m.user_id == qq)
-                            {
-                                await Bot.SendGroupMessageAt(qq, g.group_id, "FunGame推送", msg);
-                                break;
-                            }
-                        }
+                        await Bot.SendGroupMessageAt(qq, groupid, "匿名服务器消息", msg);
                     }
                     else
                     {
-                        long groupid = NetworkUtility.JsonDeserializeFromDictionary<long>(data, "groupid");
-                        if (groupid > 0 && Bot.Groups.Any(g => g.group_id == groupid))
+                        if (qq > 0)
+                        {
+                            foreach (Group g in Bot.Groups.Where(g => GeneralSettings.FunGameWebSocketGroup.Contains(g.group_id)))
+                            {
+                                Member m = Bot.GetMember(g.group_id, qq);
+                                if (m.user_id == qq)
+                                {
+                                    await Bot.SendGroupMessageAt(qq, g.group_id, "FunGame推送", msg);
+                                    break;
+                                }
+                            }
+                        }
+                        else if (groupid > 0 && Bot.Groups.Any(g => g.group_id == groupid))
                         {
                             await Bot.SendGroupMessage(groupid, "匿名服务器消息", msg);
                         }
