@@ -261,6 +261,8 @@ namespace Milimoe.RainBOT.Command
                 {
                     TaskUtility.NewTask(async () =>
                     {
+                        string m = "已经重新启动 FunGame WebSocket 服务。";
+                        string msg = m;
                         OshimaController.Config.FunGame_isRetrying = false;
                         OshimaController.Config.FunGame_isAutoRetry = true;
                         OshimaController.CurrentRetryTimes = -1;
@@ -268,12 +270,26 @@ namespace Milimoe.RainBOT.Command
                         {
                             await OshimaController.Instance.DisconnectFromAnonymousServer();
                         }
-                        catch { }
+                        catch (Exception e)
+                        {
+                            if (msg != m)
+                            {
+                                msg += "\r\n断开匿名服务器遇到问题：";
+                            }
+                            msg += e.Message;
+                        }
                         try
                         {
                             await OshimaController.Instance.DisconnectAsync();
                         }
-                        catch { }
+                        catch (Exception e)
+                        {
+                            if (msg != m)
+                            {
+                                msg += "\r\n断开 FunGame 服务器遇到问题：";
+                            }
+                            msg += e.Message;
+                        }
                         try
                         {
                             await OshimaController.Instance.Retry(true);
@@ -284,7 +300,8 @@ namespace Milimoe.RainBOT.Command
                             await OshimaController.Instance.ConnectToAnonymousServer();
                         }
                         catch { }
-                        SendMessage(send_group, target_id, "已经重新启动 FunGame WebSocket 服务。");
+                        msg += OshimaController.Instance.HTTPClient?.Connected ?? false ? $"已连接上服务器{OshimaController.Instance.HTTPClient.ServerAddress}" : "重试连接失败。";
+                        SendMessage(send_group, target_id, msg);
                     });
                 }
                 else Access_Denied(send_group, target_id);

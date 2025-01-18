@@ -2,11 +2,9 @@
 using Milimoe.OneBot.Model.Content;
 using Milimoe.OneBot.Model.Message;
 using Milimoe.OneBot.Model.Other;
-using Milimoe.RainBOT.QQBot;
 using Milimoe.RainBOT.Command;
 using Milimoe.RainBOT.ListeningTask;
 using Milimoe.RainBOT.Settings;
-using Milimoe.FunGame.Core.Api.Utility;
 using TaskScheduler = Milimoe.FunGame.Core.Api.Utility.TaskScheduler;
 
 try
@@ -18,16 +16,6 @@ try
         Console.ForegroundColor = ConsoleColor.Cyan;
         Console.WriteLine("Debug模式");
         Console.ForegroundColor = ConsoleColor.Gray;
-    }
-
-    if (args.Contains("--qqbot"))
-    {
-        GeneralSettings.IsQQBot = true;
-        Console.ForegroundColor = ConsoleColor.Cyan;
-        Console.WriteLine("QQ官方BOT模式");
-        Console.ForegroundColor = ConsoleColor.Gray;
-        QQBotMain.RunQQBot();
-        return;
     }
 
     if (args.Any(a => a.StartsWith("-g")))
