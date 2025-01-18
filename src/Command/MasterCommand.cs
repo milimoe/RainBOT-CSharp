@@ -261,6 +261,7 @@ namespace Milimoe.RainBOT.Command
                 {
                     TaskUtility.NewTask(async () =>
                     {
+                        OshimaController.Config.FunGame_isRetrying = false;
                         OshimaController.Config.FunGame_isAutoRetry = true;
                         OshimaController.CurrentRetryTimes = -1;
                         try
