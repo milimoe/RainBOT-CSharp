@@ -67,13 +67,23 @@ namespace Milimoe.RainBOT.Settings
             {
                 try
                 {
-                    result = await ConnectAsync(TransmittalType.WebSocket, GeneralSettings.FunGameServer, ssl: true, subUrl: "ws");
+                    string[] strings = GeneralSettings.FunGameServer.Split(':');
+                    int port = strings.Length > 1 ? int.Parse(strings[1]) : 443;
+                    result = await ConnectAsync(TransmittalType.WebSocket, strings[0], port, true, "ws");
                     Config.FunGame_isRetrying = false;
-                    await Task.Delay(5000);
+                    if (result != ConnectResult.Success)
+                    {
+                        await Task.Delay(5000);
+                    }
+                    else
+                    {
+                        break;
+                    }
                 }
                 catch (Exception e)
                 {
                     Error(e);
+                    break;
                 }
             }
         }
@@ -84,7 +94,9 @@ namespace Milimoe.RainBOT.Settings
             {
                 try
                 {
-                    if (await ConnectAsync(TransmittalType.WebSocket, GeneralSettings.FunGameServer, ssl: true, subUrl: "ws") == ConnectResult.Success)
+                    string[] strings = GeneralSettings.FunGameServer.Split(':');
+                    int port = strings.Length > 1 ? int.Parse(strings[1]) : 443;
+                    if (await ConnectAsync(TransmittalType.WebSocket, strings[0], port, true, "ws") == ConnectResult.Success)
                     {
                         Console.WriteLine("重连成功！");
                         if (send)
@@ -168,10 +180,15 @@ namespace Milimoe.RainBOT.Settings
             if (data.Count > 0)
             {
                 long qq = NetworkUtility.JsonDeserializeFromDictionary<long>(data, "qq");
+                string openid = NetworkUtility.JsonDeserializeFromDictionary<string>(data, "openid") ?? "";
                 long groupid = NetworkUtility.JsonDeserializeFromDictionary<long>(data, "groupid");
                 string msg = NetworkUtility.JsonDeserializeFromDictionary<string>(data, "msg") ?? "";
                 if (msg != "")
                 {
+                    if (qq == 0 && openid != "" && QQOpenID.QQAndOpenID.TryGetValue(openid, out long tempqq))
+                    {
+                        qq = tempqq;
+                    }
                     if (qq > 0 && groupid > 0)
                     {
                         await Bot.SendGroupMessageAt(qq, groupid, "匿名服务器消息", msg);
@@ -199,10 +216,14 @@ namespace Milimoe.RainBOT.Settings
             }
         }
 
-        public async Task SCAdd(long qq, long groupid, double sc = 1)
+        public async Task SCAdd(long qq, long groupid, double sc = 0)
         {
             if (HTTPClient != null)
             {
+                if (sc == 0)
+                {
+                    sc = Random.Shared.Next(-3, 4);
+                }
                 Dictionary<string, object> data = [];
                 data.Add("command", "scadd");
                 data.Add("qq", qq);

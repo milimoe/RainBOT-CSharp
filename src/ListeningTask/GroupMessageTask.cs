@@ -118,7 +118,7 @@ namespace Milimoe.RainBOT.ListeningTask
                 if (e.detail == "查询服务器启动时间")
                 {
                     if (!await Bot.CheckBlackList(true, e.user_id, e.group_id)) return quick_reply;
-                    string msg = (await Bot.HttpGet<string>("https://api.milimoe.com/test/getlastlogintime") ?? "").Trim();
+                    string msg = (await Bot.HttpGet<string>($"https://{GeneralSettings.FunGameServer}/test/getlastlogintime") ?? "").Trim();
                     if (msg != "")
                     {
                         await Bot.SendGroupMessage(e.group_id, "查询服务器启动时间", msg);
@@ -130,7 +130,7 @@ namespace Milimoe.RainBOT.ListeningTask
                 {
                     if (!await Bot.CheckBlackList(true, e.user_id, e.group_id)) return quick_reply;
                     string detail = e.detail.Replace("查询任务计划", "").Trim();
-                    string msg = await Bot.HttpGet<string>($"https://api.milimoe.com/test/gettask?name={detail}") ?? "";
+                    string msg = await Bot.HttpGet<string>($"https://{GeneralSettings.FunGameServer}/test/gettask?name={detail}") ?? "";
                     if (msg != "")
                     {
                         await Bot.SendGroupMessage(e.group_id, "查询任务计划", msg);
@@ -143,13 +143,10 @@ namespace Milimoe.RainBOT.ListeningTask
                     return quick_reply;
                 }
 
-                if (await RainBOTFunGame.Handler(e))
+                _ = Task.Run(async () =>
                 {
-                    return quick_reply;
-                }
-                if (GeneralSettings.FunGameGroup.Contains(e.group_id))
-                {
-                }
+                    await RainBOTFunGame.Handler2(e);
+                });
 
                 // 发图API
                 if (e.detail == "来图")
@@ -256,7 +253,7 @@ namespace Milimoe.RainBOT.ListeningTask
                 {
                     if (!await Bot.CheckBlackList(true, e.user_id, e.group_id)) return quick_reply;
 
-                    UserDaily daily = await Bot.HttpPost<UserDaily>("https://api.milimoe.com/userdaily/get/" + e.user_id, "") ?? new(0, 0, "");
+                    UserDaily daily = await Bot.HttpPost<UserDaily>($"https://{GeneralSettings.FunGameServer}/userdaily/get/" + e.user_id, "") ?? new(0, 0, "");
                     if (daily.daily != "")
                     {
                         if (daily.type == 0)
@@ -297,7 +294,7 @@ namespace Milimoe.RainBOT.ListeningTask
                 {
                     if (!await Bot.CheckBlackList(true, e.user_id, e.group_id)) return quick_reply;
 
-                    string msg = await Bot.HttpPost<string>("https://api.milimoe.com/userdaily/remove/" + e.user_id, "") ?? "";
+                    string msg = await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/userdaily/remove/" + e.user_id, "") ?? "";
                     if (msg != "")
                     {
                         GroupMessageContent content = new(e.group_id);
@@ -318,9 +315,9 @@ namespace Milimoe.RainBOT.ListeningTask
                         {
                             if (qq == GeneralSettings.BotQQ)
                             {
-                                await Bot.HttpPost<UserDaily>("https://api.milimoe.com/userdaily/get/" + qq, "");
+                                await Bot.HttpPost<UserDaily>($"https://{GeneralSettings.FunGameServer}/userdaily/get/" + qq, "");
                             }
-                            UserDaily daily = await Bot.HttpGet<UserDaily>("https://api.milimoe.com/userdaily/view/" + qq) ?? new(0, 0, "");
+                            UserDaily daily = await Bot.HttpGet<UserDaily>($"https://{GeneralSettings.FunGameServer}/userdaily/view/" + qq) ?? new(0, 0, "");
                             if (daily.daily != "")
                             {
                                 GroupMessageContent content = new(e.group_id);
@@ -340,7 +337,7 @@ namespace Milimoe.RainBOT.ListeningTask
                     {
                         if (long.TryParse(str_qq.Trim().Replace("@", ""), out long qq))
                         {
-                            string msg = await Bot.HttpPost<string>("https://api.milimoe.com/userdaily/remove/" + e.user_id, "") ?? "";
+                            string msg = await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/userdaily/remove/" + e.user_id, "") ?? "";
                             if (msg != "")
                             {
                                 await Bot.SendGroupMessage(e.group_id, "重置运势", "已重置" + Bot.GetMemberNickName(e.group_id, qq) + "（" + qq + "）的今日运势。");
@@ -631,7 +628,7 @@ namespace Milimoe.RainBOT.ListeningTask
                     {
                         GroupMessageContent content = new(e.group_id);
                         content.message.Add(new AtMessage(e.user_id));
-                        int sc = 1;
+                        int sc = 0;
                         switch (Random.Shared.Next(4))
                         {
                             case 0:
@@ -642,12 +639,12 @@ namespace Milimoe.RainBOT.ListeningTask
                                 break;
                             case 2:
                                 content.message.Add(new TextMessage(string.Concat(name.AsSpan(pos, name.Length > 0 ? 1 : name.Length), "圣")));
-                                sc = 3;
+                                sc = Random.Shared.Next(1, 4);
                                 break;
                             case 3:
                             default:
                                 content.message.Add(new TextMessage(string.Concat(name.AsSpan(pos, name.Length > 0 ? 1 : name.Length), "出")));
-                                sc = -1;
+                                sc = -Random.Shared.Next(1, 4);
                                 break;
                         }
                         await Bot.SendGroupMessage(e.group_id, "随机叫哥", content, delay * 1000);

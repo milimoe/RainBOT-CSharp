@@ -42,6 +42,20 @@ namespace Milimoe.RainBOT.ListeningTask
                     }
                 }
 
+                if (e.detail.StartsWith("绑定"))
+                {
+                    string detail = e.detail.Replace("绑定", "");
+                    string msg = QQOpenID.Bind(detail, e.user_id);
+                    await Bot.SendFriendMessage(e.user_id, "绑定", msg);
+                }
+                
+                if (e.detail.StartsWith("解绑"))
+                {
+                    string detail = e.detail.Replace("解绑", "");
+                    string msg = QQOpenID.Unbind(detail, e.user_id);
+                    await Bot.SendFriendMessage(e.user_id, "解绑", msg);
+                }
+
                 // OSM指令
                 if (e.detail.Length >= 4 && e.detail[..4] == ".osm")
                 {
@@ -55,7 +69,7 @@ namespace Milimoe.RainBOT.ListeningTask
                     if (!RainBOTFunGame.FunGameSimulation)
                     {
                         RainBOTFunGame.FunGameSimulation = true;
-                        List<string> msgs = await Bot.HttpGet<List<string>>("https://api.milimoe.com/fungame/test?isweb=false") ?? [];
+                        List<string> msgs = await Bot.HttpGet<List<string>>($"https://{GeneralSettings.FunGameServer}/fungame/test?isweb=false") ?? [];
                         foreach (string msg in msgs)
                         {
                             await Bot.SendFriendMessage(e.user_id, "FunGame模拟", msg.Trim());

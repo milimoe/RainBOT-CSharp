@@ -251,7 +251,7 @@ namespace Milimoe.RainBOT.Command
             {
                 if (user_id == GeneralSettings.Master)
                 {
-                    SendMessage(send_group, target_id, OshimaController.Instance.HTTPClient?.Connected ?? false ? $"已连接上服务器{OshimaController.Instance.HTTPClient.ServerAddress}" : "连接已断开。");
+                    SendMessage(send_group, target_id, OshimaController.Instance.HTTPClient?.Connected ?? false ? $"已连接上服务器。" : "连接已断开。");
                 }
                 else Access_Denied(send_group, target_id);
             }
@@ -300,7 +300,7 @@ namespace Milimoe.RainBOT.Command
                             await OshimaController.Instance.ConnectToAnonymousServer();
                         }
                         catch { }
-                        msg += OshimaController.Instance.HTTPClient?.Connected ?? false ? $"已连接上服务器{OshimaController.Instance.HTTPClient.ServerAddress}" : "重试连接失败。";
+                        msg += OshimaController.Instance.HTTPClient?.Connected ?? false ? $"已连接上服务器。" : "重试连接失败。";
                         SendMessage(send_group, target_id, msg);
                     });
                 }

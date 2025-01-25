@@ -18,6 +18,16 @@ try
         Console.ForegroundColor = ConsoleColor.Gray;
     }
 
+    if (args.Contains("--test"))
+    {
+        GeneralSettings.IsDebug = true;
+        Console.ForegroundColor = ConsoleColor.Cyan;
+        Console.WriteLine("Test模式");
+        Console.ForegroundColor = ConsoleColor.Gray;
+        Testing testing = new();
+        return;
+    }
+
     if (args.Any(a => a.StartsWith("-g")))
     {
         string debug_group = args.Where(a => a.StartsWith("-g")).FirstOrDefault() ?? "";
@@ -109,6 +119,7 @@ try
     Daily.InitDaily();
     SayNo.InitSayNo();
     Ignore.InitIgnore();
+    QQOpenID.LoadConfig();
 
     Console.ForegroundColor = ConsoleColor.Green;
     Console.WriteLine("初始化完毕！");
@@ -181,9 +192,12 @@ try
                     catch { }
                 }
             }
-            Console.ForegroundColor = ConsoleColor.Magenta;
-            Console.WriteLine("清空所有已下载的图片，释放空间。");
-            Console.ForegroundColor = ConsoleColor.Gray;
+            if (GeneralSettings.IsDebug)
+            {
+                Console.ForegroundColor = ConsoleColor.Magenta;
+                Console.WriteLine("清空所有已下载的图片，释放空间。");
+                Console.ForegroundColor = ConsoleColor.Gray;
+            }
         }
         catch (Exception e)
         {
@@ -199,6 +213,7 @@ try
     {
         await OshimaController.Instance.Start();
         await OshimaController.Instance.ConnectToAnonymousServer();
+        OshimaController.Config.FunGame_isAutoRetry = true;
     });
 
     bool isListening = true;

@@ -8,6 +8,26 @@ namespace Milimoe.RainBOT.Settings
         public static bool FunGameSimulation { get; set; } = false;
         private readonly static List<string> FunGameItemType = ["卡包", "武器", "防具", "鞋子", "饰品", "消耗品", "魔法卡", "收藏品", "特殊物品", "任务物品", "礼包", "其他"];
 
+        public static async Task Handler2(GroupMessageEvent e)
+        {
+            if (QQOpenID.QQAndOpenID.Where(kv => kv.Value == e.user_id).Select(kv => kv.Key).FirstOrDefault() is string openid)
+            {
+                string msg = await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/qqbot/thirdparty", System.Text.Json.JsonSerializer.Serialize(new ThirdPartyMessage()
+                {
+                    Id = "",
+                    AuthorOpenId = openid,
+                    OpenId = openid,
+                    Detail = e.detail,
+                    IsGroup = true,
+                    Timestamp = ""
+                }), true) ?? "";
+                if (msg.Trim() != "")
+                {
+                    await Bot.SendGroupMessageAt(e.user_id, e.group_id, "FunGame", msg.Trim());
+                }
+            }
+        }
+
         public static async Task<bool> Handler(GroupMessageEvent e)
         {
             bool result = true;
@@ -257,7 +277,7 @@ namespace Milimoe.RainBOT.Settings
                 string detail = e.detail.Replace("查技能", "").Trim();
                 if (int.TryParse(detail, out int id))
                 {
-                    string msg = (await Bot.HttpGet<string>($"https://{GeneralSettings.FunGameServer}/fungame/skillinfo?qq={e.user_id}&id=" + id, fungame: true) ?? "").Trim();
+                    string msg = (await Bot.HttpGet<string>($"https://{GeneralSettings.FunGameServer}/fungame/skillinfo?uid={e.user_id}&id=" + id, fungame: true) ?? "").Trim();
                     if (msg != "")
                     {
                         await Bot.SendGroupMessage(e.group_id, "查询FunGame角色技能", msg);
@@ -265,7 +285,7 @@ namespace Milimoe.RainBOT.Settings
                 }
                 else
                 {
-                    string msg = (await Bot.HttpGet<string>($"https://{GeneralSettings.FunGameServer}/fungame/skillinfoname?qq={e.user_id}&name=" + Uri.EscapeDataString(detail.Trim()), fungame: true) ?? "").Trim();
+                    string msg = (await Bot.HttpGet<string>($"https://{GeneralSettings.FunGameServer}/fungame/skillinfoname?uid={e.user_id}&name=" + Uri.EscapeDataString(detail.Trim()), fungame: true) ?? "").Trim();
                     if (msg != "")
                     {
                         await Bot.SendGroupMessage(e.group_id, "查询FunGame角色技能", msg);
@@ -280,7 +300,7 @@ namespace Milimoe.RainBOT.Settings
                 string detail = e.detail.Replace("查物品", "").Trim();
                 if (int.TryParse(detail, out int id))
                 {
-                    string msg = (await Bot.HttpGet<string>($"https://{GeneralSettings.FunGameServer}/fungame/iteminfo?qq={e.user_id}&id=" + id, fungame: true) ?? "").Trim();
+                    string msg = (await Bot.HttpGet<string>($"https://{GeneralSettings.FunGameServer}/fungame/iteminfo?uid={e.user_id}&id=" + id, fungame: true) ?? "").Trim();
                     if (msg != "")
                     {
                         await Bot.SendGroupMessage(e.group_id, "查询FunGame物品信息", msg);
@@ -288,7 +308,7 @@ namespace Milimoe.RainBOT.Settings
                 }
                 else
                 {
-                    string msg = (await Bot.HttpGet<string>($"https://{GeneralSettings.FunGameServer}/fungame/iteminfoname?qq={e.user_id}&name=" + Uri.EscapeDataString(detail.Trim()), fungame: true) ?? "").Trim();
+                    string msg = (await Bot.HttpGet<string>($"https://{GeneralSettings.FunGameServer}/fungame/iteminfoname?uid={e.user_id}&name=" + Uri.EscapeDataString(detail.Trim()), fungame: true) ?? "").Trim();
                     if (msg != "")
                     {
                         await Bot.SendGroupMessage(e.group_id, "查询FunGame物品信息", msg);
@@ -317,7 +337,7 @@ namespace Milimoe.RainBOT.Settings
 
                     if (count > 0)
                     {
-                        string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/createitem?qq={e.user_id}&name={Uri.EscapeDataString(name)}&count={count}&target={userid}", fungame: true) ?? "").Trim();
+                        string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/createitem?uid={e.user_id}&name={Uri.EscapeDataString(name)}&count={count}&target={userid}", fungame: true) ?? "").Trim();
                         if (msg != "")
                         {
                             await Bot.SendGroupMessage(e.group_id, "熟圣之力", msg);
@@ -354,7 +374,7 @@ namespace Milimoe.RainBOT.Settings
 
             if (e.detail == "创建存档")
             {
-                string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/createsaved?qq={e.user_id}", "", fungame: true) ?? "").Trim();
+                string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/createsaved?uid={e.user_id}", "", fungame: true) ?? "").Trim();
                 if (msg != "")
                 {
                     await Bot.SendGroupMessageAt(e.user_id, e.group_id, "创建存档", "\r\n" + msg);
@@ -364,7 +384,7 @@ namespace Milimoe.RainBOT.Settings
             
             if (e.detail == "我的存档")
             {
-                string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/showsaved?qq={e.user_id}", "", fungame: true) ?? "").Trim();
+                string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/showsaved?uid={e.user_id}", "", fungame: true) ?? "").Trim();
                 if (msg != "")
                 {
                     await Bot.SendGroupMessageAt(e.user_id, e.group_id, "我的存档", "\r\n" + msg);
@@ -374,7 +394,7 @@ namespace Milimoe.RainBOT.Settings
             
             if (e.detail == "我的主战")
             {
-                string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/showcharacterinfo?qq={e.user_id}&seq=0", "", fungame: true) ?? "").Trim();
+                string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/showcharacterinfo?uid={e.user_id}&seq=0", "", fungame: true) ?? "").Trim();
                 if (msg != "")
                 {
                     await Bot.SendGroupMessageAt(e.user_id, e.group_id, "我的主战", "\r\n" + msg);
@@ -384,7 +404,7 @@ namespace Milimoe.RainBOT.Settings
             
             if (e.detail == "我的状态")
             {
-                string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/showmaincharacterorsquadstatus?qq={e.user_id}", "", fungame: true) ?? "").Trim();
+                string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/showmaincharacterorsquadstatus?uid={e.user_id}", "", fungame: true) ?? "").Trim();
                 if (msg != "")
                 {
                     await Bot.SendGroupMessageAt(e.user_id, e.group_id, "我的状态", "\r\n" + msg);
@@ -394,7 +414,7 @@ namespace Milimoe.RainBOT.Settings
             
             if (e.detail == "小队状态" || e.detail == "我的小队状态")
             {
-                string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/showmaincharacterorsquadstatus?qq={e.user_id}&squad=true", "", fungame: true) ?? "").Trim();
+                string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/showmaincharacterorsquadstatus?uid={e.user_id}&squad=true", "", fungame: true) ?? "").Trim();
                 if (msg != "")
                 {
                     await Bot.SendGroupMessageAt(e.user_id, e.group_id, "我的小队状态", "\r\n" + msg);
@@ -404,7 +424,7 @@ namespace Milimoe.RainBOT.Settings
             
             if (e.detail == "我的小队")
             {
-                string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/showsquad?qq={e.user_id}", "", fungame: true) ?? "").Trim();
+                string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/showsquad?uid={e.user_id}", "", fungame: true) ?? "").Trim();
                 if (msg != "")
                 {
                     await Bot.SendGroupMessageAt(e.user_id, e.group_id, "我的小队", "\r\n" + msg);
@@ -414,7 +434,7 @@ namespace Milimoe.RainBOT.Settings
             
             if (e.detail == "清空小队")
             {
-                string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/clearsquad?qq={e.user_id}", "", fungame: true) ?? "").Trim();
+                string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/clearsquad?uid={e.user_id}", "", fungame: true) ?? "").Trim();
                 if (msg != "")
                 {
                     await Bot.SendGroupMessageAt(e.user_id, e.group_id, "清空小队", "\r\n" + msg);
@@ -424,7 +444,7 @@ namespace Milimoe.RainBOT.Settings
 
             if (e.detail == "还原存档")
             {
-                string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/restoresaved?qq={e.user_id}", "", fungame: true) ?? "").Trim();
+                string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/restoresaved?uid={e.user_id}", "", fungame: true) ?? "").Trim();
                 if (msg != "")
                 {
                     await Bot.SendGroupMessageAt(e.user_id, e.group_id, "还原存档", "\r\n" + msg);
@@ -434,7 +454,7 @@ namespace Milimoe.RainBOT.Settings
 
             if (e.detail == "生成自建角色")
             {
-                string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/newcustomcharacter?qq={e.user_id}", "", fungame: true) ?? "").Trim();
+                string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/newcustomcharacter?uid={e.user_id}", "", fungame: true) ?? "").Trim();
                 if (msg != "")
                 {
                     await Bot.SendGroupMessageAt(e.user_id, e.group_id, "抽卡", "\r\n" + msg);
@@ -444,7 +464,7 @@ namespace Milimoe.RainBOT.Settings
 
             if (e.detail == "角色改名")
             {
-                string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/rename?qq={e.user_id}", "", fungame: true) ?? "").Trim();
+                string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/rename?uid={e.user_id}", "", fungame: true) ?? "").Trim();
                 if (msg != "")
                 {
                     await Bot.SendGroupMessageAt(e.user_id, e.group_id, "改名", "\r\n" + msg);
@@ -454,7 +474,7 @@ namespace Milimoe.RainBOT.Settings
 
             if (e.detail == "角色重随")
             {
-                string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/randomcustom?qq={e.user_id}&confirm=false", "", fungame: true) ?? "").Trim();
+                string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/randomcustom?uid={e.user_id}&confirm=false", "", fungame: true) ?? "").Trim();
                 if (msg != "")
                 {
                     await Bot.SendGroupMessageAt(e.user_id, e.group_id, "角色重随", "\r\n" + msg);
@@ -464,7 +484,7 @@ namespace Milimoe.RainBOT.Settings
 
             if (e.detail == "确认角色重随")
             {
-                string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/randomcustom?qq={e.user_id}&confirm=true", "", fungame: true) ?? "").Trim();
+                string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/randomcustom?uid={e.user_id}&confirm=true", "", fungame: true) ?? "").Trim();
                 if (msg != "")
                 {
                     await Bot.SendGroupMessageAt(e.user_id, e.group_id, "角色重随", "\r\n" + msg);
@@ -474,7 +494,7 @@ namespace Milimoe.RainBOT.Settings
 
             if (e.detail == "取消角色重随")
             {
-                string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/cancelrandomcustom?qq={e.user_id}", "", fungame: true) ?? "").Trim();
+                string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/cancelrandomcustom?uid={e.user_id}", "", fungame: true) ?? "").Trim();
                 if (msg != "")
                 {
                     await Bot.SendGroupMessageAt(e.user_id, e.group_id, "角色重随", "\r\n" + msg);
@@ -484,7 +504,7 @@ namespace Milimoe.RainBOT.Settings
 
             if (e.detail == "抽卡")
             {
-                string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/drawcard?qq={e.user_id}", "", fungame: true) ?? "").Trim();
+                string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/drawcard?uid={e.user_id}", "", fungame: true) ?? "").Trim();
                 if (msg != "")
                 {
                     await Bot.SendGroupMessageAt(e.user_id, e.group_id, "抽卡", "\r\n" + msg);
@@ -494,7 +514,7 @@ namespace Milimoe.RainBOT.Settings
 
             if (e.detail == "十连抽卡")
             {
-                List<string> msgs = (await Bot.HttpPost<List<string>>($"https://{GeneralSettings.FunGameServer}/fungame/drawcards?qq={e.user_id}", "", fungame: true) ?? []);
+                List<string> msgs = (await Bot.HttpPost<List<string>>($"https://{GeneralSettings.FunGameServer}/fungame/drawcards?uid={e.user_id}", "", fungame: true) ?? []);
                 if (msgs.Count > 0)
                 {
                     await Bot.SendGroupMessageAt(e.user_id, e.group_id, "十连抽卡", "\r\n" + string.Join("\r\n", msgs));
@@ -504,7 +524,7 @@ namespace Milimoe.RainBOT.Settings
 
             if (e.detail == "材料抽卡")
             {
-                string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/drawcardm?qq={e.user_id}", "", fungame: true) ?? "").Trim();
+                string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/drawcardm?uid={e.user_id}", "", fungame: true) ?? "").Trim();
                 if (msg != "")
                 {
                     await Bot.SendGroupMessageAt(e.user_id, e.group_id, "材料抽卡", "\r\n" + msg);
@@ -514,7 +534,7 @@ namespace Milimoe.RainBOT.Settings
 
             if (e.detail == "材料十连抽卡")
             {
-                List<string> msgs = await Bot.HttpPost<List<string>>($"https://{GeneralSettings.FunGameServer}/fungame/drawcardsm?qq={e.user_id}", "", fungame: true) ?? [];
+                List<string> msgs = await Bot.HttpPost<List<string>>($"https://{GeneralSettings.FunGameServer}/fungame/drawcardsm?uid={e.user_id}", "", fungame: true) ?? [];
                 if (msgs.Count > 0)
                 {
                     await Bot.SendGroupMessageAt(e.user_id, e.group_id, "材料十连抽卡", "\r\n" + string.Join("\r\n", msgs));
@@ -528,7 +548,7 @@ namespace Milimoe.RainBOT.Settings
                 List<string> msgs = [];
                 if (int.TryParse(detail, out int page))
                 {
-                    msgs = await Bot.HttpPost<List<string>>($"https://{GeneralSettings.FunGameServer}/fungame/inventoryinfo2?qq={e.user_id}&page={page}", "", fungame: true) ?? [];
+                    msgs = await Bot.HttpPost<List<string>>($"https://{GeneralSettings.FunGameServer}/fungame/inventoryinfo2?uid={e.user_id}&page={page}", "", fungame: true) ?? [];
                 }
                 else if (FunGameItemType.FirstOrDefault(detail.Contains) is string matchedType)
                 {
@@ -536,16 +556,16 @@ namespace Milimoe.RainBOT.Settings
                     string remain = detail.Replace(matchedType, "").Trim();
                     if (int.TryParse(remain, out page))
                     {
-                        msgs = await Bot.HttpPost<List<string>>($"https://{GeneralSettings.FunGameServer}/fungame/inventoryinfo4?qq={e.user_id}&page={page}&type={typeIndex}", "", fungame: true) ?? [];
+                        msgs = await Bot.HttpPost<List<string>>($"https://{GeneralSettings.FunGameServer}/fungame/inventoryinfo4?uid={e.user_id}&page={page}&type={typeIndex}", "", fungame: true) ?? [];
                     }
                     else
                     {
-                        msgs = await Bot.HttpPost<List<string>>($"https://{GeneralSettings.FunGameServer}/fungame/inventoryinfo4?qq={e.user_id}&page=1&type={typeIndex}", "", fungame: true) ?? [];
+                        msgs = await Bot.HttpPost<List<string>>($"https://{GeneralSettings.FunGameServer}/fungame/inventoryinfo4?uid={e.user_id}&page=1&type={typeIndex}", "", fungame: true) ?? [];
                     }
                 }
                 else
                 {
-                    msgs = await Bot.HttpPost<List<string>>($"https://{GeneralSettings.FunGameServer}/fungame/inventoryinfo2?qq={e.user_id}&page=1", "", fungame: true) ?? [];
+                    msgs = await Bot.HttpPost<List<string>>($"https://{GeneralSettings.FunGameServer}/fungame/inventoryinfo2?uid={e.user_id}&page=1", "", fungame: true) ?? [];
                 }
                 if (msgs.Count > 0)
                 {
@@ -560,11 +580,11 @@ namespace Milimoe.RainBOT.Settings
                 List<string> msgs = [];
                 if (int.TryParse(detail, out int page))
                 {
-                    msgs = await Bot.HttpPost<List<string>>($"https://{GeneralSettings.FunGameServer}/fungame/inventoryinfo3?qq={e.user_id}&page={page}&order=2&orderqty=2", "", fungame: true) ?? [];
+                    msgs = await Bot.HttpPost<List<string>>($"https://{GeneralSettings.FunGameServer}/fungame/inventoryinfo3?uid={e.user_id}&page={page}&order=2&orderqty=2", "", fungame: true) ?? [];
                 }
                 else
                 {
-                    msgs = await Bot.HttpPost<List<string>>($"https://{GeneralSettings.FunGameServer}/fungame/inventoryinfo3?qq={e.user_id}&page=1&order=2&orderqty=2", "", fungame: true) ?? [];
+                    msgs = await Bot.HttpPost<List<string>>($"https://{GeneralSettings.FunGameServer}/fungame/inventoryinfo3?uid={e.user_id}&page=1&order=2&orderqty=2", "", fungame: true) ?? [];
                 }
                 if (msgs.Count > 0)
                 {
@@ -579,11 +599,11 @@ namespace Milimoe.RainBOT.Settings
                 List<string> msgs = [];
                 if (int.TryParse(detail, out int page))
                 {
-                    msgs = await Bot.HttpPost<List<string>>($"https://{GeneralSettings.FunGameServer}/fungame/inventoryinfo5?qq={e.user_id}&page={page}", "", fungame: true) ?? [];
+                    msgs = await Bot.HttpPost<List<string>>($"https://{GeneralSettings.FunGameServer}/fungame/inventoryinfo5?uid={e.user_id}&page={page}", "", fungame: true) ?? [];
                 }
                 else
                 {
-                    msgs = await Bot.HttpPost<List<string>>($"https://{GeneralSettings.FunGameServer}/fungame/inventoryinfo5?qq={e.user_id}&page=1", "", fungame: true) ?? [];
+                    msgs = await Bot.HttpPost<List<string>>($"https://{GeneralSettings.FunGameServer}/fungame/inventoryinfo5?uid={e.user_id}&page=1", "", fungame: true) ?? [];
                 }
                 if (msgs.Count > 0)
                 {
@@ -602,11 +622,11 @@ namespace Milimoe.RainBOT.Settings
                     List<string> msgs = [];
                     if (strings.Length > 1 && int.TryParse(strings[1].Trim(), out int page))
                     {
-                        msgs = await Bot.HttpPost<List<string>>($"https://{GeneralSettings.FunGameServer}/fungame/inventoryinfo4?qq={e.user_id}&page={page}&type={t}", "", fungame: true) ?? [];
+                        msgs = await Bot.HttpPost<List<string>>($"https://{GeneralSettings.FunGameServer}/fungame/inventoryinfo4?uid={e.user_id}&page={page}&type={t}", "", fungame: true) ?? [];
                     }
                     else
                     {
-                        msgs = await Bot.HttpPost<List<string>>($"https://{GeneralSettings.FunGameServer}/fungame/inventoryinfo4?qq={e.user_id}&page=1&type={t}", "", fungame: true) ?? [];
+                        msgs = await Bot.HttpPost<List<string>>($"https://{GeneralSettings.FunGameServer}/fungame/inventoryinfo4?uid={e.user_id}&page=1&type={t}", "", fungame: true) ?? [];
                     }
                     if (msgs.Count > 0)
                     {
@@ -622,11 +642,11 @@ namespace Milimoe.RainBOT.Settings
                 string msg = "";
                 if (int.TryParse(detail, out int seq))
                 {
-                    msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/showcharacterinfo?qq={e.user_id}&seq={seq}&simple=true", fungame: true) ?? "").Trim();
+                    msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/showcharacterinfo?uid={e.user_id}&seq={seq}&simple=true", fungame: true) ?? "").Trim();
                 }
                 else
                 {
-                    msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/showcharacterinfo?qq={e.user_id}&seq=1&simple=true", fungame: true) ?? "").Trim();
+                    msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/showcharacterinfo?uid={e.user_id}&seq=1&simple=true", fungame: true) ?? "").Trim();
                 }
                 if (msg != "")
                 {
@@ -641,11 +661,11 @@ namespace Milimoe.RainBOT.Settings
                 string msg = "";
                 if (int.TryParse(detail, out int seq))
                 {
-                    msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/showcharacterinfo?qq={e.user_id}&seq={seq}&simple=false", fungame: true) ?? "").Trim();
+                    msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/showcharacterinfo?uid={e.user_id}&seq={seq}&simple=false", fungame: true) ?? "").Trim();
                 }
                 else
                 {
-                    msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/showcharacterinfo?qq={e.user_id}&seq=1&simple=false", fungame: true) ?? "").Trim();
+                    msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/showcharacterinfo?uid={e.user_id}&seq=1&simple=false", fungame: true) ?? "").Trim();
                 }
                 if (msg != "")
                 {
@@ -660,11 +680,11 @@ namespace Milimoe.RainBOT.Settings
                 string msg = "";
                 if (int.TryParse(detail, out int seq))
                 {
-                    msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/showcharacterskills?qq={e.user_id}&seq={seq}", fungame: true) ?? "").Trim();
+                    msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/showcharacterskills?uid={e.user_id}&seq={seq}", fungame: true) ?? "").Trim();
                 }
                 else
                 {
-                    msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/showcharacterskills?qq={e.user_id}&seq=1", fungame: true) ?? "").Trim();
+                    msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/showcharacterskills?uid={e.user_id}&seq=1", fungame: true) ?? "").Trim();
                 }
                 if (msg != "")
                 {
@@ -679,11 +699,11 @@ namespace Milimoe.RainBOT.Settings
                 string msg = "";
                 if (int.TryParse(detail, out int seq))
                 {
-                    msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/showcharacteritems?qq={e.user_id}&seq={seq}", fungame: true) ?? "").Trim();
+                    msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/showcharacteritems?uid={e.user_id}&seq={seq}", fungame: true) ?? "").Trim();
                 }
                 else
                 {
-                    msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/showcharacteritems?qq={e.user_id}&seq=1", fungame: true) ?? "").Trim();
+                    msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/showcharacteritems?uid={e.user_id}&seq=1", fungame: true) ?? "").Trim();
                 }
                 if (msg != "")
                 {
@@ -698,11 +718,11 @@ namespace Milimoe.RainBOT.Settings
                 string msg = "";
                 if (int.TryParse(detail, out int cid))
                 {
-                    msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/setmain?qq={e.user_id}&c={cid}", fungame: true) ?? "").Trim();
+                    msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/setmain?uid={e.user_id}&c={cid}", fungame: true) ?? "").Trim();
                 }
                 else
                 {
-                    msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/setmain?qq={e.user_id}&c=1", fungame: true) ?? "").Trim();
+                    msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/setmain?uid={e.user_id}&c=1", fungame: true) ?? "").Trim();
                 }
                 if (msg != "")
                 {
@@ -711,17 +731,17 @@ namespace Milimoe.RainBOT.Settings
                 return result;
             }
 
-            if (e.detail.Length >= 4 && e.detail[..4].Equals("开启练级", StringComparison.CurrentCultureIgnoreCase))
+            if (e.detail.Length >= 4 && e.detail[..4].Equals("开启练级", StringComparison.CurrentCultureIgnoreCase) || e.detail.Length >= 4 && e.detail[..4].Equals("开始练级", StringComparison.CurrentCultureIgnoreCase))
             {
-                string detail = e.detail.Replace("开启练级", "").Trim();
+                string detail = e.detail.Replace("开启练级", "").Replace("开始练级", "").Trim();
                 string msg = "";
                 if (int.TryParse(detail, out int cid))
                 {
-                    msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/starttraining?qq={e.user_id}&c={cid}", fungame: true) ?? "").Trim();
+                    msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/starttraining?uid={e.user_id}&c={cid}", fungame: true) ?? "").Trim();
                 }
                 else
                 {
-                    msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/starttraining?qq={e.user_id}&c=1", fungame: true) ?? "").Trim();
+                    msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/starttraining?uid={e.user_id}&c=1", fungame: true) ?? "").Trim();
                 }
                 if (msg != "")
                 {
@@ -732,7 +752,7 @@ namespace Milimoe.RainBOT.Settings
 
             if (e.detail == "练级信息")
             {
-                string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/gettraininginfo?qq={e.user_id}", "", fungame: true) ?? "").Trim();
+                string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/gettraininginfo?uid={e.user_id}", "", fungame: true) ?? "").Trim();
                 if (msg != "")
                 {
                     await Bot.SendGroupMessageAt(e.user_id, e.group_id, "练级信息", "\r\n" + msg);
@@ -742,7 +762,7 @@ namespace Milimoe.RainBOT.Settings
 
             if (e.detail == "练级结算")
             {
-                string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/stoptraining?qq={e.user_id}", "", fungame: true) ?? "").Trim();
+                string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/stoptraining?uid={e.user_id}", "", fungame: true) ?? "").Trim();
                 if (msg != "")
                 {
                     await Bot.SendGroupMessageAt(e.user_id, e.group_id, "练级结算", "\r\n" + msg);
@@ -752,7 +772,7 @@ namespace Milimoe.RainBOT.Settings
 
             if (e.detail == "材料抽卡")
             {
-                string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/drawcardm?qq={e.user_id}", "", fungame: true) ?? "").Trim();
+                string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/drawcardm?uid={e.user_id}", "", fungame: true) ?? "").Trim();
                 if (msg != "")
                 {
                     await Bot.SendGroupMessageAt(e.user_id, e.group_id, "材料抽卡", "\r\n" + msg);
@@ -762,7 +782,7 @@ namespace Milimoe.RainBOT.Settings
             
             if (e.detail == "任务列表")
             {
-                string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/checkquestlist?qq={e.user_id}", "", fungame: true) ?? "").Trim();
+                string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/checkquestlist?uid={e.user_id}", "", fungame: true) ?? "").Trim();
                 if (msg != "")
                 {
                     await Bot.SendGroupMessageAt(e.user_id, e.group_id, "任务列表", "\r\n" + msg);
@@ -772,7 +792,7 @@ namespace Milimoe.RainBOT.Settings
             
             if (e.detail == "任务信息")
             {
-                string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/checkworkingquest?qq={e.user_id}", "", fungame: true) ?? "").Trim();
+                string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/checkworkingquest?uid={e.user_id}", "", fungame: true) ?? "").Trim();
                 if (msg != "")
                 {
                     await Bot.SendGroupMessageAt(e.user_id, e.group_id, "任务信息", "\r\n" + msg);
@@ -782,7 +802,7 @@ namespace Milimoe.RainBOT.Settings
             
             if (e.detail == "任务结算")
             {
-                string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/settlequest?qq={e.user_id}", "", fungame: true) ?? "").Trim();
+                string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/settlequest?uid={e.user_id}", "", fungame: true) ?? "").Trim();
                 if (msg != "")
                 {
                     await Bot.SendGroupMessageAt(e.user_id, e.group_id, "任务结算", "\r\n" + msg);
@@ -792,7 +812,7 @@ namespace Milimoe.RainBOT.Settings
             
             if (e.detail == "签到")
             {
-                string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/signin?qq={e.user_id}", "", fungame: true) ?? "").Trim();
+                string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/signin?uid={e.user_id}", "", fungame: true) ?? "").Trim();
                 if (msg != "")
                 {
                     await Bot.SendGroupMessageAt(e.user_id, e.group_id, "签到", "\r\n" + msg);
@@ -805,7 +825,7 @@ namespace Milimoe.RainBOT.Settings
                 string detail = e.detail.Replace("开始任务", "").Trim();
                 if (int.TryParse(detail, out int index))
                 {
-                    string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/acceptquest?qq={e.user_id}&id={index}", fungame: true) ?? "").Trim();
+                    string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/acceptquest?uid={e.user_id}&id={index}", fungame: true) ?? "").Trim();
                     if (msg != "")
                     {
                         await Bot.SendGroupMessage(e.group_id, "开始任务", msg);
@@ -819,7 +839,7 @@ namespace Milimoe.RainBOT.Settings
                 string detail = e.detail.Replace("我的物品", "").Trim();
                 if (int.TryParse(detail, out int index))
                 {
-                    string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/showiteminfo?qq={e.user_id}&seq={index}", fungame: true) ?? "").Trim();
+                    string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/showiteminfo?uid={e.user_id}&seq={index}", fungame: true) ?? "").Trim();
                     if (msg != "")
                     {
                         await Bot.SendGroupMessage(e.group_id, "查库存物品", msg);
@@ -833,7 +853,7 @@ namespace Milimoe.RainBOT.Settings
                 string detail = e.detail.Replace("兑换金币", "").Trim();
                 if (int.TryParse(detail, out int materials))
                 {
-                    string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/exchangecredits?qq={e.user_id}&materials={materials}", fungame: true) ?? "").Trim();
+                    string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/exchangecredits?uid={e.user_id}&materials={materials}", fungame: true) ?? "").Trim();
                     if (msg != "")
                     {
                         await Bot.SendGroupMessage(e.group_id, "兑换金币", msg);
@@ -851,7 +871,7 @@ namespace Milimoe.RainBOT.Settings
                 {
                     if (c != -1 && i != -1)
                     {
-                        string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/unequipitem?qq={e.user_id}&c={c}&i={i}", fungame: true) ?? "").Trim();
+                        string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/unequipitem?uid={e.user_id}&c={c}&i={i}", fungame: true) ?? "").Trim();
                         if (msg != "")
                         {
                             await Bot.SendGroupMessage(e.group_id, "取消装备", msg);
@@ -870,7 +890,7 @@ namespace Milimoe.RainBOT.Settings
                 {
                     if (c != -1 && i != -1)
                     {
-                        string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/equipitem?qq={e.user_id}&c={c}&i={i}", fungame: true) ?? "").Trim();
+                        string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/equipitem?uid={e.user_id}&c={c}&i={i}", fungame: true) ?? "").Trim();
                         if (msg != "")
                         {
                             await Bot.SendGroupMessage(e.group_id, "装备", msg);
@@ -890,7 +910,7 @@ namespace Milimoe.RainBOT.Settings
                     string s = strings[1].Trim();
                     if (c != -1 && s != "")
                     {
-                        string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/getskilllevelupneedy?qq={e.user_id}&c={c}&s={s}", fungame: true) ?? "").Trim();
+                        string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/getskilllevelupneedy?uid={e.user_id}&c={c}&s={s}", fungame: true) ?? "").Trim();
                         if (msg != "")
                         {
                             await Bot.SendGroupMessage(e.group_id, "查看技能升级", msg);
@@ -910,7 +930,7 @@ namespace Milimoe.RainBOT.Settings
                     string s = strings[1].Trim();
                     if (c != -1 && s != "")
                     {
-                        string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/skilllevelup?qq={e.user_id}&c={c}&s={s}", fungame: true) ?? "").Trim();
+                        string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/skilllevelup?uid={e.user_id}&c={c}&s={s}", fungame: true) ?? "").Trim();
                         if (msg != "")
                         {
                             await Bot.SendGroupMessage(e.group_id, "技能升级", msg);
@@ -929,7 +949,7 @@ namespace Milimoe.RainBOT.Settings
                 {
                     if (id1 != -1 && id2 != -1 && id3 != -1)
                     {
-                        string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/conflatemagiccardpack?qq={e.user_id}", System.Text.Json.JsonSerializer.Serialize<int[]>([id1, id2, id3]), fungame: true) ?? "").Trim();
+                        string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/conflatemagiccardpack?uid={e.user_id}", System.Text.Json.JsonSerializer.Serialize<int[]>([id1, id2, id3]), fungame: true) ?? "").Trim();
                         if (msg != "")
                         {
                             await Bot.SendGroupMessage(e.group_id, "合成魔法卡", msg);
@@ -945,11 +965,11 @@ namespace Milimoe.RainBOT.Settings
                 string msg = "";
                 if (int.TryParse(detail, out int cid))
                 {
-                    msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/characterlevelup?qq={e.user_id}&c={cid}", fungame: true) ?? "").Trim();
+                    msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/characterlevelup?uid={e.user_id}&c={cid}", fungame: true) ?? "").Trim();
                 }
                 else
                 {
-                    msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/characterlevelup?qq={e.user_id}&c=1", fungame: true) ?? "").Trim();
+                    msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/characterlevelup?uid={e.user_id}&c=1", fungame: true) ?? "").Trim();
                 }
                 if (msg != "")
                 {
@@ -964,11 +984,11 @@ namespace Milimoe.RainBOT.Settings
                 string msg = "";
                 if (int.TryParse(detail, out int cid))
                 {
-                    msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/getnormalattacklevelupneedy?qq={e.user_id}&c={cid}", fungame: true) ?? "").Trim();
+                    msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/getnormalattacklevelupneedy?uid={e.user_id}&c={cid}", fungame: true) ?? "").Trim();
                 }
                 else
                 {
-                    msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/getnormalattacklevelupneedy?qq={e.user_id}&c=1", fungame: true) ?? "").Trim();
+                    msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/getnormalattacklevelupneedy?uid={e.user_id}&c=1", fungame: true) ?? "").Trim();
                 }
                 if (msg != "")
                 {
@@ -983,11 +1003,11 @@ namespace Milimoe.RainBOT.Settings
                 string msg = "";
                 if (int.TryParse(detail, out int cid))
                 {
-                    msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/normalattacklevelup?qq={e.user_id}&c={cid}", fungame: true) ?? "").Trim();
+                    msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/normalattacklevelup?uid={e.user_id}&c={cid}", fungame: true) ?? "").Trim();
                 }
                 else
                 {
-                    msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/normalattacklevelup?qq={e.user_id}&c=1", fungame: true) ?? "").Trim();
+                    msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/normalattacklevelup?uid={e.user_id}&c=1", fungame: true) ?? "").Trim();
                 }
                 if (msg != "")
                 {
@@ -1002,11 +1022,11 @@ namespace Milimoe.RainBOT.Settings
                 string msg = "";
                 if (int.TryParse(detail, out int cid))
                 {
-                    msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/characterlevelbreak?qq={e.user_id}&c={cid}", fungame: true) ?? "").Trim();
+                    msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/characterlevelbreak?uid={e.user_id}&c={cid}", fungame: true) ?? "").Trim();
                 }
                 else
                 {
-                    msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/characterlevelbreak?qq={e.user_id}&c=1", fungame: true) ?? "").Trim();
+                    msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/characterlevelbreak?uid={e.user_id}&c=1", fungame: true) ?? "").Trim();
                 }
                 if (msg != "")
                 {
@@ -1021,11 +1041,11 @@ namespace Milimoe.RainBOT.Settings
                 string msg = "";
                 if (int.TryParse(detail, out int cid))
                 {
-                    msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/getlevelbreakneedy?qq={e.user_id}&id={cid}", fungame: true) ?? "").Trim();
+                    msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/getlevelbreakneedy?uid={e.user_id}&id={cid}", fungame: true) ?? "").Trim();
                 }
                 else
                 {
-                    msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/getlevelbreakneedy?qq={e.user_id}&id=1", fungame: true) ?? "").Trim();
+                    msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/getlevelbreakneedy?uid={e.user_id}&id=1", fungame: true) ?? "").Trim();
                 }
                 if (msg != "")
                 {
@@ -1050,7 +1070,7 @@ namespace Milimoe.RainBOT.Settings
                         {
                             if (id > 0 && id2 > 0)
                             {
-                                string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/useitem3?qq={e.user_id}&id={id}&id2={id2}&c={isCharacter}", fungame: true) ?? "").Trim();
+                                string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/useitem3?uid={e.user_id}&id={id}&id2={id2}&c={isCharacter}", fungame: true) ?? "").Trim();
                                 if (msg != "")
                                 {
                                     await Bot.SendGroupMessage(e.group_id, "使用魔法卡", msg);
@@ -1071,7 +1091,7 @@ namespace Milimoe.RainBOT.Settings
                         {
                             string characterIdsString = match.Groups["characterIds"].Value;
                             int[] characterIds = characterIdsString != "" ? [.. characterIdsString.Split(chars, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse)] : [1];
-                            string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/useitem2?qq={e.user_id}&name={itemName}&count={count}", System.Text.Json.JsonSerializer.Serialize(characterIds), fungame: true) ?? "").Trim();
+                            string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/useitem2?uid={e.user_id}&name={itemName}&count={count}", System.Text.Json.JsonSerializer.Serialize(characterIds), fungame: true) ?? "").Trim();
                             if (msg != "")
                             {
                                 await Bot.SendGroupMessage(e.group_id, "使用", msg);
@@ -1088,7 +1108,7 @@ namespace Milimoe.RainBOT.Settings
                             {
                                 string characterIdsString = match.Groups["characterIds"].Value;
                                 int[] characterIds = characterIdsString != "" ? [.. characterIdsString.Split(chars, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse)] : [1];
-                                string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/useitem?qq={e.user_id}&id={itemId}", System.Text.Json.JsonSerializer.Serialize(characterIds), fungame: true) ?? "").Trim();
+                                string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/useitem?uid={e.user_id}&id={itemId}", System.Text.Json.JsonSerializer.Serialize(characterIds), fungame: true) ?? "").Trim();
                                 if (msg != "")
                                 {
                                     await Bot.SendGroupMessage(e.group_id, "使用", msg);
@@ -1104,7 +1124,7 @@ namespace Milimoe.RainBOT.Settings
                                 string itemName = match.Groups["itemName"].Value.Trim();
                                 if (int.TryParse(match.Groups["count"].Value, out int count))
                                 {
-                                    string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/useitem2?qq={e.user_id}&name={itemName}&count={count}", fungame: true) ?? "").Trim();
+                                    string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/useitem2?uid={e.user_id}&name={itemName}&count={count}", fungame: true) ?? "").Trim();
                                     if (msg != "")
                                     {
                                         await Bot.SendGroupMessage(e.group_id, "使用", msg);
@@ -1119,7 +1139,7 @@ namespace Milimoe.RainBOT.Settings
                                 {
                                     if (int.TryParse(match.Groups["itemId"].Value, out int itemId))
                                     {
-                                        string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/useitem?qq={e.user_id}&id={itemId}", fungame: true) ?? "").Trim();
+                                        string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/useitem?uid={e.user_id}&id={itemId}", fungame: true) ?? "").Trim();
                                         if (msg != "")
                                         {
                                             await Bot.SendGroupMessage(e.group_id, "使用", msg);
@@ -1145,7 +1165,7 @@ namespace Milimoe.RainBOT.Settings
                         ids.Add(id);
                     }
                 }
-                string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/decomposeitem?qq={e.user_id}", System.Text.Json.JsonSerializer.Serialize(ids), fungame: true) ?? "").Trim();
+                string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/decomposeitem?uid={e.user_id}", System.Text.Json.JsonSerializer.Serialize(ids), fungame: true) ?? "").Trim();
                 if (msg != "")
                 {
                     await Bot.SendGroupMessage(e.group_id, "分解物品", msg);
@@ -1164,7 +1184,7 @@ namespace Milimoe.RainBOT.Settings
                     string itemName = match.Groups["itemName"].Value.Trim();
                     if (int.TryParse(match.Groups["count"].Value, out int count))
                     {
-                        string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/decomposeitem2?qq={e.user_id}&name={itemName}&count={count}", fungame: true) ?? "").Trim();
+                        string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/decomposeitem2?uid={e.user_id}&name={itemName}&count={count}", fungame: true) ?? "").Trim();
                         if (msg != "")
                         {
                             await Bot.SendGroupMessage(e.group_id, "分解", msg);
@@ -1180,7 +1200,7 @@ namespace Milimoe.RainBOT.Settings
                 string detail = e.detail.Replace("品质分解", "").Trim();
                 if (int.TryParse(detail, out int q))
                 {
-                    string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/decomposeitem3?qq={e.user_id}&q={q}", fungame: true) ?? "").Trim();
+                    string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/decomposeitem3?uid={e.user_id}&q={q}", fungame: true) ?? "").Trim();
                     if (msg != "")
                     {
                         await Bot.SendGroupMessage(e.group_id, "品质分解", msg);
@@ -1205,7 +1225,7 @@ namespace Milimoe.RainBOT.Settings
                         {
                             userid = temp;
                         }
-                        string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/createitem?qq={e.user_id}&name={name}&count={count}&target={userid}", fungame: true) ?? "").Trim();
+                        string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/createitem?uid={e.user_id}&name={name}&count={count}&target={userid}", fungame: true) ?? "").Trim();
                         if (msg != "")
                         {
                             await Bot.SendGroupMessage(e.group_id, "熟圣之力", msg);
@@ -1225,11 +1245,11 @@ namespace Milimoe.RainBOT.Settings
                 List<string> msgs = [];
                 if (long.TryParse(detail.Trim(), out long eqq))
                 {
-                    msgs = await Bot.HttpPost<List<string>>($"https://{GeneralSettings.FunGameServer}/fungame/fightcustom?qq={e.user_id}&eqq={eqq}&all=true", fungame: true) ?? [];
+                    msgs = await Bot.HttpPost<List<string>>($"https://{GeneralSettings.FunGameServer}/fungame/fightcustom?uid={e.user_id}&euid={eqq}&all=true", fungame: true) ?? [];
                 }
                 else
                 {
-                    msgs = await Bot.HttpPost<List<string>>($"https://{GeneralSettings.FunGameServer}/fungame/fightcustom2?qq={e.user_id}&name={detail.Trim()}&all=true", fungame: true) ?? [];
+                    msgs = await Bot.HttpPost<List<string>>($"https://{GeneralSettings.FunGameServer}/fungame/fightcustom2?uid={e.user_id}&name={detail.Trim()}&all=true", fungame: true) ?? [];
                 }
                 List<string> real = [];
                 if (msgs.Count >= 2)
@@ -1278,11 +1298,11 @@ namespace Milimoe.RainBOT.Settings
                 List<string> msgs = [];
                 if (long.TryParse(detail.Trim(), out long eqq))
                 {
-                    msgs = await Bot.HttpPost<List<string>>($"https://{GeneralSettings.FunGameServer}/fungame/fightcustom?qq={e.user_id}&eqq={eqq}&all=false", fungame: true) ?? [];
+                    msgs = await Bot.HttpPost<List<string>>($"https://{GeneralSettings.FunGameServer}/fungame/fightcustom?uid={e.user_id}&euid={eqq}&all=false", fungame: true) ?? [];
                 }
                 else
                 {
-                    msgs = await Bot.HttpPost<List<string>>($"https://{GeneralSettings.FunGameServer}/fungame/fightcustom2?qq={e.user_id}&name={detail.Trim()}&all=false", fungame: true) ?? [];
+                    msgs = await Bot.HttpPost<List<string>>($"https://{GeneralSettings.FunGameServer}/fungame/fightcustom2?uid={e.user_id}&name={detail.Trim()}&all=false", fungame: true) ?? [];
                 }
                 List<string> real = [];
                 if (msgs.Count > 2)
@@ -1324,11 +1344,11 @@ namespace Milimoe.RainBOT.Settings
                 List<string> msgs = [];
                 if (long.TryParse(detail.Trim(), out long eqq))
                 {
-                    msgs = await Bot.HttpPost<List<string>>($"https://{GeneralSettings.FunGameServer}/fungame/fightcustomteam?qq={e.user_id}&eqq={eqq}&all=true", fungame: true) ?? [];
+                    msgs = await Bot.HttpPost<List<string>>($"https://{GeneralSettings.FunGameServer}/fungame/fightcustomteam?uid={e.user_id}&euid={eqq}&all=true", fungame: true) ?? [];
                 }
                 else
                 {
-                    msgs = await Bot.HttpPost<List<string>>($"https://{GeneralSettings.FunGameServer}/fungame/fightcustomteam2?qq={e.user_id}&name={detail.Trim()}&all=true", fungame: true) ?? [];
+                    msgs = await Bot.HttpPost<List<string>>($"https://{GeneralSettings.FunGameServer}/fungame/fightcustomteam2?uid={e.user_id}&name={detail.Trim()}&all=true", fungame: true) ?? [];
                 }
                 List<string> real = [];
                 if (msgs.Count >= 3)
@@ -1397,7 +1417,7 @@ namespace Milimoe.RainBOT.Settings
                 List<string> msgs = [];
                 if (int.TryParse(detail.Trim(), out int index))
                 {
-                    msgs = await Bot.HttpPost<List<string>>($"https://{GeneralSettings.FunGameServer}/fungame/fightbossteam?qq={e.user_id}&index={index}&all=true", fungame: true) ?? [];
+                    msgs = await Bot.HttpPost<List<string>>($"https://{GeneralSettings.FunGameServer}/fungame/fightbossteam?uid={e.user_id}&index={index}&all=true", fungame: true) ?? [];
                     List<string> real = [];
                     if (msgs.Count >= 3)
                     {
@@ -1451,7 +1471,7 @@ namespace Milimoe.RainBOT.Settings
                 List<string> msgs = [];
                 if (int.TryParse(detail.Trim(), out int index))
                 {
-                    msgs = await Bot.HttpPost<List<string>>($"https://{GeneralSettings.FunGameServer}/fungame/fightboss?qq={e.user_id}&index={index}&all=true", fungame: true) ?? [];
+                    msgs = await Bot.HttpPost<List<string>>($"https://{GeneralSettings.FunGameServer}/fungame/fightboss?uid={e.user_id}&index={index}&all=true", fungame: true) ?? [];
                     List<string> real = [];
                     if (msgs.Count >= 3)
                     {
@@ -1504,7 +1524,7 @@ namespace Milimoe.RainBOT.Settings
                 string detail = e.detail.Replace("小队添加", "").Trim();
                 if (int.TryParse(detail, out int c))
                 {
-                    string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/addsquad?qq={e.user_id}&c={c}", fungame: true) ?? "").Trim();
+                    string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/addsquad?uid={e.user_id}&c={c}", fungame: true) ?? "").Trim();
                     if (msg != "")
                     {
                         await Bot.SendGroupMessage(e.group_id, "小队", msg);
@@ -1518,7 +1538,7 @@ namespace Milimoe.RainBOT.Settings
                 string detail = e.detail.Replace("小队移除", "").Trim();
                 if (int.TryParse(detail, out int c))
                 {
-                    string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/removesquad?qq={e.user_id}&c={c}", fungame: true) ?? "").Trim();
+                    string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/removesquad?uid={e.user_id}&c={c}", fungame: true) ?? "").Trim();
                     if (msg != "")
                     {
                         await Bot.SendGroupMessage(e.group_id, "小队", msg);
@@ -1539,7 +1559,7 @@ namespace Milimoe.RainBOT.Settings
                         cindexs.Add(c);
                     }
                 }
-                string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/setsquad?qq={e.user_id}", System.Text.Json.JsonSerializer.Serialize(cindexs), fungame: true) ?? "").Trim();
+                string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/setsquad?uid={e.user_id}", System.Text.Json.JsonSerializer.Serialize(cindexs), fungame: true) ?? "").Trim();
                 if (msg != "")
                 {
                     await Bot.SendGroupMessage(e.group_id, "小队", msg);
@@ -1552,7 +1572,7 @@ namespace Milimoe.RainBOT.Settings
                 string detail = e.detail.Replace("加入社团", "").Trim();
                 if (int.TryParse(detail, out int c))
                 {
-                    string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/joinclub?qq={e.user_id}&id={c}", fungame: true) ?? "").Trim();
+                    string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/joinclub?uid={e.user_id}&id={c}", fungame: true) ?? "").Trim();
                     if (msg != "")
                     {
                         await Bot.SendGroupMessage(e.group_id, "社团", msg);
@@ -1570,7 +1590,7 @@ namespace Milimoe.RainBOT.Settings
                     isPublic = false;
                 }
                 detail = detail.Replace("私密", "").Trim();
-                string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/createclub?qq={e.user_id}&public={isPublic}&prefix={detail}", fungame: true) ?? "").Trim();
+                string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/createclub?uid={e.user_id}&public={isPublic}&prefix={detail}", fungame: true) ?? "").Trim();
                 if (msg != "")
                 {
                     await Bot.SendGroupMessage(e.group_id, "社团", msg);
@@ -1580,7 +1600,7 @@ namespace Milimoe.RainBOT.Settings
 
             if (e.detail == "退出社团")
             {
-                string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/quitclub?qq={e.user_id}", "", fungame: true) ?? "").Trim();
+                string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/quitclub?uid={e.user_id}", "", fungame: true) ?? "").Trim();
                 if (msg != "")
                 {
                     await Bot.SendGroupMessageAt(e.user_id, e.group_id, "社团", "\r\n" + msg);
@@ -1590,7 +1610,7 @@ namespace Milimoe.RainBOT.Settings
             
             if (e.detail == "我的社团")
             {
-                string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/showclubinfo?qq={e.user_id}", "", fungame: true) ?? "").Trim();
+                string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/showclubinfo?uid={e.user_id}", "", fungame: true) ?? "").Trim();
                 if (msg != "")
                 {
                     await Bot.SendGroupMessageAt(e.user_id, e.group_id, "社团", "\r\n" + msg);
@@ -1600,7 +1620,7 @@ namespace Milimoe.RainBOT.Settings
 
             if (e.detail == "解散社团")
             {
-                string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/disbandclub?qq={e.user_id}", "", fungame: true) ?? "").Trim();
+                string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/disbandclub?uid={e.user_id}", "", fungame: true) ?? "").Trim();
                 if (msg != "")
                 {
                     await Bot.SendGroupMessageAt(e.user_id, e.group_id, "社团", "\r\n" + msg);
@@ -1610,7 +1630,7 @@ namespace Milimoe.RainBOT.Settings
             
             if (e.detail == "查看社团成员")
             {
-                string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/showclubmemberlist?qq={e.user_id}&type=0", "", fungame: true) ?? "").Trim();
+                string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/showclubmemberlist?uid={e.user_id}&type=0", "", fungame: true) ?? "").Trim();
                 if (msg != "")
                 {
                     await Bot.SendGroupMessageAt(e.user_id, e.group_id, "社团", "\r\n" + msg);
@@ -1620,7 +1640,7 @@ namespace Milimoe.RainBOT.Settings
             
             if (e.detail == "查看社团管理")
             {
-                string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/showclubmemberlist?qq={e.user_id}&type=1", "", fungame: true) ?? "").Trim();
+                string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/showclubmemberlist?uid={e.user_id}&type=1", "", fungame: true) ?? "").Trim();
                 if (msg != "")
                 {
                     await Bot.SendGroupMessageAt(e.user_id, e.group_id, "社团", "\r\n" + msg);
@@ -1630,7 +1650,7 @@ namespace Milimoe.RainBOT.Settings
             
             if (e.detail == "查看申请人列表")
             {
-                string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/showclubmemberlist?qq={e.user_id}&type=2", "", fungame: true) ?? "").Trim();
+                string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/showclubmemberlist?uid={e.user_id}&type=2", "", fungame: true) ?? "").Trim();
                 if (msg != "")
                 {
                     await Bot.SendGroupMessageAt(e.user_id, e.group_id, "社团", "\r\n" + msg);
@@ -1643,7 +1663,7 @@ namespace Milimoe.RainBOT.Settings
                 string detail = e.detail.Replace("社团批准", "").Replace("@", "").Trim();
                 if (long.TryParse(detail, out long id))
                 {
-                    string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/approveclub?qq={e.user_id}&id={id}&approval=true", fungame: true) ?? "").Trim();
+                    string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/approveclub?uid={e.user_id}&id={id}&approval=true", fungame: true) ?? "").Trim();
                     if (msg != "")
                     {
                         await Bot.SendGroupMessage(e.group_id, "社团", msg);
@@ -1657,7 +1677,7 @@ namespace Milimoe.RainBOT.Settings
                 string detail = e.detail.Replace("社团拒绝", "").Replace("@", "").Trim();
                 if (long.TryParse(detail, out long id))
                 {
-                    string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/approveclub?qq={e.user_id}&id={id}&approval=false", fungame: true) ?? "").Trim();
+                    string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/approveclub?uid={e.user_id}&id={id}&approval=false", fungame: true) ?? "").Trim();
                     if (msg != "")
                     {
                         await Bot.SendGroupMessage(e.group_id, "社团", msg);
@@ -1671,7 +1691,7 @@ namespace Milimoe.RainBOT.Settings
                 string detail = e.detail.Replace("社团踢出", "").Replace("@", "").Trim();
                 if (long.TryParse(detail, out long id))
                 {
-                    string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/kickclub?qq={e.user_id}&id={id}", fungame: true) ?? "").Trim();
+                    string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/kickclub?uid={e.user_id}&id={id}", fungame: true) ?? "").Trim();
                     if (msg != "")
                     {
                         await Bot.SendGroupMessage(e.group_id, "社团", msg);
@@ -1703,7 +1723,7 @@ namespace Milimoe.RainBOT.Settings
                     {
                         args = [.. strings[1..]];
                     }
-                    string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/changeclub?qq={e.user_id}&part={part}", System.Text.Json.JsonSerializer.Serialize(args), fungame: true) ?? "").Trim();
+                    string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/changeclub?uid={e.user_id}&part={part}", System.Text.Json.JsonSerializer.Serialize(args), fungame: true) ?? "").Trim();
                     if (msg != "")
                     {
                         await Bot.SendGroupMessage(e.group_id, "社团", msg);
@@ -1716,10 +1736,48 @@ namespace Milimoe.RainBOT.Settings
             {
                 string detail = e.detail.Replace("社团转让", "").Replace("@", "").Trim();
                 List<string> args = [detail];
-                string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/changeclub?qq={e.user_id}&part=setmaster", System.Text.Json.JsonSerializer.Serialize(args), fungame: true) ?? "").Trim();
+                string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/changeclub?uid={e.user_id}&part=setmaster", System.Text.Json.JsonSerializer.Serialize(args), fungame: true) ?? "").Trim();
                 if (msg != "")
                 {
                     await Bot.SendGroupMessage(e.group_id, "社团", msg);
+                }
+                return result;
+            }
+
+            if (e.detail == "每日商店")
+            {
+                string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/showdailystore?uid={e.user_id}", fungame: true) ?? "").Trim();
+                if (msg != "")
+                {
+                    await Bot.SendGroupMessageAt(e.user_id, e.group_id, "商店", "\r\n" + msg);
+                }
+                return result;
+            }
+
+            if (e.detail.StartsWith("商店购买", StringComparison.CurrentCultureIgnoreCase))
+            {
+                string detail = e.detail.Replace("商店购买", "").Trim();
+                if (int.TryParse(detail, out int id))
+                {
+                    string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/dailystorebuy?uid={e.user_id}&id={id}", fungame: true) ?? "").Trim();
+                    if (msg != "")
+                    {
+                        await Bot.SendGroupMessage(e.group_id, "商店", msg);
+                    }
+                }
+                return result;
+            }
+
+            if (e.detail.StartsWith("商店查看", StringComparison.CurrentCultureIgnoreCase))
+            {
+                string detail = e.detail.Replace("商店查看", "").Trim();
+                if (int.TryParse(detail, out int id))
+                {
+                    string msg = (await Bot.HttpPost<string>($"https://{GeneralSettings.FunGameServer}/fungame/dailystoreshowinfo?uid={e.user_id}&id={id}", fungame: true) ?? "").Trim();
+                    if (msg != "")
+                    {
+                        await Bot.SendGroupMessage(e.group_id, "商店", msg);
+                    }
                 }
                 return result;
             }
