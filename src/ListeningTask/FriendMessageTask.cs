@@ -48,8 +48,7 @@ namespace Milimoe.RainBOT.ListeningTask
                     string msg = QQOpenID.Bind(detail, e.user_id);
                     await Bot.SendFriendMessage(e.user_id, "绑定", msg);
                 }
-                
-                if (e.detail.StartsWith("解绑"))
+                else if (e.detail.StartsWith("解绑"))
                 {
                     string detail = e.detail.Replace("解绑", "");
                     string msg = QQOpenID.Unbind(detail, e.user_id);

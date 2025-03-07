@@ -60,8 +60,9 @@ namespace Milimoe.RainBOT.Settings
 
         public static string Unbind(string openid, long qq)
         {
-            if (QQOpenID.QQAndOpenID.TryGetValue(openid, out long bindqq) && bindqq == qq && QQOpenID.QQAndOpenID.Remove(openid))
+            if (QQAndOpenID.TryGetValue(openid, out long bindqq) && bindqq == qq && QQAndOpenID.Remove(openid))
             {
+                SaveConfig();
                 return NetworkUtility.JsonSerialize($"解绑成功！");
             }
 

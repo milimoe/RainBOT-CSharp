@@ -1,6 +1,4 @@
-﻿using System.Text.RegularExpressions;
-using Microsoft.VisualBasic;
-using Milimoe.OneBot.Framework;
+﻿using Milimoe.OneBot.Framework;
 using Milimoe.OneBot.Model.Content;
 using Milimoe.OneBot.Model.Event;
 using Milimoe.OneBot.Model.Message;
@@ -102,7 +100,7 @@ namespace Milimoe.RainBOT.ListeningTask
                     }
                 }
 
-                if (Ignore.CustomIgnore.Any(e.detail.Contains) && Bot.BotIsAdmin(e.group_id))
+                if (e.user_id != GeneralSettings.Master && Ignore.CustomIgnore.Any(e.detail.Contains) && Bot.BotIsAdmin(e.group_id))
                 {
                     await Bot.SendMessage(SupportedAPI.delete_msg, e.group_id, "撤回", new DeleteMsgContent(e.real_id), true);
                     await Bot.SendMessage(SupportedAPI.set_group_ban, e.group_id, "禁言", new SetGroupBanContent(e.group_id, e.user_id, 120), true);
@@ -112,7 +110,19 @@ namespace Milimoe.RainBOT.ListeningTask
                 if (e.detail.Contains("圣人榜"))
                 {
                     if (!await Bot.CheckBlackList(true, e.user_id, e.group_id)) return quick_reply;
-                    _ = OshimaController.Instance.SCList(e.group_id);
+                    _ = OshimaController.Instance.SCList(e.group_id, e.user_id);
+                }
+                
+                if (e.detail.Contains("出生榜"))
+                {
+                    if (!await Bot.CheckBlackList(true, e.user_id, e.group_id)) return quick_reply;
+                    _ = OshimaController.Instance.SCList(e.group_id, e.user_id, true);
+                }
+                
+                if (e.detail.Contains("圣人点数") || e.detail == "查询sc" || e.detail == "sc查询")
+                {
+                    if (!await Bot.CheckBlackList(true, e.user_id, e.group_id)) return quick_reply;
+                    _ = OshimaController.Instance.SCRecord(e.group_id, e.user_id);
                 }
                 
                 if (e.detail == "查询服务器启动时间")
@@ -356,14 +366,17 @@ namespace Milimoe.RainBOT.ListeningTask
                     if (!await Bot.CheckBlackList(true, e.user_id, e.group_id) || !Bot.BotIsAdmin(e.group_id)) return quick_reply;
                     if (e.user_id != GeneralSettings.Master)
                     {
-                        await Bot.SendGroupMessage(e.group_id, "禁言抽奖", "2秒后开奖～\r\n如需要忏悔，请在开奖后3秒内发送忏悔，开奖前发送无效。");
-                        await Task.Delay(2000);
-                        if (!MuteRecall.WillMute.ContainsKey(e.user_id)) MuteRecall.WillMute.Add(e.user_id, e.user_id);
-                        long mute_time = GeneralSettings.MuteTime[0] + new Random().NextInt64(GeneralSettings.MuteTime[1] - GeneralSettings.MuteTime[0]);
-                        await Bot.SendGroupMessage(e.group_id, "禁言抽奖", "开奖啦！禁言时长：" + (mute_time / 60) + "分钟" + (mute_time % 60) + "秒。\r\n" + "你现在有3秒时间发送忏悔拒绝领奖！");
-                        await Task.Delay(3200);
-                        await Bot.SendMessage(SupportedAPI.set_group_ban, e.group_id, "禁言抽奖", new SetGroupBanContent(e.group_id, e.user_id, mute_time), true);
-                        MuteRecall.WillMute.Remove(e.user_id);
+                        _ = Task.Run(async () =>
+                        {
+                            await Bot.SendGroupMessage(e.group_id, "禁言抽奖", "2秒后开奖～\r\n如需要忏悔，请在开奖后3秒内发送忏悔，开奖前发送无效。");
+                            await Task.Delay(2000);
+                            if (!MuteRecall.WillMute.ContainsKey(e.user_id)) MuteRecall.WillMute.Add(e.user_id, e.user_id);
+                            long mute_time = GeneralSettings.MuteTime[0] + new Random().NextInt64(GeneralSettings.MuteTime[1] - GeneralSettings.MuteTime[0]);
+                            await Bot.SendGroupMessage(e.group_id, "禁言抽奖", "开奖啦！禁言时长：" + (mute_time / 60) + "分钟" + (mute_time % 60) + "秒。\r\n" + "你现在有3秒时间发送忏悔拒绝领奖！");
+                            await Task.Delay(3200);
+                            await Bot.SendMessage(SupportedAPI.set_group_ban, e.group_id, "禁言抽奖", new SetGroupBanContent(e.group_id, e.user_id, mute_time), true);
+                            MuteRecall.WillMute.Remove(e.user_id);
+                        });
                     }
                     else
                     {
@@ -375,10 +388,13 @@ namespace Milimoe.RainBOT.ListeningTask
                 else if (GeneralSettings.IsMute && e.detail == "忏悔" && MuteRecall.WillMute.ContainsKey(e.user_id))
                 {
                     if (!await Bot.CheckBlackList(true, e.user_id, e.group_id) || !Bot.BotIsAdmin(e.group_id)) return quick_reply;
-                    await Task.Delay(3800);
-                    MuteRecall.WillMute.Remove(e.user_id);
-                    await Bot.SendMessage(SupportedAPI.set_group_ban, e.group_id, "忏悔", new SetGroupBanContent(e.group_id, e.user_id, 0), true);
-                    await Bot.SendGroupMessage(e.group_id, "忏悔", "忏悔成功！！希望你保持纯真，保持野性的美。");
+                    _ = Task.Run(async () =>
+                    {
+                        await Task.Delay(3800);
+                        MuteRecall.WillMute.Remove(e.user_id);
+                        await Bot.SendMessage(SupportedAPI.set_group_ban, e.group_id, "忏悔", new SetGroupBanContent(e.group_id, e.user_id, 0), true);
+                        await Bot.SendGroupMessage(e.group_id, "忏悔", "忏悔成功！！希望你保持纯真，保持野性的美。");
+                    });
                     return quick_reply;
                 }
 
@@ -457,7 +473,7 @@ namespace Milimoe.RainBOT.ListeningTask
                     if (content.message.Count > 0)
                     {
                         await Bot.SendGroupMessage(e.group_id, "随机反驳不", content);
-                        _ = OshimaController.Instance.SCAdd(e.user_id, e.group_id);
+                        _ = OshimaController.Instance.SCAdd(e.user_id, e.group_id, e.detail);
                     }
                 }
                 else if (SayNo.TriggerBeforeNo.Any(e.detail.Contains) && GeneralSettings.IsSayNo && e.CheckThrow(GeneralSettings.PSayNo, out dice))
@@ -511,7 +527,7 @@ namespace Milimoe.RainBOT.ListeningTask
                     if (content.message.Count > 0)
                     {
                         await Bot.SendGroupMessage(e.group_id, "随机反驳不", content);
-                        _ = OshimaController.Instance.SCAdd(e.user_id, e.group_id);
+                        _ = OshimaController.Instance.SCAdd(e.user_id, e.group_id, e.detail);
                     }
                 }
                 else if (e.detail.Contains("可以") && !e.detail.Contains('不') && e.CheckThrow(GeneralSettings.PSayNo, out dice))
@@ -520,12 +536,12 @@ namespace Milimoe.RainBOT.ListeningTask
                     if (dice < (GeneralSettings.PSayNo / 2))
                     {
                         await Bot.SendGroupMessage(e.group_id, "随机反驳不", "可以");
-                        _ = OshimaController.Instance.SCAdd(e.user_id, e.group_id);
+                        _ = OshimaController.Instance.SCAdd(e.user_id, e.group_id, e.detail);
                     }
                     else
                     {
                         await Bot.SendGroupMessage(e.group_id, "随机反驳不", "不可以");
-                        _ = OshimaController.Instance.SCAdd(e.user_id, e.group_id);
+                        _ = OshimaController.Instance.SCAdd(e.user_id, e.group_id, e.detail);
                     }
                 }
                 else if (e.detail.Contains('能') && !e.detail.Contains('不') && !SayNo.IgnoreTriggerBeforeCan.Any(e.detail.Contains) && e.CheckThrow(GeneralSettings.PSayNo, out dice))
@@ -534,12 +550,12 @@ namespace Milimoe.RainBOT.ListeningTask
                     if (dice < (GeneralSettings.PSayNo / 2))
                     {
                         await Bot.SendGroupMessage(e.group_id, "随机反驳不", "能");
-                        _ = OshimaController.Instance.SCAdd(e.user_id, e.group_id);
+                        _ = OshimaController.Instance.SCAdd(e.user_id, e.group_id, e.detail);
                     }
                     else
                     {
                         await Bot.SendGroupMessage(e.group_id, "随机反驳不", "不能");
-                        _ = OshimaController.Instance.SCAdd(e.user_id, e.group_id);
+                        _ = OshimaController.Instance.SCAdd(e.user_id, e.group_id, e.detail);
                     }
                 }
                 else if (e.detail.Contains("可能") && !e.detail.Contains('不') && e.CheckThrow(GeneralSettings.PSayNo, out dice))
@@ -548,25 +564,25 @@ namespace Milimoe.RainBOT.ListeningTask
                     if (dice < (GeneralSettings.PSayNo / 2))
                     {
                         await Bot.SendGroupMessage(e.group_id, "随机反驳不", "可能");
-                        _ = OshimaController.Instance.SCAdd(e.user_id, e.group_id);
+                        _ = OshimaController.Instance.SCAdd(e.user_id, e.group_id, e.detail);
                     }
                     else
                     {
                         await Bot.SendGroupMessage(e.group_id, "随机反驳不", "不可能");
-                        _ = OshimaController.Instance.SCAdd(e.user_id, e.group_id);
+                        _ = OshimaController.Instance.SCAdd(e.user_id, e.group_id, e.detail);
                     }
                 }
                 else if (e.detail.Contains('要') && !e.detail.Contains('不') && e.CheckThrow(GeneralSettings.PSayNo, out dice))
                 {
                     Bot.ColorfulCheckPass(sender, "随机反驳不", dice, GeneralSettings.PSayNo);
                     await Bot.SendGroupMessage(e.group_id, "随机反驳不", SayNo.SayWantWords[new Random().Next(SayNo.SayWantWords.Count)]);
-                    _ = OshimaController.Instance.SCAdd(e.user_id, e.group_id);
+                    _ = OshimaController.Instance.SCAdd(e.user_id, e.group_id, e.detail);
                 }
                 else if (e.detail.Contains('想') && !e.detail.Contains('不') && e.CheckThrow(GeneralSettings.PSayNo, out dice))
                 {
                     Bot.ColorfulCheckPass(sender, "随机反驳不", dice, GeneralSettings.PSayNo);
                     await Bot.SendGroupMessage(e.group_id, "随机反驳不", SayNo.SayThinkWords[new Random().Next(SayNo.SayThinkWords.Count)]);
-                    _ = OshimaController.Instance.SCAdd(e.user_id, e.group_id);
+                    _ = OshimaController.Instance.SCAdd(e.user_id, e.group_id, e.detail);
                 }
 
                 // 反向艾特
@@ -600,20 +616,20 @@ namespace Milimoe.RainBOT.ListeningTask
                     };
                     content.message.Add(new ImageMessage(img));
                     await Bot.SendGroupMessage(e.group_id, "Image", content);
-                    _ = OshimaController.Instance.SCAdd(e.user_id, e.group_id);
+                    _ = OshimaController.Instance.SCAdd(e.user_id, e.group_id, e.detail);
                     return quick_reply;
                 }
 
                 // 随机复读
-                if (GeneralSettings.IsRepeat && !Ignore.RepeatIgnore.Any(e.detail.Contains) && !Ignore.RepeatQQIgnore.Contains(e.user_id) && e.CheckThrow(GeneralSettings.PRepeat, out dice))
+                if (GeneralSettings.IsRepeat && !Ignore.RepeatIgnore.Any(e.detail.Contains) && !Ignore.RepeatQQIgnore.Contains(e.user_id) && e.CheckThrow(GeneralSettings.PRepeat, out dice) && !GroupRecallTask.Recalls.ContainsKey(e.detail))
                 {
                     // 出现了@at就直接触发复读，没有延迟
                     int delay = e.message.Where(m => m.type == "at").Any() ? 0 : GeneralSettings.RepeatDelay[0] + new Random().Next(GeneralSettings.RepeatDelay[1] - GeneralSettings.RepeatDelay[0]);
                     Bot.ColorfulCheckPass(sender, "随机复读", dice, GeneralSettings.PRepeat, delay);
                     GroupMessageContent content = new(e.group_id);
                     content.message.AddRange(e.message);
-                    await Bot.SendGroupMessage(e.group_id, "随机复读", content, delay * 1000);
-                    _ = OshimaController.Instance.SCAdd(e.user_id, e.group_id);
+                    _ = Bot.SendGroupMessage(e.group_id, "随机复读", content, delay * 1000);
+                    _ = OshimaController.Instance.SCAdd(e.user_id, e.group_id, e.detail);
                     return quick_reply;
                 }
 
@@ -629,7 +645,7 @@ namespace Milimoe.RainBOT.ListeningTask
                         GroupMessageContent content = new(e.group_id);
                         content.message.Add(new AtMessage(e.user_id));
                         int sc = 0;
-                        switch (Random.Shared.Next(4))
+                        switch (Random.Shared.Next(6))
                         {
                             case 0:
                                 content.message.Add(new TextMessage(string.Concat(name.AsSpan(pos, name.Length > 1 ? 2 : name.Length), "哥")));
@@ -642,13 +658,21 @@ namespace Milimoe.RainBOT.ListeningTask
                                 sc = Random.Shared.Next(1, 4);
                                 break;
                             case 3:
+                                content.message.Add(new TextMessage(string.Concat(name.AsSpan(pos, name.Length > 0 ? 1 : name.Length), "亲")));
+                                break;
+                            case 4:
+                                content.message.Add(new TextMessage(string.Concat(name.AsSpan(pos, name.Length > 1 ? 2 : name.Length), "亲")));
+                                break;
+                            case 5:
+                                content.message.Add(new TextMessage(string.Concat("哈基", name.AsSpan(pos, name.Length > 0 ? 1 : name.Length))));
+                                break;
                             default:
                                 content.message.Add(new TextMessage(string.Concat(name.AsSpan(pos, name.Length > 0 ? 1 : name.Length), "出")));
                                 sc = -Random.Shared.Next(1, 4);
                                 break;
                         }
-                        await Bot.SendGroupMessage(e.group_id, "随机叫哥", content, delay * 1000);
-                        _ = OshimaController.Instance.SCAdd(e.user_id, e.group_id, sc);
+                        _ = Bot.SendGroupMessage(e.group_id, "随机叫哥", content, delay * 1000);
+                        _ = OshimaController.Instance.SCAdd(e.user_id, e.group_id, e.detail, sc);
                         return quick_reply;
                     }
                 }

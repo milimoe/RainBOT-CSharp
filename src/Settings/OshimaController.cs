@@ -5,6 +5,7 @@ using Milimoe.FunGame.Core.Library.Common.Network;
 using Milimoe.FunGame.Core.Library.Constant;
 using Milimoe.FunGame.Core.Model;
 using Milimoe.OneBot.Model.Other;
+using Milimoe.RainBOT.ListeningTask;
 
 namespace Milimoe.RainBOT.Settings
 {
@@ -216,30 +217,53 @@ namespace Milimoe.RainBOT.Settings
             }
         }
 
-        public async Task SCAdd(long qq, long groupid, double sc = 0)
+        public async Task SCAdd(long qq, long groupid, string content, double sc = 0)
         {
-            if (HTTPClient != null)
+            if (HTTPClient != null && !GroupRecallTask.Recalls.ContainsKey(content))
             {
                 if (sc == 0)
                 {
                     sc = Random.Shared.Next(-3, 4);
+                    if (sc == 0)
+                    {
+                        return;
+                    }
                 }
                 Dictionary<string, object> data = [];
                 data.Add("command", "scadd");
                 data.Add("qq", qq);
                 data.Add("groupid", groupid);
+                if (content.Length > 8)
+                {
+                    content = content[..8] + "...";
+                }
+                data.Add("content", content);
                 data.Add("sc", sc);
                 await HTTPClient.Send(SocketMessageType.AnonymousGameServer, ServerName, data);
             }
         }
 
-        public async Task SCList(long groupid)
+        public async Task SCList(long groupid, long qq, bool reverse = false)
         {
             if (HTTPClient != null)
             {
                 Dictionary<string, object> data = [];
                 data.Add("command", "sclist");
                 data.Add("groupid", groupid);
+                data.Add("qq", qq);
+                data.Add("reverse", reverse);
+                await HTTPClient.Send(SocketMessageType.AnonymousGameServer, ServerName, data);
+            }
+        }
+
+        public async Task SCRecord(long groupid, long qq)
+        {
+            if (HTTPClient != null)
+            {
+                Dictionary<string, object> data = [];
+                data.Add("command", "screcord");
+                data.Add("groupid", groupid);
+                data.Add("qq", qq);
                 await HTTPClient.Send(SocketMessageType.AnonymousGameServer, ServerName, data);
             }
         }

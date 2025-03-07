@@ -131,6 +131,7 @@ try
     listener.GroupMessageListening += GroupMessageTask.ListeningTask_handler;
     listener.GroupBanNoticeListening += GroupBanTask.ListeningTask_handler;
     listener.FriendMessageListening += FriendMessageTask.ListeningTask_handler;
+    listener.GroupRecallNoticeListening += GroupRecallTask.ListeningTask_handler;
 
     TaskScheduler.Shared.AddTask("发送每日新闻", new TimeSpan(8, 30, 0), async () =>
     {
@@ -197,6 +198,17 @@ try
                 Console.ForegroundColor = ConsoleColor.Magenta;
                 Console.WriteLine("清空所有已下载的图片，释放空间。");
                 Console.ForegroundColor = ConsoleColor.Gray;
+            }
+            // 清除超时的撤回记录
+            DateTime now = DateTime.Now.AddMinutes(-5);
+            List<string> recalls = [.. GroupRecallTask.Recalls.Keys];
+            foreach (string recall in recalls)
+            {
+                DateTime recallTime = GroupRecallTask.Recalls[recall];
+                if (now > recallTime)
+                {
+                    GroupRecallTask.Recalls.Remove(recall);
+                }
             }
         }
         catch (Exception e)

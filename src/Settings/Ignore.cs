@@ -45,6 +45,10 @@ namespace Milimoe.RainBOT.Settings
             {
                 ReverseAtIgnore = (List<long>)value;
             }
+            if (configs.TryGetValue("CustomIgnore", out value) && value != null)
+            {
+                CustomIgnore = new HashSet<string>((List<string>)value);
+            }
         }
 
         public static void SaveConfig()
